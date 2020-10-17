@@ -6,3 +6,5 @@
 - PR should be linked to an issue, this way it will close an issue when it is completed
 - it is recommended for every team member to take part in code review
 - each commit message must start with the issue number it is related to. Example: #6 fixed displaying calendar grid
+
+Sensitive data (accounts, passwords, connection strings, etc.) should not be committed. Every deleloper will use its own configuration file(s).
