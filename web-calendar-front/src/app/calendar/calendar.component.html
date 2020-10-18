@@ -1,0 +1,76 @@
+<div class="row">
+    <nav class="col-lg-3 col-md-4 col-sm-12 navbar-nav">
+        <div class="sticky-top pt-5">
+            <div class="container d-flex align-items-center justify-content-between">
+                <h4 class="sidebar-heading">User name</h4>
+                <button class="btn btn-link btn-sm">User settings</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="d-flex align-items-center justify-content-between">
+                                <span>Calendars</span><button class="btn btn-primary btn-sm">Add</button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td *ngFor="let number of [1,2,3,4,5]" class="d-flex align-items-center justify-content-between">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox{{number}}">
+                                    <label class="form-check-label" for="inlineCheckbox{{number}}">Calendar name {{number}}</label>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-warning btn-sm">Edit</button>
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </nav>
+    <main class="col-lg-9 col-md-8 col-sm-12">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="btn-group">
+                    <div class="btn btn-primary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+                        Previous
+                    </div>
+                    <div class="btn btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+                        Today
+                    </div>
+                    <div class="btn btn-primary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+                        Next
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h3>
+            </div>
+            <div class="col-md-4">
+                <div class="btn-group">
+                    <div class="btn btn-primary" (click)="setView(CalendarView.Month)"
+                        [class.active]="view === CalendarView.Month">
+                        Month
+                    </div>
+                    <div class="btn btn-primary" (click)="setView(CalendarView.Week)"
+                        [class.active]="view === CalendarView.Week">
+                        Week
+                    </div>
+                    <div class="btn btn-primary" (click)="setView(CalendarView.Day)"
+                        [class.active]="view === CalendarView.Day">
+                        Day
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div [ngSwitch]="view">
+            <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"></mwl-calendar-month-view>
+            <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"></mwl-calendar-week-view>
+            <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events"></mwl-calendar-day-view>
+        </div>
+    </main>
+</div>
