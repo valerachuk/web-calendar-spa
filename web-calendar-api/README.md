@@ -1,5 +1,5 @@
 # How to run ?
 - Open "Package Manager Console"
-- Select Default project: "web-calendar-data"
+- Select Default project: "WebCalendar.Data"
 - Run `Update-Database` in "Package Manager Console"
 - Run solution

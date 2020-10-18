@@ -1,16 +1,18 @@
-using AutoMapper;
+  using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using web_calendar_business;
-using web_calendar_business.Domains;
-using web_calendar_data;
-using web_calendar_data.Repositories;
+using WebCalendar.Business;
+using WebCalendar.Business.Domains;
+  using WebCalendar.Business.Domains.Interfaces;
+  using WebCalendar.Data;
+using WebCalendar.Data.Repositories;
+  using WebCalendar.Data.Repositories.Interfaces;
 
-namespace web_calendar_api
+  namespace WebCalendar.Api
 {
   public class Startup
   {

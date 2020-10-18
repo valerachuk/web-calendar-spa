@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace web_calendar_data.Migrations
+namespace WebCalendar.Data.Migrations
 {
     public partial class Initial : Migration
     {

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using web_calendar_business.ViewModels;
-using web_calendar_data.Entities;
+using WebCalendar.Business.ViewModels;
+using WebCalendar.Data.Entities;
 
-namespace web_calendar_business
+namespace WebCalendar.Business
 {
   public class MappingProfile : Profile
   {

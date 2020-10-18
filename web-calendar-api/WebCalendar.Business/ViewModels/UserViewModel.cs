@@ -1,4 +1,4 @@
-﻿namespace web_calendar_business.ViewModels
+﻿namespace WebCalendar.Business.ViewModels
 {
   public class UserViewModel
   {

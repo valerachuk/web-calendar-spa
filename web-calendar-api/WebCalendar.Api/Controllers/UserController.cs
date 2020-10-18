@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using web_calendar_business.Domains;
+using WebCalendar.Business.Domains;
+using WebCalendar.Business.Domains.Interfaces;
 
-namespace web_calendar_api.Controllers
+namespace WebCalendar.Api.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]

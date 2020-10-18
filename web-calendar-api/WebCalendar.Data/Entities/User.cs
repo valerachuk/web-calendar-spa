@@ -1,4 +1,4 @@
-﻿namespace web_calendar_data.Entities
+﻿namespace WebCalendar.Data.Entities
 {
   public class User
   {

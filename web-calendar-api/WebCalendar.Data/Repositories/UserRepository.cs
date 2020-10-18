@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using web_calendar_data.Entities;
+using WebCalendar.Data.Entities;
+using WebCalendar.Data.Repositories.Interfaces;
 
-namespace web_calendar_data.Repositories
+namespace WebCalendar.Data.Repositories
 {
-  public interface IUserRepository
-  {
-    IEnumerable<User> Get();
-  }
-
   public class UserRepository : IUserRepository
   {
     private readonly IWebCalendarDbContext _context;

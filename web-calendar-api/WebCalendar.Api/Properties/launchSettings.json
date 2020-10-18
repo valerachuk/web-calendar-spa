@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "web_calendar_api": {
+    "WebCalendar.Api": {
       "commandName": "Project",
       "launchUrl": "weatherforecast",
       "environmentVariables": {

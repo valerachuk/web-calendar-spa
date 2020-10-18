@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>web_calendar_business</RootNamespace>
+    <RootNamespace>WebCalendar.Business</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\web-calendar-data\web-calendar-data.csproj" />
+    <ProjectReference Include="..\WebCalendar.Data\WebCalendar.Data.csproj" />
   </ItemGroup>
 
 </Project>

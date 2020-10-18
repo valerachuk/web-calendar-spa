@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace web_calendar_api
+namespace WebCalendar.Api
 {
   public class Program
   {

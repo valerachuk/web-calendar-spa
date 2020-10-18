@@ -1,16 +1,13 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using web_calendar_business.ViewModels;
-using web_calendar_data.Entities;
-using web_calendar_data.Repositories;
+using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.ViewModels;
+using WebCalendar.Data.Entities;
+using WebCalendar.Data.Repositories;
+using WebCalendar.Data.Repositories.Interfaces;
 
-namespace web_calendar_business.Domains
+namespace WebCalendar.Business.Domains
 {
-  public interface IUserDomain
-  {
-    IEnumerable<UserViewModel> Get();
-  }
-
   public class UserDomain : IUserDomain
   {
     private readonly IUserRepository _userRepository;

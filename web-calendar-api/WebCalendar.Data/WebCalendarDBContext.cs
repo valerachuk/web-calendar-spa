@@ -1,14 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using web_calendar_data.Entities;
+using WebCalendar.Data.Entities;
 
-namespace web_calendar_data
+namespace WebCalendar.Data
 {
-  public interface IWebCalendarDbContext
-  {
-    DbSet<User> Users { get; set; }
-  }
-
   public class WebCalendarDbContext : DbContext, IWebCalendarDbContext
   {
     public WebCalendarDbContext(DbContextOptions contextOptions) : base(contextOptions)
