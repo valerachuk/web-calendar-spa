@@ -6,5 +6,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
   public interface IUserRepository
   {
     IEnumerable<User> Get();
+    void Create(User user);
   }
 }
