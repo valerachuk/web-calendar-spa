@@ -17,9 +17,6 @@ namespace WebCalendar.Api.Controllers
       _userDomain = userDomain;
     }
 
-    [HttpGet]
-    public IActionResult GetUsers() => Ok(_userDomain.Get());
-
     [HttpGet("id")]
     [Authorize]
     public IActionResult GetId()
@@ -45,15 +42,17 @@ namespace WebCalendar.Api.Controllers
     [HttpPost("sign-up")]
     public IActionResult SignUp(RegisterViewModel register)
     {
-      var id = _userDomain.Register(register);
-      if (id == null)
+
+      if (_userDomain.HasUser(register.Email))
       {
         return Conflict();
       }
 
+      var id = _userDomain.Register(register);
+
       return Ok(new
       {
-        access_token = _userDomain.GenerateJWT((int)id)
+        access_token = _userDomain.GenerateJWT(id)
       });
     }
 

@@ -31,12 +31,9 @@ namespace WebCalendar.Business.Domains
       _authOptions = authOptions;
     }
 
-    public IEnumerable<UserViewModel> Get() =>
-      _mapper.Map<IEnumerable<User>, IEnumerable<UserViewModel>>(_userRepository.Get());
-
     public int? Authenticate(LoginViewModel login)
     {
-      var user = _userRepository.Get().FirstOrDefault(usr => usr.Email == login.Email);
+      var user = _userRepository.GetByEmail(login.Email);
       if (user == null) return null;
 
       var isPasswordValid = ComputePasswordHash(user.Salt, login.Password)
@@ -45,23 +42,17 @@ namespace WebCalendar.Business.Domains
       return isPasswordValid ? user.Id : (int?)null;
     }
 
-    public int? Register(RegisterViewModel register)
+    public int Register(RegisterViewModel register)
     {
       var user = _mapper.Map<User>(register);
       user.Salt = CreateSalt();
       user.PasswordHash = ComputePasswordHash(user.Salt, register.Password);
 
-      try
-      {
-        _userRepository.Create(user);
-        return user.Id;
-      }
-      catch (Microsoft.EntityFrameworkCore.DbUpdateException)
-      {
-        return null;
-      }
-
+      _userRepository.Create(user);
+      return user.Id;
     }
+
+    public bool HasUser(string email) => _userRepository.GetByEmail(email) != null;
 
     private byte[] CreateSalt()
     {

@@ -35,13 +35,9 @@ export class SignUpFormComponent {
     this.authService.signUp(this.form.value)
       .subscribe(
         (token) => {
-          console.log('Logged in, all fine');
-          console.log(token);
           this.router.navigate(['']);
         },
         error => {
-          console.log('Token error');
-          console.log(error);
           if (error.status === 409) {
             this.isEmailExsists = true;
             this.form.enable();

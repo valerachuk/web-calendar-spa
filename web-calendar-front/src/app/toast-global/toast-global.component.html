@@ -1,0 +1,5 @@
+<div class="fixed-top">
+    <ngb-toast *ngFor="let toast of toastService.toasts" [header]="toast.title" [delay]="toast.delay" (hide)="toastService.delete(toast)" class="float-right">
+        {{toast.content}}
+    </ngb-toast>
+</div>

@@ -20,7 +20,6 @@ export class MyIdComponent implements OnInit {
     this.httpClient.get(`${this.apiUrl}/auth/id`)
       .subscribe(id => {
         this.id = +id;
-        console.log(this.id);
       })
   }
 

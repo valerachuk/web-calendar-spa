@@ -10,13 +10,33 @@ namespace WebCalendar.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      modelBuilder
-        .Entity<User>()
+      var userModelBuilder = modelBuilder.Entity<User>();
+
+      userModelBuilder
         .HasIndex(u => u.Email)
         .IsUnique();
 
-      modelBuilder
-        .Entity<User>()
+      userModelBuilder
+        .Property(user => user.Email)
+        .IsRequired();
+
+      userModelBuilder
+        .Property(user => user.FirstName)
+        .IsRequired();
+
+      userModelBuilder
+        .Property(user => user.LastName)
+        .IsRequired();
+
+      userModelBuilder
+        .Property(user => user.PasswordHash)
+        .IsRequired();
+      
+      userModelBuilder
+        .Property(user => user.Salt)
+        .IsRequired();
+
+      userModelBuilder
         .HasData(new[]
         {
           new User

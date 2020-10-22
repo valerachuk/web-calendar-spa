@@ -28,7 +28,6 @@ export class SignInFormComponent {
       return;
     }
 
-    console.log(this.form.value);
     this.form.disable();
 
     this.authService.signIn(this.form.value)
