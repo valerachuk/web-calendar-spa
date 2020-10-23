@@ -19,6 +19,9 @@ namespace WebCalendar.Data.Repositories
     {
       _context.Users.Add(user);
       _context.SaveChanges();
+      Calendar defaultCalendar = new Calendar() { Name = "Default calendar", UserId = user.Id };
+      _context.Calendars.Add(defaultCalendar);
+      _context.SaveChanges();
     }
   }
 }
