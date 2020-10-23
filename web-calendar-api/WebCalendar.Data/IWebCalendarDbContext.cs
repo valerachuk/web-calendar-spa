@@ -6,6 +6,7 @@ namespace WebCalendar.Data
   public interface IWebCalendarDbContext
   {
     DbSet<User> Users { get; set; }
+    DbSet<Calendar> Calendars { get; set; }
 
     int SaveChanges();
   }

@@ -55,8 +55,26 @@ namespace WebCalendar.Data
             PasswordHash = new byte[] {1, 2, 3, 4, 5}, Salt = new byte[] { 1, 2 }
           }
         });
+
+      var calendarModelBuilder = modelBuilder.Entity<Calendar>();
+
+      calendarModelBuilder
+        .Property(calendar => calendar.Name)
+        .IsRequired()
+        .HasMaxLength(100);
+
+      calendarModelBuilder
+        .Property(calendar => calendar.Description)
+        .HasMaxLength(1000);
+
+      calendarModelBuilder
+        .HasOne(calendar => calendar.User)
+        .WithMany(user => user.Calendars)
+        .HasForeignKey(calendar => calendar.UserId)
+        .IsRequired();
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Calendar> Calendars { get; set; }
   }
 }

@@ -1,36 +1,5 @@
 <div class="row">
-    <nav class="col-lg-3 col-md-4 col-sm-12 navbar-nav">
-        <div class="sticky-top pt-5">
-            <div class="container d-flex align-items-center justify-content-between">
-                <h4 class="sidebar-heading">User name</h4>
-                <button class="btn btn-link btn-sm">User settings</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="d-flex align-items-center justify-content-between">
-                                <span>Calendars</span><button class="btn btn-primary btn-sm">Add</button></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td *ngFor="let number of [1,2,3,4,5]" class="d-flex align-items-center justify-content-between">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="inlineCheckbox{{number}}">
-                                    <label class="form-check-label" for="inlineCheckbox{{number}}">Calendar name {{number}}</label>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </nav>
+    <app-calendar-nav class="col-lg-3 col-md-4 col-sm-12"></app-calendar-nav>
     <main class="col-lg-9 col-md-8 col-sm-12">
         <div class="row text-center">
             <div class="col-md-4">
