@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
@@ -14,6 +13,12 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
-    public IEnumerable<User> Get() => _context.Users.ToList();
+    public User GetByEmail(string email) => _context.Users.FirstOrDefault(user => user.Email == email);
+    
+    public void Create(User user)
+    {
+      _context.Users.Add(user);
+      _context.SaveChanges();
+    }
   }
 }

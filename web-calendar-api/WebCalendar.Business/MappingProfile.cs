@@ -9,6 +9,7 @@ namespace WebCalendar.Business
     public MappingProfile()
     {
       CreateMap<User, UserViewModel>();
+      CreateMap<RegisterViewModel, User>();
     }
   }
 }
