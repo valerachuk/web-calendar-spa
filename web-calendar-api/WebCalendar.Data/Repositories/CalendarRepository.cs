@@ -14,9 +14,9 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
-    public IEnumerable<Calendar> GetUserCalendars(int UserId)
+    public IEnumerable<Calendar> GetUserCalendars(int userId)
     {
-      return _context.Calendars.Where(calendar => calendar.UserId == UserId).ToList();
+      return _context.Calendars.Where(calendar => calendar.UserId == userId).ToList();
     }
 
     public int AddCalendar(Calendar calendar)

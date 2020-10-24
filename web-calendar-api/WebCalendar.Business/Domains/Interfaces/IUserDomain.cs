@@ -8,5 +8,6 @@ namespace WebCalendar.Business.Domains.Interfaces
     int Register(RegisterViewModel login);
     bool HasUser(string email);
     string GenerateJWT(int userId);
+    UserViewModel GetUser(int id);
   }
 }

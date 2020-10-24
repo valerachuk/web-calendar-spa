@@ -1,7 +1,7 @@
 <nav class="navbar-nav h-100">
     <div class="sticky-top pt-5">
         <div class="container d-flex align-items-center justify-content-between">
-            <h4 class="sidebar-heading">User name</h4>
+            <h4 class="sidebar-heading">{{userName}}</h4>
             <button class="btn btn-link btn-sm">User settings</button>
         </div>
         <div class="table-responsive">
@@ -43,18 +43,23 @@
           <div class="form-group" >
             <label for="newCalendarName">Calendar name</label>
             <input type="text" class="form-control" name="calendarName" 
-            [class.is-invalid]="addCalendarForm.get('newCalendarName').invalid && addCalendarForm.get('newCalendarName').touched"
-            [class.is-valid]="addCalendarForm.get('newCalendarName').valid && addCalendarForm.get('newCalendarName').touched"
-            [formControl]="addCalendarForm.get('newCalendarName')" id="newCalendarName" placeholder="New calendar">            
+            [class.is-invalid]="calendarName.invalid && calendarName.touched"
+            [class.is-valid]="calendarName.valid && calendarName.touched"
+            [formControl]="calendarName" placeholder="New calendar">            
           </div>
           <div class="form-group">
             <label for="newCalendarDesc">Description</label>
-            <textarea class="form-control" name="newCalendarDesc"
-            [formControl]="addCalendarForm.get('newCalendarDesc')" id="newCalendarDesc" placeholder="Your text" cols="20" rows="5"></textarea>
+            <textarea class="form-control" name="calendarDesc"
+            [class.is-invalid]="calendarDesc.invalid && calendarDesc.touched"
+            [class.is-valid]="calendarDesc.valid && calendarDesc.touched"
+            [formControl]="calendarDesc" placeholder="Your text" cols="20" rows="5"></textarea>
           </div>
       </form>
       <div *ngIf="addedNewCalendar" class="alert alert-success mb-0">
         Added new calendar!
+      </div>
+      <div *ngIf="errors.length > 0" class="alert alert-danger mb-0">
+        {{errors.toString()}}
       </div>
     </div>
     <div class="modal-footer">

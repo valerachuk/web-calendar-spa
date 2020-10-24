@@ -10,14 +10,17 @@ import { Calendar } from '../interfaces/calendar.interface';
   styleUrls: ['./calendar-nav.component.css']
 })
 export class CalendarNavComponent implements OnInit {
-  public userId: number;
   public calendars: Calendar[];
+  public userName = localStorage.getItem('firstName');
 
   public addCalendarForm = new FormGroup({
-    newCalendarName: new FormControl(null, Validators.required),
-    newCalendarDesc: new FormControl(null)
+    newCalendarName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+    newCalendarDesc: new FormControl(null, Validators.maxLength(1000))
   });
   public addedNewCalendar = false;
+  public errors = [];
+  calendarName = this.addCalendarForm.get('newCalendarName');
+  calendarDesc = this.addCalendarForm.get('newCalendarDesc');
 
   constructor(
     private modalService: NgbModal,
@@ -25,7 +28,7 @@ export class CalendarNavComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.calendarService.get().subscribe(data => {
+    this.calendarService.get(Number(localStorage.getItem('userId'))).subscribe(data => {
       this.calendars = data;
     });
   }
@@ -44,11 +47,16 @@ export class CalendarNavComponent implements OnInit {
       id: 0,
       name: this.addCalendarForm.value.newCalendarName,
       description: this.addCalendarForm.value.newCalendarDesc,
-      userId: this.calendarService.userId
+      userId: Number(localStorage.getItem('userId'))
     }
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
       this.calendars.push(calendar);
       this.addedNewCalendar = true;
+      setTimeout(()=> this.addedNewCalendar = false, 2500);
+    }, err => {
+      if(err.status == 400)
+        this.errors.push("Error code 400, calendar not added");
+    },() => { 
       this.addCalendarForm.reset();
       this.addCalendarForm.enable();
     });

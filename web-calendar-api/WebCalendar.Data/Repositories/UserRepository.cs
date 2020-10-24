@@ -14,6 +14,8 @@ namespace WebCalendar.Data.Repositories
     }
 
     public User GetByEmail(string email) => _context.Users.FirstOrDefault(user => user.Email == email);
+
+    public User GetUser(int id) => _context.Users.Find(id);
     
     public void Create(User user)
     {

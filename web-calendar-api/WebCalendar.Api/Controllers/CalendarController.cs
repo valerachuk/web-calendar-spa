@@ -9,28 +9,23 @@ namespace WebCalendar.Api.Controllers
   [ApiController]
   public class CalendarController : ControllerBase
   {
-    private readonly ICalendarDomain _CaDomain;
+    private readonly ICalendarDomain _caDomain;
 
     public CalendarController(ICalendarDomain calendarDomain)
     {
-      _CaDomain = calendarDomain;
+      _caDomain = calendarDomain;
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetUserCalendars(int id) => Ok(_CaDomain.GetUserCalendars(id));
+    public IActionResult GetUserCalendars(int id) => Ok(_caDomain.GetUserCalendars(id));
 
     [HttpPost]
     public IActionResult AddCalendar(CalendarViewModel calendar)
     {
-      if (string.IsNullOrEmpty(calendar.Name))
-        ModelState.AddModelError("Name", "Wrong calendar name");
-      else if (calendar.UserId <= 0)
-        ModelState.AddModelError("UserId", "UserId is required");
-
       if (!ModelState.IsValid)
         return BadRequest(ModelState);
 
-      int id = _CaDomain.AddCalendar(calendar);
+      int id = _caDomain.AddCalendar(calendar);
       if (id > 0)
       {
         calendar.Id = id;
