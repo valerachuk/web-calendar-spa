@@ -5,9 +5,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Token } from '../interfaces/token.interface';
 import { Login } from '../interfaces/login.interface';
 import { Register } from '../interfaces/register.interface';
+import { SignInfo } from '../interfaces/signInfo.interface';
 
 export const ACCESS_TOKEN_KEY = 'access_token';
 
@@ -24,20 +24,24 @@ export class AuthService {
     private jwtHelper: JwtHelperService
   ) { }
 
-  public signIn(login: Login): Observable<Token> {
-    return this.httpClient.post<Token>(`${this.apiUrl}/auth/sign-in`, login)
+  public signIn(login: Login): Observable<SignInfo> {
+    return this.httpClient.post<SignInfo>(`${this.apiUrl}/auth/sign-in`, login)
     .pipe(
-      tap(token => {
-        localStorage.setItem(ACCESS_TOKEN_KEY, token.access_token);
+      tap(info => {
+        localStorage.setItem(ACCESS_TOKEN_KEY, info.access_token);
+        localStorage.setItem('userId', info.userId.toString());
+        localStorage.setItem('firstName', info.firstName);
       })
     );
   }
 
-  public signUp(register: Register): Observable<Token> {
-    return this.httpClient.post<Token>(`${this.apiUrl}/auth/sign-up`, register)
+  public signUp(register: Register): Observable<SignInfo> {
+    return this.httpClient.post<SignInfo>(`${this.apiUrl}/auth/sign-up`, register)
     .pipe(
-      tap(token => {
-        localStorage.setItem(ACCESS_TOKEN_KEY, token.access_token);
+      tap(info => {
+        localStorage.setItem(ACCESS_TOKEN_KEY, info.access_token);
+        localStorage.setItem('userId', info.userId.toString());
+        localStorage.setItem('firstName', info.firstName);
       })
     );
   }
@@ -49,6 +53,8 @@ export class AuthService {
 
   public signOut(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem('userId');
+    localStorage.removeItem('firstName');
     this.router.navigate(['auth']);
   }
 

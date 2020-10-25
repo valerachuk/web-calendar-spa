@@ -85,5 +85,7 @@ namespace WebCalendar.Business.Domains
 
       return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public UserViewModel GetUser(int id) => _mapper.Map<User, UserViewModel > (_userRepository.GetUser(id));
   }
 }

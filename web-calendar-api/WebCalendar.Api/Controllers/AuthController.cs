@@ -33,9 +33,15 @@ namespace WebCalendar.Api.Controllers
         return UnprocessableEntity();
       }
 
+      var userDomain = _userDomain.GetUser((int)id);
+
       return Ok(new
       {
-        access_token = _userDomain.GenerateJWT((int)id)
+        access_token = _userDomain.GenerateJWT((int)id),
+        userId = id,
+        firstName = userDomain.FirstName,
+        lastName = userDomain.LastName,
+        email = userDomain.Email
       });
     }
 
@@ -50,9 +56,15 @@ namespace WebCalendar.Api.Controllers
 
       var id = _userDomain.Register(register);
 
+      var userDomain = _userDomain.GetUser((int)id);
+
       return Ok(new
       {
-        access_token = _userDomain.GenerateJWT(id)
+        access_token = _userDomain.GenerateJWT(id),
+        userId = id,
+        firstName = userDomain.FirstName,
+        lastName = userDomain.LastName,
+        email = userDomain.Email
       });
     }
 

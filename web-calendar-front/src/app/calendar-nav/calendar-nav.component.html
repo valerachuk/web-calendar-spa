@@ -1,0 +1,69 @@
+<nav class="navbar-nav h-100">
+    <div class="sticky-top pt-5">
+        <div class="container d-flex align-items-center justify-content-between">
+            <h4 class="sidebar-heading">{{userName}}</h4>
+            <button class="btn btn-link btn-sm">User settings</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="d-flex align-items-center justify-content-between">
+                            <span>Calendars</span><button (click)="openModal(content)" class="btn btn-primary btn-sm">Add</button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td *ngFor="let calendar of calendars" class="d-flex align-items-center justify-content-between">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox{{calendar.id}}">
+                                <label class="form-check-label" for="inlineCheckbox{{calendar.id}}">{{calendar.name}}</label>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-warning btn-sm">Edit</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</nav>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Add new calendar</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.close()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="addCalendarForm" (submit)="addCalendar()" id="addCalendarForm">
+          <div class="form-group" >
+            <label for="newCalendarName">Calendar name</label>
+            <input type="text" class="form-control" name="calendarName" 
+            [class.is-invalid]="calendarName.invalid && calendarName.touched"
+            [class.is-valid]="calendarName.valid && calendarName.touched"
+            [formControl]="calendarName" placeholder="New calendar">            
+          </div>
+          <div class="form-group">
+            <label for="newCalendarDesc">Description</label>
+            <textarea class="form-control" name="calendarDesc"
+            [class.is-invalid]="calendarDesc.invalid && calendarDesc.touched"
+            [class.is-valid]="calendarDesc.valid && calendarDesc.touched"
+            [formControl]="calendarDesc" placeholder="Your text" cols="20" rows="5"></textarea>
+          </div>
+      </form>
+      <div *ngIf="addedNewCalendar" class="alert alert-success mb-0">
+        Added new calendar!
+      </div>
+      <div *ngIf="errors.length > 0" class="alert alert-danger mb-0">
+        {{errors.toString()}}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" form="addCalendarForm" class="btn btn-primary" [disabled]="addCalendarForm.disabled" ngbAutofocus>Save</button>
+      <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    </div>
+</ng-template>

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201023122932_Calendar")]
+    partial class Calendar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
