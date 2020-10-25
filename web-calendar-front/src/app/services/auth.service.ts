@@ -17,20 +17,31 @@ export const ACCESS_TOKEN_KEY = 'access_token';
 export class AuthService {
 
   private apiUrl = environment.apiUrl;
-
+  public userId: number;
+  public firstName: string;
+  
   constructor(
     private httpClient: HttpClient,
     private router: Router,
     private jwtHelper: JwtHelperService
-  ) { }
+  ) { 
+    this.userId = (localStorage.getItem('userId') !== null) ? Number(localStorage.getItem('userId')) : undefined; 
+    this.firstName = (localStorage.getItem('firstName') !== null) ? localStorage.getItem('firstName') : undefined; 
+  }
+
+  private initStorageInfo(info) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, info.access_token);
+    localStorage.setItem('userId', info.userId.toString());
+    localStorage.setItem('firstName', info.firstName);
+    this.userId = info.userId;
+    this.firstName = info.firstName;
+  }
 
   public signIn(login: Login): Observable<SignInfo> {
     return this.httpClient.post<SignInfo>(`${this.apiUrl}/auth/sign-in`, login)
     .pipe(
       tap(info => {
-        localStorage.setItem(ACCESS_TOKEN_KEY, info.access_token);
-        localStorage.setItem('userId', info.userId.toString());
-        localStorage.setItem('firstName', info.firstName);
+        this.initStorageInfo(info);
       })
     );
   }
@@ -39,9 +50,7 @@ export class AuthService {
     return this.httpClient.post<SignInfo>(`${this.apiUrl}/auth/sign-up`, register)
     .pipe(
       tap(info => {
-        localStorage.setItem(ACCESS_TOKEN_KEY, info.access_token);
-        localStorage.setItem('userId', info.userId.toString());
-        localStorage.setItem('firstName', info.firstName);
+        this.initStorageInfo(info);
       })
     );
   }

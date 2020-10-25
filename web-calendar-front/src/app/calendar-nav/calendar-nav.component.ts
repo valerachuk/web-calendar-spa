@@ -3,6 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CalendarService } from '../services/calendar.service';
 import { Calendar } from '../interfaces/calendar.interface';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-calendar-nav',
@@ -11,7 +12,7 @@ import { Calendar } from '../interfaces/calendar.interface';
 })
 export class CalendarNavComponent implements OnInit {
   public calendars: Calendar[];
-  public userName = localStorage.getItem('firstName');
+  public userName = this.authService.firstName;
 
   public addCalendarForm = new FormGroup({
     newCalendarName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
@@ -24,11 +25,12 @@ export class CalendarNavComponent implements OnInit {
 
   constructor(
     private modalService: NgbModal,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    this.calendarService.get(Number(localStorage.getItem('userId'))).subscribe(data => {
+    this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
     });
   }
@@ -47,7 +49,7 @@ export class CalendarNavComponent implements OnInit {
       id: 0,
       name: this.addCalendarForm.value.newCalendarName,
       description: this.addCalendarForm.value.newCalendarDesc,
-      userId: Number(localStorage.getItem('userId'))
+      userId: this.authService.userId
     }
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
       this.calendars.push(calendar);

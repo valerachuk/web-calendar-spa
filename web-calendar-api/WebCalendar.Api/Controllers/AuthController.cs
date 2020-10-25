@@ -24,39 +24,9 @@ namespace WebCalendar.Api.Controllers
       return Ok(User.GetId());
     }
 
-    [HttpPost("sign-in")]
-    public IActionResult SignIn(LoginViewModel login)
-    {
-      var id = _userDomain.Authenticate(login);
-      if (id == null)
-      {
-        return UnprocessableEntity();
-      }
-
-      var userDomain = _userDomain.GetUser((int)id);
-
-      return Ok(new
-      {
-        access_token = _userDomain.GenerateJWT((int)id),
-        userId = id,
-        firstName = userDomain.FirstName,
-        lastName = userDomain.LastName,
-        email = userDomain.Email
-      });
-    }
-
-    [HttpPost("sign-up")]
-    public IActionResult SignUp(RegisterViewModel register)
-    {
-
-      if (_userDomain.HasUser(register.Email))
-      {
-        return Conflict();
-      }
-
-      var id = _userDomain.Register(register);
-
-      var userDomain = _userDomain.GetUser((int)id);
+    private IActionResult GenerateUserInfo(int id)
+		{
+      var userDomain = _userDomain.GetUser(id);
 
       return Ok(new
       {
@@ -66,6 +36,31 @@ namespace WebCalendar.Api.Controllers
         lastName = userDomain.LastName,
         email = userDomain.Email
       });
+    }
+
+    [HttpPost("sign-in")]
+    public IActionResult SignIn(LoginViewModel login)
+    {
+      var id = _userDomain.Authenticate(login);
+      if (id == null)
+      {
+        return UnprocessableEntity();
+      }
+
+      return GenerateUserInfo((int)id);
+    }
+
+    [HttpPost("sign-up")]
+    public IActionResult SignUp(RegisterViewModel register)
+    {
+      if (_userDomain.HasUser(register.Email))
+      {
+        return Conflict();
+      }
+
+      var id = _userDomain.Register(register);
+
+      return GenerateUserInfo(id);
     }
 
   }
