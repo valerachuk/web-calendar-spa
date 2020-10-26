@@ -25,5 +25,7 @@ namespace WebCalendar.Business.Domains
     {
       return _caRepository.AddCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendar));
     }
+
+    public bool DeleteCalendar(int id) => _caRepository.DeleteCalendar(id);
   }
 }

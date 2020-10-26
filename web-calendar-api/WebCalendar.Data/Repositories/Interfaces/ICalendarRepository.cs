@@ -7,5 +7,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
   {
     IEnumerable<Calendar> GetUserCalendars(int userId);
     int AddCalendar(Calendar calendar);
+    bool DeleteCalendar(int id);
   }
 }

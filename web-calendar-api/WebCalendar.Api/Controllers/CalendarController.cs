@@ -35,5 +35,14 @@ namespace WebCalendar.Api.Controllers
       return BadRequest();
     }
 
+    [HttpDelete("{id}")]
+    public IActionResult DeleteCalendar(int id)
+		{
+      if (_caDomain.DeleteCalendar(id))
+        return Ok(id);
+
+      return BadRequest();
+		}
+
   }
 }
