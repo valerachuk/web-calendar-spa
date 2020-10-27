@@ -39,15 +39,12 @@ namespace WebCalendar.Api.Controllers
 
     [HttpDelete("{id}")]
     public IActionResult DeleteCalendar(int id)
-		{
-      if (_caDomain.GetUserCalendars(User.GetId()).Any(calendar => calendar.Id == id))
-        return Forbid();
-
-      if (_caDomain.DeleteCalendar(id))
+    {
+      if (_caDomain.DeleteCalendar(id, User.GetId()))
         return Ok(id);
 
       return BadRequest();
-		}
+    }
 
   }
 }
