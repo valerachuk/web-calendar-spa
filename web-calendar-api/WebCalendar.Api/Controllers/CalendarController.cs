@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
@@ -38,6 +40,9 @@ namespace WebCalendar.Api.Controllers
     [HttpDelete("{id}")]
     public IActionResult DeleteCalendar(int id)
 		{
+      if (_caDomain.GetUserCalendars(User.GetId()).Any(calendar => calendar.Id == id))
+        return Forbid();
+
       if (_caDomain.DeleteCalendar(id))
         return Ok(id);
 

@@ -56,8 +56,13 @@ export class CalendarNavComponent implements OnInit {
 
   deleteCalendar(id: number) {
     this.calendarService.delete(id).subscribe(id => {
-      let index = this.calendars.findIndex(calendar => calendar.id == id);
+      let index = this.calendars.findIndex(calendar => calendar.id === id);
       this.calendars.splice(index, 1);
+    }, err => {
+      if(err.status === 403) {
+        this.isCalendarOwner = false;
+        this.openModal(this.deleteModal, 'sm');
+      }
     });
   }
 
