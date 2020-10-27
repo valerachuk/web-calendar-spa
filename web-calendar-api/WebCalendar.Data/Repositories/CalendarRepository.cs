@@ -27,9 +27,9 @@ namespace WebCalendar.Data.Repositories
     }
 
     public bool DeleteCalendar(int id)
-		{
+    {
       _context.Calendars.Remove(_context.Calendars.Find(id));
       return _context.SaveChanges() > 0;
-		}
+    }
   }
 }
