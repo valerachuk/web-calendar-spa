@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CalendarService } from '../services/calendar.service';
@@ -11,6 +11,10 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./calendar-nav.component.css']
 })
 export class CalendarNavComponent implements OnInit {
+  @ViewChild('delCalendar') deleteModal: any;
+  isCalendarOwner: boolean;
+  deleteCalendarId: number;
+
   public calendars: Calendar[];
   public userName = this.authService.firstName;
 
@@ -35,8 +39,31 @@ export class CalendarNavComponent implements OnInit {
     });
   }
 
-  openModal(content) {
-   this.modalService.open(content, { centered: true });
+  openModal(content, mdSize) {
+    this.modalService.open(content, { centered: true, size: mdSize});
+   }
+
+  confirmDeleteCalendar(calendarId: number) {
+    if(this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
+      this.isCalendarOwner = false;
+      this.openModal(this.deleteModal, 'sm');
+      return;
+    }
+    this.isCalendarOwner = true;
+    this.deleteCalendarId = calendarId;
+    this.openModal(this.deleteModal, 'sm');
+  }
+
+  deleteCalendar(id: number) {
+    this.calendarService.delete(id).subscribe(id => {
+      let index = this.calendars.findIndex(calendar => calendar.id === id);
+      this.calendars.splice(index, 1);
+    }, err => {
+      if(err.status === 403) {
+        this.isCalendarOwner = false;
+        this.openModal(this.deleteModal, 'sm');
+      }
+    });
   }
 
   addCalendar(){

@@ -19,11 +19,19 @@ namespace WebCalendar.Data.Repositories
       return _context.Calendars.Where(calendar => calendar.UserId == userId).ToList();
     }
 
+    public Calendar GetCalendar(int id) => _context.Calendars.Find(id);
+
     public int AddCalendar(Calendar calendar)
     {
       _context.Calendars.Add(calendar);
       _context.SaveChanges();
       return calendar.Id;
+    }
+
+    public bool DeleteCalendar(int id)
+    {
+      _context.Calendars.Remove(_context.Calendars.Find(id));
+      return _context.SaveChanges() > 0;
     }
   }
 }
