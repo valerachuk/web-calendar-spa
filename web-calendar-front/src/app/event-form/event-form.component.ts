@@ -114,6 +114,6 @@ export class EventFormComponent implements OnInit {
           this.dateTimeInit();
           this.eventForm.enable();
         });
-        this.error = null;
+    this.error = null;
   }
 }

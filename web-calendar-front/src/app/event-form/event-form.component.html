@@ -11,8 +11,8 @@
         <div class="form-group">
           <label for="eventName">Name</label>
           <span class="text-danger">*</span>
-          <input type="text" class="form-control" formControlName="eventName" name="eventName"
-            placeholder="New Event" [(ngModel)]="calendarEvent.name"
+          <input type="text" class="form-control" formControlName="eventName" name="eventName" placeholder="New Event"
+            [(ngModel)]="calendarEvent.name"
             [class.is-invalid]="eventForm.controls['eventName'].invalid && eventForm.controls['eventName'].touched" />
           <small class="form-text text-danger"
             *ngIf="eventForm.getError('required', 'eventName') && eventForm.get('eventName').touched">
@@ -43,8 +43,8 @@
         <span class="text-danger">*</span>
         <div class="input-group mb-3">
           <input class="form-control" formControlName="eventStartDate" name="eventStartDate" [(ngModel)]="startDate"
-            ngbDatepicker #startdate="ngbDatepicker" 
-            [class.danger-input]="eventForm.controls['eventStartDate'].invalid && eventForm.controls['eventStartDate'].touched"/>
+            ngbDatepicker #startdate="ngbDatepicker"
+            [class.danger-input]="eventForm.controls['eventStartDate'].invalid && eventForm.controls['eventStartDate'].touched" />
           <div class="input-group-append">
             <button class="btn btn-outline-secondary calendar" (click)="startdate.toggle()" type="button"></button>
           </div>
@@ -58,8 +58,7 @@
         </ngb-timepicker>
       </div>
     </div>
-    <small class="form-text text-danger"
-      *ngIf="eventForm.getError('required', 'eventStartDate') && eventForm.get('eventStartDate').touched ||
+    <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventStartDate') && eventForm.get('eventStartDate').touched ||
       eventForm.getError('required', 'eventStartTime') && eventForm.get('eventStartTime').touched">
       Start date and time are required
     </small>
@@ -69,8 +68,8 @@
         <span class="text-danger">*</span>
         <div class="input-group mb-3">
           <input class="form-control" formControlName="eventEndDate" name="eventEndDate" [(ngModel)]="endDate"
-            ngbDatepicker #enddate="ngbDatepicker" 
-            [class.danger-input]="eventForm.controls['eventEndDate'].invalid && eventForm.controls['eventEndDate'].touched"/>
+            ngbDatepicker #enddate="ngbDatepicker"
+            [class.danger-input]="eventForm.controls['eventEndDate'].invalid && eventForm.controls['eventEndDate'].touched" />
           <div class="input-group-append">
             <button class="btn btn-outline-secondary calendar" (click)="enddate.toggle()" type="button"></button>
           </div>
@@ -84,8 +83,7 @@
         </ngb-timepicker>
       </div>
     </div>
-    <small class="form-text text-danger"
-      *ngIf="eventForm.getError('required', 'eventEndDate') && eventForm.get('eventEndDate').touched ||
+    <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventEndDate') && eventForm.get('eventEndDate').touched ||
       eventForm.getError('required', 'eventEndTime') && eventForm.get('eventEndTime').touched">
       End date and time are required
     </small>

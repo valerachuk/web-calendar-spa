@@ -1,12 +1,12 @@
 export interface CalendarEvent {
   id: number;
   name: string;
-  venue: string| null;
+  venue: string | null;
   calendarId: number;
   startDateTime: string;
   endDateTime: string;
-  notificationTime: NotificationTime| null;
-  reiteration: Reiteration| null;
+  notificationTime: NotificationTime | null;
+  reiteration: Reiteration | null;
 }
 
 export enum NotificationTime {

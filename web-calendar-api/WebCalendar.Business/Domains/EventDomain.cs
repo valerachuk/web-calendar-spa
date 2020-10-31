@@ -1,22 +1,19 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
-namespace WebCalendar.Business.Domains.Interfaces
+namespace WebCalendar.Business.Domains
 {
   public class EventDomain : IEventDomain
   {
     private readonly IEventRepository _evRepository;
-    private readonly IMapper _mapper;
 
     public EventDomain(IEventRepository eventRepository, IMapper mapper)
     {
       _evRepository = eventRepository;
-      _mapper = mapper;
     }
 
     public void AddCalendarEvent(EventViewModel calendarEvent)
@@ -33,8 +30,8 @@ namespace WebCalendar.Business.Domains.Interfaces
         StartDateTime = calendarEvent.StartDateTime,
         EndDateTime = calendarEvent.EndDateTime,
         Venue = calendarEvent.Venue,
-        NotificationTime = (NotificationTime?)calendarEvent.NotificationTime,
-        Reiteration = (Reiteration?)calendarEvent.Reiteration,
+        NotificationTime = calendarEvent.NotificationTime,
+        Reiteration = calendarEvent.Reiteration,
         CalendarId = calendarEvent.CalendarId
       };
 
@@ -43,6 +40,7 @@ namespace WebCalendar.Business.Domains.Interfaces
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
     {
+      var generatedEvents = new List<Event>();
       int eventRepetitionsNumber = calendarEvent.Reiteration != null ? 365 / (int)calendarEvent.Reiteration : -1;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
 
@@ -55,13 +53,14 @@ namespace WebCalendar.Business.Domains.Interfaces
           StartDateTime = calendarEvent.StartDateTime.AddDays(i),
           EndDateTime = calendarEvent.EndDateTime.AddDays(i),
           Venue = calendarEvent.Venue,
-          NotificationTime = (NotificationTime?)calendarEvent.NotificationTime,
-          Reiteration = (Reiteration?)calendarEvent.Reiteration,
+          NotificationTime = calendarEvent.NotificationTime,
+          Reiteration = calendarEvent.Reiteration,
           CalendarId = calendarEvent.CalendarId,
           SeriesId = seriesId
         };
-        _evRepository.AddSeriesOfCalendarEvents(newCalendarEvent, seriesId);
+        generatedEvents.Add(newCalendarEvent);
       }
+      _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
   }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+using WebCalendar.Constants.Enums;
 
 namespace WebCalendar.Business.ViewModels
 {
@@ -19,21 +18,7 @@ namespace WebCalendar.Business.ViewModels
     public DateTime EndDateTime { get; set; }
     [StringLength(100, ErrorMessage = "Venue can't be longer than 100 characters.")]
     public string Venue { get; set; }
-    public NotificationTimeViewModel? NotificationTime { get; set; }
-    public ReiterationViewModel? Reiteration { get; set; }
-  }
-
-  public enum NotificationTimeViewModel
-  {
-    In10Minutes = 10,
-    In15Minutes = 15,
-    In30Minutes = 30,
-    In1Hour = 60
-  }
-
-  public enum ReiterationViewModel
-  {
-    Daily = 1,
-    Weekly = 7
+    public NotificationTime? NotificationTime { get; set; }
+    public Reiteration? Reiteration { get; set; }
   }
 }

@@ -43,7 +43,7 @@ function tokenGetter(): string {
     EventFormComponent
   ],
   exports: [EventFormComponent],
-  entryComponents:[EventFormComponent],
+  entryComponents: [EventFormComponent],
   imports: [
     BrowserModule,
     FormsModule,

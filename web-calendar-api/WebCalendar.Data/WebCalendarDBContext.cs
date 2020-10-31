@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
 using WebCalendar.Data.Entities;
 
 namespace WebCalendar.Data
