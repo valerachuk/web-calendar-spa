@@ -19,6 +19,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/moment';
 import * as moment from 'moment';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
+import { EventFormComponent } from './event-form/event-form.component';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -38,8 +39,11 @@ function tokenGetter(): string {
     MyIdComponent,
     CalendarComponent,
     ToastGlobalComponent,
-    CalendarNavComponent
+    CalendarNavComponent,
+    EventFormComponent
   ],
+  exports: [EventFormComponent],
+  entryComponents:[EventFormComponent],
   imports: [
     BrowserModule,
     FormsModule,

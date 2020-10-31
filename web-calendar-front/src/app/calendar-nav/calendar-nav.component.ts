@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CalendarService } from '../services/calendar.service';
 import { Calendar } from '../interfaces/calendar.interface';
 import { AuthService } from '../services/auth.service';
+import { EventFormComponent } from '../event-form/event-form.component';
 
 @Component({
   selector: 'app-calendar-nav',
   templateUrl: './calendar-nav.component.html',
   styleUrls: ['./calendar-nav.component.css']
 })
+
 export class CalendarNavComponent implements OnInit {
   public calendars: Calendar[];
   public userName = this.authService.firstName;
@@ -28,7 +30,7 @@ export class CalendarNavComponent implements OnInit {
     private calendarService: CalendarService,
     private authService: AuthService
   ) { }
-
+ 
   ngOnInit(): void {
     this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
@@ -36,10 +38,14 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openModal(content) {
-   this.modalService.open(content, { centered: true });
+    this.modalService.open(content, { centered: true });
   }
 
-  addCalendar(){
+  openEventModal() {
+    this.modalService.open(EventFormComponent, { centered: true });
+  }
+
+  addCalendar() {
     if (!this.addCalendarForm.valid) {
       this.addCalendarForm.markAllAsTouched();
       return;
@@ -54,11 +60,11 @@ export class CalendarNavComponent implements OnInit {
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
       this.calendars.push(calendar);
       this.addedNewCalendar = true;
-      setTimeout(()=> this.addedNewCalendar = false, 2500);
+      setTimeout(() => this.addedNewCalendar = false, 2500);
     }, err => {
-      if(err.status == 400)
+      if (err.status == 400)
         this.errors.push("Error code 400, calendar not added");
-    },() => { 
+    }, () => {
       this.addCalendarForm.reset();
       this.addCalendarForm.enable();
     });

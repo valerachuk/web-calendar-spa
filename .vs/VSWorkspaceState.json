@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\web-calendar-api",
+    "\\web-calendar-api\\WebCalendar.Api",
+    "\\web-calendar-api\\WebCalendar.Business",
+    "\\web-calendar-api\\WebCalendar.Data"
+  ],
+  "SelectedNode": "\\web-calendar-api\\WebCalendar.Api\\WebCalendar.Api.csproj",
+  "PreviewInSolutionExplorer": false
+}

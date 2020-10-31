@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201030172837_Event_SeriesIdSequence_2")]
+    partial class Event_SeriesIdSequence_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,11 +69,8 @@ namespace WebCalendar.Data.Migrations
                     b.Property<int?>("NotificationTime")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Reiteration")
-                        .HasColumnType("int");
-
                     b.Property<int>("SeriesId")
-                        .ValueGeneratedOnAdd()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq");
 
