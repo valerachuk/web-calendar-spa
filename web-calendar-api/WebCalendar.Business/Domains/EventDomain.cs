@@ -10,10 +10,12 @@ namespace WebCalendar.Business.Domains
   public class EventDomain : IEventDomain
   {
     private readonly IEventRepository _evRepository;
+    private readonly IMapper _mapper;
 
     public EventDomain(IEventRepository eventRepository, IMapper mapper)
     {
       _evRepository = eventRepository;
+      _mapper = mapper;
     }
 
     public void AddCalendarEvent(EventViewModel calendarEvent)
@@ -24,18 +26,7 @@ namespace WebCalendar.Business.Domains
 
     private int AddMainEventOfSeries(EventViewModel calendarEvent)
     {
-      var newCalendarEvent = new Event()
-      {
-        Name = calendarEvent.Name,
-        StartDateTime = calendarEvent.StartDateTime,
-        EndDateTime = calendarEvent.EndDateTime,
-        Venue = calendarEvent.Venue,
-        NotificationTime = calendarEvent.NotificationTime,
-        Reiteration = calendarEvent.Reiteration,
-        CalendarId = calendarEvent.CalendarId
-      };
-
-      return _evRepository.AddCalendarEvents(newCalendarEvent);
+      return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
