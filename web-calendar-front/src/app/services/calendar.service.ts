@@ -9,6 +9,8 @@ import { Observable } from 'rxjs';
 })
 export class CalendarService {
   private apiUrl = environment.apiUrl + "/calendar/";
+  public calendars: Calendar[];
+
   constructor(private httpClient: HttpClient) {
   }
 

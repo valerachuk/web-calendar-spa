@@ -6,7 +6,6 @@ import { MyIdComponent } from './my-id/my-id.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { SignInFormComponent } from './sign-in-form/sign-in-form.component';
 import { SignUpFormComponent } from './sign-up-form/sign-up-form.component';
-import { CalendarComponent } from './calendar/calendar.component';
 
 const routes: Routes = [
   {
@@ -30,7 +29,7 @@ const routes: Routes = [
       },
       {
         path: 'calendar',
-        component: CalendarComponent
+        loadChildren: () => import('./calendar/web-calendar.module').then(module => module.WebCalendarModule)
       }
     ]
   },

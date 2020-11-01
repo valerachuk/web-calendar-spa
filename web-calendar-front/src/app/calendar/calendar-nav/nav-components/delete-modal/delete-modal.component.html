@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h4 class="modal-title">Delete calendar</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div *ngIf="isCalendarOwner">
+    <p>Are you sure you want to delete the calendar?</p>
+  </div>
+  <div *ngIf="!isCalendarOwner">
+    <p>You are not the owner of this calendar</p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button *ngIf="isCalendarOwner" type="submit" form="addCalendarForm" (click)="deleteCalendar(deleteCalendarId)" class="btn btn-danger">Delete</button>
+  <button type="button" class="btn btn-secondary" ngbAutofocus (click)="activeModal.close()">Cancel</button>
+</div>
