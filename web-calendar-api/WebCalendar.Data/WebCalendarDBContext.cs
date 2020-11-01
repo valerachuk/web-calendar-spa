@@ -31,7 +31,7 @@ namespace WebCalendar.Data
       userModelBuilder
         .Property(user => user.PasswordHash)
         .IsRequired();
-      
+
       userModelBuilder
         .Property(user => user.Salt)
         .IsRequired();
@@ -72,9 +72,44 @@ namespace WebCalendar.Data
         .WithMany(user => user.Calendars)
         .HasForeignKey(calendar => calendar.UserId)
         .IsRequired();
+
+      var eventModelBuilder = modelBuilder.Entity<Event>();
+
+      eventModelBuilder
+        .Property(calendarEvent => calendarEvent.Name)
+        .IsRequired()
+        .HasMaxLength(100);
+
+      eventModelBuilder
+        .Property(calendarEvent => calendarEvent.Venue)
+        .HasMaxLength(100);
+
+      eventModelBuilder
+        .Property(calendarEvent => calendarEvent.StartDateTime)
+        .IsRequired();
+
+      eventModelBuilder
+       .Property(calendarEvent => calendarEvent.EndDateTime)
+       .IsRequired();
+
+      modelBuilder.HasSequence<int>("SeriesId_seq")
+        .StartsAt(1)
+        .IncrementsBy(1);
+
+      eventModelBuilder
+        .Property(calendarEvent => calendarEvent.SeriesId)
+        .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq")
+        .IsRequired();
+
+      eventModelBuilder
+      .HasOne(calendarEvent => calendarEvent.Calendar)
+      .WithMany(calendar => calendar.Events)
+      .HasForeignKey(calendarEvent => calendarEvent.CalendarId)
+      .IsRequired();
     }
 
     public DbSet<User> Users { get; set; }
     public DbSet<Calendar> Calendars { get; set; }
+    public DbSet<Event> Events { get; set; }
   }
 }

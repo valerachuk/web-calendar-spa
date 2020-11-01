@@ -24,8 +24,10 @@
     "@ng-bootstrap/ng-bootstrap": "^7.0.0",
     "angular-calendar": "^0.28.20",
     "bootstrap": "^4.5.0",
+    "jquery": "^3.5.1",
     "moment": "^2.29.1",
     "ng-bootstrap": "^1.6.3",
+    "popper.js": "^1.16.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"
