@@ -10,6 +10,7 @@ import { CalendarEvent } from 'angular-calendar';
 })
 export class CalendarService {
   private apiUrl = environment.apiUrl + "/calendar/";
+  
   constructor(private httpClient: HttpClient) {
   }
 

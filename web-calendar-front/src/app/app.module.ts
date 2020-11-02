@@ -13,18 +13,8 @@ import { ACCESS_TOKEN_KEY } from './services/auth.service';
 import { DefaultLayoutComponent } from './default-layout/default-layout.component';
 import { AuthorizeLayoutComponent } from './authorize-layout/authorize-layout.component';
 import { MyIdComponent } from './my-id/my-id.component';
-import { CalendarComponent } from './calendar/calendar.component';
-import { CalendarModule, DateAdapter } from 'angular-calendar';
-import { adapterFactory } from 'angular-calendar/date-adapters/moment';
-import * as moment from 'moment';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
-import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
-import { EventFormComponent } from './event-form/event-form.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 
-export function momentAdapterFactory() {
-  return adapterFactory(moment);
-};
 
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -38,13 +28,8 @@ function tokenGetter(): string {
     DefaultLayoutComponent,
     AuthorizeLayoutComponent,
     MyIdComponent,
-    CalendarComponent,
-    ToastGlobalComponent,
-    CalendarNavComponent,
-    EventFormComponent
+    ToastGlobalComponent
   ],
-  exports: [EventFormComponent],
-  entryComponents: [EventFormComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -52,14 +37,12 @@ function tokenGetter(): string {
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
-    AngularMultiSelectModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,
         allowedDomains: environment.allowedApiDomainsAuth
       }
     }),
-    CalendarModule.forRoot({ provide: DateAdapter, useFactory: momentAdapterFactory })
   ],
   providers: [],
   bootstrap: [AppComponent]

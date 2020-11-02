@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateStruct, NgbModal, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
-import { Calendar } from '../interfaces/calendar.interface';
-import { CalendarEvent } from '../interfaces/event.interface';
-import { AuthService } from '../services/auth.service';
-import { CalendarEventService } from '../services/calendar-event.service';
-import { CalendarService } from '../services/calendar.service';
+
+import { Calendar } from 'src/app/interfaces/calendar.interface';
+import { NotificationTime, Reiteration, CalendarEvent } from 'src/app/interfaces/event.interface';
+import { AuthService } from 'src/app/services/auth.service';
+import { CalendarEventService } from 'src/app/services/calendar-event.service';
+import { CalendarService } from 'src/app/services/calendar.service';
 
 @Component({
   selector: 'app-event-form',
