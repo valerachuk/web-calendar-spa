@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h4 class="modal-title">Add new calendar</h4>
-  <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -29,6 +29,6 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="submit" form="addCalendarForm" class="btn btn-primary" [disabled]="addCalendarForm.disabled" ngbAutofocus>Save</button>
-  <button type="button" class="btn btn-secondary" (click)="activeModal.close()">Close</button>
+  <button type="submit" form="addCalendarForm" class="btn btn-primary" [disabled]="!addCalendarForm.valid" ngbAutofocus>Save</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
 </div>

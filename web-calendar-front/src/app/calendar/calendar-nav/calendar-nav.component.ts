@@ -14,9 +14,6 @@ import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal
 })
 
 export class CalendarNavComponent implements OnInit {
-  public addModal = AddModalComponent;
-  public deleteModal = DeleteModalComponent;
-
   public calendars: Calendar[];
   public userName = this.authService.firstName;
 
@@ -28,21 +25,32 @@ export class CalendarNavComponent implements OnInit {
  
   ngOnInit(): void {
     this.calendarService.get(this.authService.userId).subscribe(data => {
-      this.calendarService.calendars = data;
-      this.calendars = this.calendarService.calendars;
+      this.calendars = data;
     });
   }
 
   openEventModal() {
     this.modalService.open(EventFormComponent, { centered: true });
   }
-  
-  openModal(content, mdSize) {
-    this.modalService.open(content, { centered: true, size: mdSize});
+
+  openAddModal() {
+    this.modalService.open(AddModalComponent, { centered: true, size: 'md'}).result
+      .then(closeData => {
+        this.calendars.push(closeData);
+      }, () => { });
   }
 
   openDeleteModal(calendarId) {
-    let modalRef = this.modalService.open(this.deleteModal, { centered: true, size: 'sm'});
+    let modalRef = this.modalService.open(DeleteModalComponent, { centered: true, size: 'sm'});
+    if(this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
+      modalRef.componentInstance.isCalendarOwner = false;
+      return;
+    }
+    modalRef.componentInstance.isCalendarOwner = true;
     modalRef.componentInstance.calendarId = calendarId;
+    modalRef.result.then(closeData => {
+      let index = this.calendars.findIndex(calendar => calendar.id === closeData);
+      this.calendars.splice(index, 1);
+    }, () => { });
   }
 }

@@ -43,9 +43,8 @@ export class AddModalComponent implements OnInit {
       userId: this.authService.userId
     }
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
-      this.calendarService.calendars.push(calendar);
       this.addedNewCalendar = true;
-      setTimeout(() => this.addedNewCalendar = false, 2500);
+      setTimeout(() => this.activeModal.close(calendar), 500);
     }, err => {
       if (err.status == 400)
         this.errors.push("Error code 400, calendar not added");
