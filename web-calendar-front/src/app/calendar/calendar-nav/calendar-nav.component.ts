@@ -6,6 +6,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EventFormComponent } from './nav-components/event-form/event-form.component';
 import { AddModalComponent } from './nav-components/add-modal/add-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
+import { EditModalComponent } from './nav-components/edit-modal/edit-modal.component';
 
 @Component({
   selector: 'app-calendar-nav',
@@ -51,6 +52,20 @@ export class CalendarNavComponent implements OnInit {
     modalRef.result.then(closeData => {
       let index = this.calendars.findIndex(calendar => calendar.id === closeData);
       this.calendars.splice(index, 1);
+    }, () => { });
+  }
+
+  openEditModal(calendarId) {
+    let modalRef = this.modalService.open(EditModalComponent, { centered: true, size: 'md'});
+    let calendarIndex = this.calendars.findIndex(calendar => calendar.id === calendarId);
+    if(this.calendars[calendarIndex].userId !== this.authService.userId) {
+      modalRef.componentInstance.isCalendarOwner = false;
+      return;
+    }
+    modalRef.componentInstance.isCalendarOwner = true;
+    modalRef.componentInstance.calendar = this.calendars[calendarIndex];
+    modalRef.result.then(closeData => {
+      this.calendars.splice(calendarIndex, 1, closeData);
     }, () => { });
   }
 }

@@ -24,4 +24,8 @@ export class CalendarService {
   delete(id: number): Observable<number> {
     return this.httpClient.delete<number>(this.apiUrl + id);
   }
+
+  editCalendar(calendar: Calendar): Observable<Calendar> {
+    return this.httpClient.put<Calendar>(this.apiUrl, calendar);
+  }
 }

@@ -13,6 +13,7 @@ import { AddModalComponent } from './calendar-nav/nav-components/add-modal/add-m
 import { DeleteModalComponent } from './calendar-nav/nav-components/delete-modal/delete-modal.component';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
+import { EditModalComponent } from './calendar-nav/nav-components/edit-modal/edit-modal.component';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -24,7 +25,8 @@ export function momentAdapterFactory() {
     AddModalComponent,
     DeleteModalComponent,
     CalendarComponent,
-    CalendarNavComponent
+    CalendarNavComponent,
+    EditModalComponent
   ],
   exports: [EventFormComponent],
   entryComponents: [EventFormComponent],

@@ -8,5 +8,6 @@ namespace WebCalendar.Business.Domains.Interfaces
     IEnumerable<CalendarViewModel> GetUserCalendars(int id);
     int AddCalendar(CalendarViewModel calendar);
     bool DeleteCalendar(int id, int userId);
+    bool EditCalendar(CalendarViewModel calendarView, int userId);
   }
 }

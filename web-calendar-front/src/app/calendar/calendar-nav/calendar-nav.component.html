@@ -33,7 +33,7 @@
                               <label class="form-check-label" for="inlineCheckbox{{calendar.id}}">{{calendar.name}}</label>
                             </div>
                             <div class="btn-group">
-                              <button class="btn btn-warning btn-sm">Edit</button>
+                              <button (click)="openEditModal(calendar.id)" class="btn btn-warning btn-sm">Edit</button>
                               <button (click)="openDeleteModal(calendar.id)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </td>

@@ -34,5 +34,13 @@ namespace WebCalendar.Business.Domains
 
       return _caRepository.DeleteCalendar(id);
     }
+
+    public bool EditCalendar(CalendarViewModel calendarView, int userId)
+		{
+      if (_caRepository.GetCalendar(calendarView.Id).UserId != userId)
+        throw new ForbiddenException("Not calendar owner");
+
+      return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
+    }
   }
 }
