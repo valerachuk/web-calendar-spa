@@ -1,9 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateStruct, NgbModal, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
 import { Calendar } from '../interfaces/calendar.interface';
-import { NotificationTime, Reiteration, CalendarEvent } from '../interfaces/event.interface';
+import { CalendarEvent } from '../interfaces/event.interface';
 import { AuthService } from '../services/auth.service';
 import { CalendarEventService } from '../services/calendar-event.service';
 import { CalendarService } from '../services/calendar.service';
@@ -82,16 +82,8 @@ export class EventFormComponent implements OnInit {
       time.minute - (new Date()).getTimezoneOffset()).toJSON();
   }
 
-  isDatesValid(): boolean {
-    if (this.startDate > this.endDate ||
-      (this.endDate === this.startDate) && (this.endTime < this.startTime)) {
-      return false;
-    }
-    return true;
-  }
-
   submitEvent() {
-    if (!this.eventForm.valid || !this.isDatesValid()) {
+    if (!this.eventForm.valid) {
       this.eventForm.markAllAsTouched();
       return;
     }

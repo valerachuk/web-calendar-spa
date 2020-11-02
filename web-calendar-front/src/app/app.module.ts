@@ -20,6 +20,7 @@ import * as moment from 'moment';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
 import { EventFormComponent } from './event-form/event-form.component';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -51,6 +52,7 @@ function tokenGetter(): string {
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
+    AngularMultiSelectModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

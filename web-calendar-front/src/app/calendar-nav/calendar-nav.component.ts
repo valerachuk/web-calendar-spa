@@ -5,6 +5,8 @@ import { CalendarService } from '../services/calendar.service';
 import { Calendar } from '../interfaces/calendar.interface';
 import { AuthService } from '../services/auth.service';
 import { EventFormComponent } from '../event-form/event-form.component';
+import { CalendarComponent } from '../calendar/calendar.component';
+
 
 @Component({
   selector: 'app-calendar-nav',
@@ -17,40 +19,85 @@ export class CalendarNavComponent implements OnInit {
   isCalendarOwner: boolean;
   deleteCalendarId: number;
 
-  public calendars: Calendar[];
+
+  public calendars = [];
   public userName = this.authService.firstName;
 
   public addCalendarForm = new FormGroup({
     newCalendarName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
     newCalendarDesc: new FormControl(null, Validators.maxLength(1000))
   });
+
+
   public addedNewCalendar = false;
   public errors = [];
   calendarName = this.addCalendarForm.get('newCalendarName');
   calendarDesc = this.addCalendarForm.get('newCalendarDesc');
+
+  selectedItems = [];
+  dropdownSettings = {};
 
   constructor(
     private modalService: NgbModal,
     private calendarService: CalendarService,
     private authService: AuthService
   ) { }
- 
+
   ngOnInit(): void {
     this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
     });
+
+    this.selectedItems = [];
+    this.dropdownSettings = {
+      singleSelection: false,
+      text: "",
+      selectAllText: 'Select all',
+      unSelectAllText: 'UnSelect all',
+      enableSearchFilter: true,
+      showCheckbox: true,
+      noDataLabel: "Cannot find calendar",
+      maxHeight: 150,
+      searchPlaceholderText: "Calendar name"
+    };
+  }
+
+  calendarIsChecked(calendar: Calendar) {
+    return this.selectedItems.includes(calendar);
+  }
+
+  setSelectedCalendars(calendar: Calendar) {
+    if (this.selectedItems.includes(calendar)) {
+      this.selectedItems = this.selectedItems.filter(x => x.id !== calendar.id);
+    } else {
+      this.selectedItems.push(calendar);
+    }
+    this.UpdateCalendarItems();
+  }
+
+  UpdateCalendarItems() {
+    console.log(this.selectedItems);
+    this.calendarService.getCalendarsItems(this.selectedItems)
+      .subscribe(calendarItems => {
+        var calendarMatrix = {} as CalendarComponent;
+        calendarMatrix.events = calendarItems;
+      },
+        err => {
+          if (err.status == 400)
+            this.errors.push("Error code 400, calendars items was not found");
+        });
   }
 
   openEventModal() {
     this.modalService.open(EventFormComponent, { centered: true });
   }
-  
+
   openModal(content, mdSize) {
-    this.modalService.open(content, { centered: true, size: mdSize});
-   }
+    this.modalService.open(content, { centered: true, size: mdSize });
+  }
 
   confirmDeleteCalendar(calendarId: number) {
-    if(this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
+    if (this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
       this.isCalendarOwner = false;
       this.openModal(this.deleteModal, 'sm');
       return;
@@ -65,7 +112,7 @@ export class CalendarNavComponent implements OnInit {
       let index = this.calendars.findIndex(calendar => calendar.id === id);
       this.calendars.splice(index, 1);
     }, err => {
-      if(err.status === 403) {
+      if (err.status === 403) {
         this.isCalendarOwner = false;
         this.openModal(this.deleteModal, 'sm');
       }

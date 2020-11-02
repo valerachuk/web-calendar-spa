@@ -10,6 +10,7 @@ import * as moment from 'moment';
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css']
 })
+
 export class CalendarComponent {
   Moment = moment.updateLocale('en', {
     week: {
@@ -20,9 +21,7 @@ export class CalendarComponent {
   CalendarView = CalendarView;
 
   viewDate: Date = new Date();
-  events: CalendarEvent[] = [
-
-  ];
+  events: CalendarEvent[] = [];
 
   setView(view: CalendarView) {
     this.view = view;
