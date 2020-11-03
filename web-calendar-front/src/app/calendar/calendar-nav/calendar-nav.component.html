@@ -30,7 +30,7 @@
       </table>
       <div class="d-flex">
         <ng-select [items]="calendars" bindLabel="name" bindValue="id" placeholder="Search calendar"
-          [(ngModel)]="selectedItems" [multiple]="true" style="width:100%;" (change)="updateCalendarItems()">
+          [(ngModel)]="selectedItems" [multiple]="true" class="w-100" (change)="updateCalendarItems()">
         </ng-select>
       </div>
       <table class="table table-fixed">
@@ -46,10 +46,10 @@
               </div>
               <div class="btn-group">
                 <button class="btn">
-                  <fa-icon [icon]="faPencil" style="color:goldenrod"></fa-icon>
+                  <fa-icon [icon]="faPencil" class="text-warning"></fa-icon>
                 </button>
                 <button (click)="openDeleteModal(calendar.id)" class="btn">
-                  <fa-icon [icon]="faTrash" style="color:darkred"></fa-icon>
+                  <fa-icon [icon]="faTrash" class="text-danger"></fa-icon>
                 </button>
               </div>
             </td>

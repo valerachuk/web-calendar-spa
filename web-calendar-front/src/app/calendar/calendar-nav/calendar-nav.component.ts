@@ -65,15 +65,15 @@ export class CalendarNavComponent implements OnInit {
     }, () => { });
   }
 
-  calendarIsChecked(calendar: number) {
-    return this.selectedItems.includes(calendar);
+  calendarIsChecked(calendarId: number) {
+    return this.selectedItems.includes(calendarId);
   }
 
-  setSelectedCalendars(calendar: number) {
-    if (this.selectedItems.includes(calendar)) {
-      this.selectedItems = this.selectedItems.filter(x => x !== calendar);
+  setSelectedCalendars(calendarId: number) {
+    if (this.selectedItems.includes(calendarId)) {
+      this.selectedItems = this.selectedItems.filter(x => x !== calendarId);
     } else {
-      this.selectedItems = [...this.selectedItems, calendar];
+      this.selectedItems = [...this.selectedItems, calendarId];
     }
     this.updateCalendarItems();
   }
