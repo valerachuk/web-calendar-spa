@@ -1,0 +1,14 @@
+.table-fixed{
+  width: 100%;
+}
+
+.table-fixed tbody{
+  height: 350px;
+  overflow-y:auto;
+  width: 100%;
+}
+
+thead,tbody,tr,td,th{
+  display:block;
+}
+    

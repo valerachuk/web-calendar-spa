@@ -32,23 +32,17 @@ namespace WebCalendar.Business.Domains
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
     {
       var generatedEvents = new List<Event>();
-      int eventRepetitionsNumber = calendarEvent.Reiteration != null ? 365 / (int)calendarEvent.Reiteration : -1;
+      int eventRepetitionsNumber = calendarEvent.Reiteration != null ? 365 : -1;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
 
       // Create events in one series for a selected time interval for the year ahead
       for (int i = eventFrequency; i < eventRepetitionsNumber; i += eventFrequency)
       {
-        var newCalendarEvent = new Event()
-        {
-          Name = calendarEvent.Name,
-          StartDateTime = calendarEvent.StartDateTime.AddDays(i),
-          EndDateTime = calendarEvent.EndDateTime.AddDays(i),
-          Venue = calendarEvent.Venue,
-          NotificationTime = calendarEvent.NotificationTime,
-          Reiteration = calendarEvent.Reiteration,
-          CalendarId = calendarEvent.CalendarId,
-          SeriesId = seriesId
-        };
+        Event newCalendarEvent = _mapper.Map<EventViewModel, Event>(calendarEvent);
+        newCalendarEvent.SeriesId = seriesId;
+        newCalendarEvent.StartDateTime = calendarEvent.StartDateTime.AddDays(i);
+        newCalendarEvent.EndDateTime = calendarEvent.EndDateTime.AddDays(i);
+
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
