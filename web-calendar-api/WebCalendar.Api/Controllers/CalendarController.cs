@@ -48,12 +48,12 @@ namespace WebCalendar.Api.Controllers
 
     [HttpPut] 
     public IActionResult EditCalendar(CalendarViewModel calendarView)
-		{
+    {
       if (_caDomain.EditCalendar(calendarView, User.GetId()))
         return Ok(calendarView);
 
       return BadRequest();
-		}
+    }
 
   }
 }

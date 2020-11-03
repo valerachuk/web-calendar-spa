@@ -38,6 +38,11 @@ namespace WebCalendar.Api.Middleware
         message = exception.Message;
         status = HttpStatusCode.Forbidden;
       }
+      else if(exception is NotFoundException)
+      {
+        message = exception.Message;
+        status = HttpStatusCode.NotFound;
+      }
       else
       {
         message = exception.Message;

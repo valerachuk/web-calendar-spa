@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <h4 class="modal-title" *ngIf="addMode">Add new calendar</h4>
+  <h4 class="modal-title" *ngIf="!addMode">Edit calendar</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" (submit)="addMode ? addCalendar() : editCalendar()" id="form">
+    <div class="form-group">
+      <label for="name">Calendar name</label>
+      <span class="text-danger">*</span>
+  
+      <input class="form-control" 
+        type="text" 
+        id="name" 
+        name="calendarName" 
+        [formControl]="calendarName"
+        placeholder="Calendar name"
+        [class.is-invalid]="calendarName.invalid && calendarName.touched">
+  
+      <small class="form-text text-danger" 
+        *ngIf="calendarName.hasError('required') && calendarName.touched">
+        Calendar name required
+      </small>
+      <small class="form-text text-danger" 
+        *ngIf="calendarName.hasError('maxlength') && calendarName.touched">
+        Name must be less then 100 characters
+      </small>
+    </div>
+    <div class="form-group">
+      <label for="desc">Description</label>
+      <textarea class="form-control" 
+        id="desc" 
+        name="calendarDesc"
+        [formControl]="calendarDesc" cols="20" rows="5"
+        placeholder="Your text"
+        [class.is-invalid]="calendarDesc.invalid && calendarDesc.touched">
+      </textarea>
+      <small class="form-text text-danger" 
+        *ngIf="calendarDesc.hasError('maxlength') && calendarDesc.touched">
+        Description must be less then 1000 characters
+      </small>
+    </div>
+  </form>
+  <div *ngIf="addedNewCalendar" class="alert alert-success mb-0">
+    Added new calendar!
+  </div>
+  <div *ngIf="errors.length > 0" class="alert alert-danger mb-0">
+    {{errors.toString()}}
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="submit" form="form" class="btn btn-primary" [disabled]="!form.valid && form.disabled" ngbAutofocus>Save</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Close</button>
+</div>

@@ -35,11 +35,11 @@ namespace WebCalendar.Data.Repositories
     }
 
     public bool EditCalendar(Calendar calendar)
-		{
+    {
       var oldCalendar = _context.Calendars.Find(calendar.Id);
       oldCalendar.Name = calendar.Name;
       oldCalendar.Description = calendar.Description;
       return _context.SaveChanges() > 0;
-		}
+    }
   }
 }
