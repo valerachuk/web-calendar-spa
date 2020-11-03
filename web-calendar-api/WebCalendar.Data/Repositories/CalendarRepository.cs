@@ -33,5 +33,13 @@ namespace WebCalendar.Data.Repositories
       _context.Calendars.Remove(_context.Calendars.Find(id));
       return _context.SaveChanges() > 0;
     }
+
+    public bool EditCalendar(Calendar calendar)
+    {
+      var oldCalendar = _context.Calendars.Find(calendar.Id);
+      oldCalendar.Name = calendar.Name;
+      oldCalendar.Description = calendar.Description;
+      return _context.SaveChanges() > 0;
+    }
   }
 }
