@@ -6,6 +6,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EventFormComponent } from './nav-components/event-form/event-form.component';
 import { AddModalComponent } from './nav-components/add-modal/add-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
+import { CalendarComponent } from '../calendar.component';
+import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-calendar-nav',
@@ -16,7 +18,12 @@ import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal
 export class CalendarNavComponent implements OnInit {
   public calendars: Calendar[];
   public userName = this.authService.firstName;
-
+  selectedItems = [];
+  
+  faPlus = faPlus;
+  faTrash = faTrash;
+  faPencil = faEdit;
+  faSearch = faSearch;
   constructor(
     private modalService: NgbModal,
     private calendarService: CalendarService,
@@ -36,7 +43,7 @@ export class CalendarNavComponent implements OnInit {
   openAddModal() {
     this.modalService.open(AddModalComponent, { centered: true, size: 'md'}).result
       .then(closeData => {
-        this.calendars.push(closeData);
+        this.calendars = [...this.calendars, closeData];
       }, () => { });
   }
 
@@ -51,6 +58,31 @@ export class CalendarNavComponent implements OnInit {
     modalRef.result.then(closeData => {
       let index = this.calendars.findIndex(calendar => calendar.id === closeData);
       this.calendars.splice(index, 1);
+      this.calendars = [...this.calendars];
+      index = this.selectedItems.findIndex(calendar => calendar.id === closeData);
+      this.selectedItems.splice(index, 1);
+      this.selectedItems = [...this.selectedItems];
     }, () => { });
+  }
+
+  calendarIsChecked(calendarId: number) {
+    return this.selectedItems.includes(calendarId);
+  }
+
+  setSelectedCalendars(calendarId: number) {
+    if (this.selectedItems.includes(calendarId)) {
+      this.selectedItems = this.selectedItems.filter(x => x !== calendarId);
+    } else {
+      this.selectedItems = [...this.selectedItems, calendarId];
+    }
+    this.updateCalendarItems();
+  }
+
+  updateCalendarItems() {
+    this.calendarService.getCalendarsItems(this.selectedItems)
+      .subscribe(calendarItems => {
+        var calendarMatrix = {} as CalendarComponent;
+        calendarMatrix.events = calendarItems;
+      });
   }
 }
