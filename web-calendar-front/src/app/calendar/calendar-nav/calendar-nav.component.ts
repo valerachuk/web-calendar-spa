@@ -7,6 +7,7 @@ import { EventFormComponent } from './nav-components/event-form/event-form.compo
 import { AddModalComponent } from './nav-components/add-modal/add-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
 import { CalendarComponent } from '../calendar.component';
+import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-calendar-nav',
@@ -18,8 +19,11 @@ export class CalendarNavComponent implements OnInit {
   public calendars: Calendar[];
   public userName = this.authService.firstName;
   selectedItems = [];
-  dropdownSettings = {};
-
+  
+  faPlus = faPlus;
+  faTrash = faTrash;
+  faPencil = faEdit;
+  faSearch = faSearch;
   constructor(
     private modalService: NgbModal,
     private calendarService: CalendarService,
@@ -30,18 +34,6 @@ export class CalendarNavComponent implements OnInit {
     this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
     });
-
-    this.dropdownSettings = {
-      singleSelection: false,
-      text: "",
-      selectAllText: 'Select all',
-      unSelectAllText: 'UnSelect all',
-      enableSearchFilter: true,
-      showCheckbox: true,
-      noDataLabel: "Cannot find calendar",
-      maxHeight: 150,
-      searchPlaceholderText: "Calendar name"
-    };
   }
 
   openEventModal() {
@@ -51,7 +43,7 @@ export class CalendarNavComponent implements OnInit {
   openAddModal() {
     this.modalService.open(AddModalComponent, { centered: true, size: 'md'}).result
       .then(closeData => {
-        this.calendars.push(closeData);
+        this.calendars = [...this.calendars, closeData];
       }, () => { });
   }
 
@@ -66,24 +58,27 @@ export class CalendarNavComponent implements OnInit {
     modalRef.result.then(closeData => {
       let index = this.calendars.findIndex(calendar => calendar.id === closeData);
       this.calendars.splice(index, 1);
+      this.calendars = [...this.calendars];
+      index = this.selectedItems.findIndex(calendar => calendar.id === closeData);
+      this.selectedItems.splice(index, 1);
+      this.selectedItems = [...this.selectedItems];
     }, () => { });
   }
 
-  calendarIsChecked(calendar: Calendar) {
+  calendarIsChecked(calendar: number) {
     return this.selectedItems.includes(calendar);
   }
 
-  setSelectedCalendars(calendar: Calendar) {
+  setSelectedCalendars(calendar: number) {
     if (this.selectedItems.includes(calendar)) {
-      this.selectedItems = this.selectedItems.filter(x => x.id !== calendar.id);
+      this.selectedItems = this.selectedItems.filter(x => x !== calendar);
     } else {
-      this.selectedItems.push(calendar);
+      this.selectedItems = [...this.selectedItems, calendar];
     }
-    this.UpdateCalendarItems();
+    this.updateCalendarItems();
   }
 
-  UpdateCalendarItems() {
-    console.log(this.selectedItems);
+  updateCalendarItems() {
     this.calendarService.getCalendarsItems(this.selectedItems)
       .subscribe(calendarItems => {
         var calendarMatrix = {} as CalendarComponent;

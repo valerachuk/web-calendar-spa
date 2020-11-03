@@ -6,7 +6,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import * as moment from 'moment';
 import { adapterFactory } from 'angular-calendar/date-adapters/moment';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 
 import { WebCalendarRoutingModule } from './web-calendar-routing.module';
 import { EventFormComponent } from './calendar-nav/nav-components/event-form/event-form.component';
@@ -14,6 +13,8 @@ import { AddModalComponent } from './calendar-nav/nav-components/add-modal/add-m
 import { DeleteModalComponent } from './calendar-nav/nav-components/delete-modal/delete-modal.component';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -36,7 +37,8 @@ export function momentAdapterFactory() {
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AngularMultiSelectModule,
+    NgSelectModule,
+    FontAwesomeModule,
     CalendarModule.forRoot({ provide: DateAdapter, useFactory: momentAdapterFactory })
   ]
 })

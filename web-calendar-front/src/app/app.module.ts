@@ -15,7 +15,6 @@ import { AuthorizeLayoutComponent } from './authorize-layout/authorize-layout.co
 import { MyIdComponent } from './my-id/my-id.component';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
 
-
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
 }

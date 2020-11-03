@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
-  integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 <nav class="navbar-nav h-100 container">
   <div class="sticky-top pt-5">
     <div class="container d-flex align-items-center justify-content-between p-3">
@@ -9,7 +7,7 @@
     <div class="dropdown dropright d-flex align-items-center justify-content-center align-self-center p-3">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCalendarItems" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-plus"></i>
+        <fa-icon [icon]="faPlus"></fa-icon>
         Create item
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownCalendarItems">
@@ -23,23 +21,17 @@
         <thead>
           <tr>
             <th class="d-flex align-items-center justify-content-between">
-              <span>Calendars</span><button (click)="openAddModal()" class="btn btn-primary btn-sm"><i
-                  class="fas fa-plus"></i></button>
+              <span>Calendars</span><button (click)="openAddModal()" class="btn btn-primary btn-sm">
+                <fa-icon [icon]="faPlus"></fa-icon>
+              </button>
             </th>
           </tr>
         </thead>
       </table>
       <div class="d-flex">
-        <i class="fa fa-search"></i>
-        <angular2-multiselect [data]="calendars" [(ngModel)]="selectedItems" [settings]="dropdownSettings"
-          (onSelect)="UpdateCalendarItems()" (onDeSelect)="UpdateCalendarItems()" (onSelectAll)="UpdateCalendarItems()"
-          (onDeSelectAll)="UpdateCalendarItems()" style="width: 100%">
-          <c-item>
-            <ng-template let-item="item">
-              <label style="max-width:auto">{{item.name}}</label>
-            </ng-template>
-          </c-item>
-        </angular2-multiselect>
+        <ng-select [items]="calendars" bindLabel="name" bindValue="id" placeholder="Search calendar"
+          [(ngModel)]="selectedItems" [multiple]="true" style="width:100%;" (change)="updateCalendarItems()">
+        </ng-select>
       </div>
       <table class="table table-fixed">
         <tbody>
@@ -49,15 +41,15 @@
               triggers="mouseenter:mouseleave" placement="right">
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" id="inlineCheckbox{{calendar.id}}"
-                  [checked]="calendarIsChecked(calendar)" (change)="setSelectedCalendars(calendar)">
+                  [checked]="calendarIsChecked(calendar.id)" (change)="setSelectedCalendars(calendar.id)">
                 <label class="form-check-label" for="inlineCheckbox{{calendar.id}}">{{calendar.name}}</label>
               </div>
               <div class="btn-group">
                 <button class="btn">
-                  <i class="fa fa-pencil-alt" style="color:darkgoldenrod"></i>
+                  <fa-icon [icon]="faPencil" style="color:goldenrod"></fa-icon>
                 </button>
                 <button (click)="openDeleteModal(calendar.id)" class="btn">
-                  <i class="fa fa-trash-alt" style="color:darkred"></i>
+                  <fa-icon [icon]="faTrash" style="color:darkred"></fa-icon>
                 </button>
               </div>
             </td>
