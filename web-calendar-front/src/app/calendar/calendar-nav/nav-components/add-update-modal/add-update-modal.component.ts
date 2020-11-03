@@ -25,6 +25,7 @@ export class AddUpdateModalComponent implements OnInit {
   @Input() calendar: Calendar;
 
   public addMode: boolean;
+  public modalTitle: string;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -35,6 +36,7 @@ export class AddUpdateModalComponent implements OnInit {
   ngOnInit(): void {
     if(typeof this.calendar === 'undefined' || typeof this.isCalendarOwner === 'undefined') {
       this.addMode = true;
+      this.modalTitle = "Add new calendar";
     }
     else {
       this.calendarName.setValue(this.calendar.name);
@@ -42,6 +44,7 @@ export class AddUpdateModalComponent implements OnInit {
       if(!this.isCalendarOwner)
         this.notOwner();
       this.addMode = false;
+      this.modalTitle = "Edit calendar";
     }
   }
 
@@ -50,19 +53,26 @@ export class AddUpdateModalComponent implements OnInit {
     setTimeout(()=> this.activeModal.dismiss(), 1000);
   }
 
-  addCalendar() {
+  submit() {
     if (!this.form.valid) {
       this.form.markAllAsTouched();
       return;
     }
     this.errors = [];
     this.form.disable();
-    var newCalendar: Calendar = {
-      id: 0,
+    let newCalendar: Calendar = {
+      id: this.addMode ? 0 : this.calendar.id,
       name: this.form.value.calendarName,
       description: this.form.value.calendarDesc,
       userId: this.authService.userId
     }
+    if(this.addMode) 
+      this.addCalendar(newCalendar);
+    else
+      this.editCalendar(newCalendar);
+  }
+
+  addCalendar(newCalendar) {
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
       this.addedNewCalendar = true;
       setTimeout(() => this.activeModal.close(calendar), 500);
@@ -76,19 +86,7 @@ export class AddUpdateModalComponent implements OnInit {
     });
   }
 
-  editCalendar() {
-    if (!this.form.valid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    this.errors = [];
-    this.form.disable();
-    var newCalendar: Calendar = {
-      id: this.calendar.id,
-      name: this.calendarName.value,
-      description: this.calendarDesc.value,
-      userId: this.calendar.userId
-    }
+  editCalendar(newCalendar) {
     this.calendarService.editCalendar(newCalendar).subscribe(calendar => {
       this.activeModal.close(calendar);
     }, err => {

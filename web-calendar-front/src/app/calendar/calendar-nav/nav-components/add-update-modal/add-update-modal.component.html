@@ -1,12 +1,11 @@
 <div class="modal-header">
-  <h4 class="modal-title" *ngIf="addMode">Add new calendar</h4>
-  <h4 class="modal-title" *ngIf="!addMode">Edit calendar</h4>
+  <h4 class="modal-title">{{modalTitle}}</h4>
   <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 <div class="modal-body">
-  <form [formGroup]="form" (submit)="addMode ? addCalendar() : editCalendar()" id="form">
+  <form [formGroup]="form" (submit)="submit()" id="form">
     <div class="form-group">
       <label for="name">Calendar name</label>
       <span class="text-danger">*</span>
