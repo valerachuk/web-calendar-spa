@@ -7,7 +7,8 @@ namespace WebCalendar.Business.Domains.Interfaces
     int? Authenticate(LoginViewModel login);
     int Register(RegisterViewModel login);
     bool HasUser(string email);
-    string GenerateJWT(int userId);
+    string GenerateJWT(UserViewModel userId);
     UserViewModel GetUser(int id);
+    bool EditUser(UserViewModel userView);
   }
 }

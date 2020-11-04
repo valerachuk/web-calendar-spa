@@ -66,7 +66,7 @@ namespace WebCalendar.Business.Domains
       return _sha1.ComputeHash(salt.Concat(Encoding.UTF8.GetBytes(password)).ToArray());
     }
 
-    public string GenerateJWT(int userId)
+    public string GenerateJWT(UserViewModel user)
     {
       var authOptions = _authOptions.Value;
 
@@ -78,7 +78,10 @@ namespace WebCalendar.Business.Domains
         authOptions.Audience,
         new[]
         {
-          new Claim(JwtRegisteredClaimNames.Sub, userId.ToString())
+          new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+          new Claim("firstName", user.FirstName),
+          new Claim("lastName", user.LastName),
+          new Claim("email", user.Email)
         },
         expires: DateTime.Now.AddSeconds(authOptions.TokenLifetime),
         signingCredentials: credentials);
@@ -87,5 +90,8 @@ namespace WebCalendar.Business.Domains
     }
 
     public UserViewModel GetUser(int id) => _mapper.Map<User, UserViewModel > (_userRepository.GetUser(id));
+
+    public bool EditUser(UserViewModel userView) => 
+      _userRepository.Edit(_mapper.Map<UserViewModel, User>(userView));
   }
 }

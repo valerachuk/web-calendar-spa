@@ -1,8 +1,10 @@
-<!-- temp-header-menu -->
-<div class="p-5 bg-light">
-    <button class="btn btn-warning ml-auto float-right" (click)="signOut()">SignOut</button>
-</div>
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="navbar-nav w-100">
+        <a class="nav-item nav-link" routerLink="/calendar" routerLinkActive="active">Calendar</a>
+        <a class="nav-item nav-link" routerLink="/user" routerLinkActive="active">User page</a>
+        <button class="btn btn-warning ml-auto float-right" (click)="signOut()">SignOut</button>
+    </div>
+</nav>
 <div class="container-fluid p-5">
     <router-outlet></router-outlet>
 </div>

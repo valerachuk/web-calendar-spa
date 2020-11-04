@@ -14,6 +14,8 @@ import { DefaultLayoutComponent } from './default-layout/default-layout.componen
 import { AuthorizeLayoutComponent } from './authorize-layout/authorize-layout.component';
 import { MyIdComponent } from './my-id/my-id.component';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
+import { UserPageComponent } from './user-page/user-page.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -27,7 +29,8 @@ function tokenGetter(): string {
     DefaultLayoutComponent,
     AuthorizeLayoutComponent,
     MyIdComponent,
-    ToastGlobalComponent
+    ToastGlobalComponent,
+    UserPageComponent
   ],
   imports: [
     BrowserModule,
@@ -36,6 +39,7 @@ function tokenGetter(): string {
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
+    NgSelectModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

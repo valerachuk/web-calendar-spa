@@ -8,5 +8,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
     User GetByEmail(string email);
     User GetUser(int id);
     void Create(User user);
+    bool Edit(User user);
   }
 }
