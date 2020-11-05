@@ -9,5 +9,6 @@ namespace WebCalendar.Business.Domains.Interfaces
     bool HasUser(string email);
     string GenerateJWT(int userId);
     UserViewModel GetUser(int id);
+    bool EditUser(UserViewModel userView, int authedUserId);
   }
 }

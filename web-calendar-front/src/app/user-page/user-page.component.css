@@ -1,0 +1,12 @@
+.input-group-prepend {
+  width : 100px;
+}
+
+.input-group-prepend span {
+  width: 100%;
+  overflow: hidden;
+}
+
+.form-text {
+  margin-left: 100px;
+}

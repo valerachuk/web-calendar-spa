@@ -8,7 +8,7 @@ namespace WebCalendar.Business
   {
     public MappingProfile()
     {
-      CreateMap<User, UserViewModel>();
+      CreateMap<User, UserViewModel>().ReverseMap();
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
       CreateMap<Event, EventViewModel>().ReverseMap();

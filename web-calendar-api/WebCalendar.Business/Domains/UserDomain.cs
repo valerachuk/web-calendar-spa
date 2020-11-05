@@ -13,6 +13,7 @@ using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
+using WebCalendar.Business.Exceptions;
 
 namespace WebCalendar.Business.Domains
 {
@@ -68,6 +69,7 @@ namespace WebCalendar.Business.Domains
 
     public string GenerateJWT(int userId)
     {
+      var user = GetUser(userId);
       var authOptions = _authOptions.Value;
 
       var securityKey = authOptions.SymmetricSecurityKey;
@@ -78,7 +80,11 @@ namespace WebCalendar.Business.Domains
         authOptions.Audience,
         new[]
         {
-          new Claim(JwtRegisteredClaimNames.Sub, userId.ToString())
+          new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+          new Claim("firstName", user.FirstName),
+          new Claim("lastName", user.LastName),
+          new Claim("email", user.Email),
+          new Claim("notifications", user.ReceiveEmailNotifications.ToString()),
         },
         expires: DateTime.Now.AddSeconds(authOptions.TokenLifetime),
         signingCredentials: credentials);
@@ -86,6 +92,20 @@ namespace WebCalendar.Business.Domains
       return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public UserViewModel GetUser(int id) => _mapper.Map<User, UserViewModel > (_userRepository.GetUser(id));
+    public UserViewModel GetUser(int id) {
+      var user = _userRepository.GetUser(id);
+      if (user == null)
+        throw new NotFoundException("User not found");
+
+      return _mapper.Map<User, UserViewModel>(user);
+    }
+
+    public bool EditUser(UserViewModel userView, int authedUserId)
+    {
+      if (userView.Id != authedUserId)
+        throw new ForbiddenException("Unauthorized");
+
+      return _userRepository.Edit(_mapper.Map<UserViewModel, User>(userView));
+    }
   }
 }

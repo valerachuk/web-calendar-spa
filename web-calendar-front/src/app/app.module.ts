@@ -14,6 +14,8 @@ import { DefaultLayoutComponent } from './default-layout/default-layout.componen
 import { AuthorizeLayoutComponent } from './authorize-layout/authorize-layout.component';
 import { MyIdComponent } from './my-id/my-id.component';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
+import { UserPageComponent } from './user-page/user-page.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 function tokenGetter(): string {
@@ -28,7 +30,8 @@ function tokenGetter(): string {
     DefaultLayoutComponent,
     AuthorizeLayoutComponent,
     MyIdComponent,
-    ToastGlobalComponent
+    ToastGlobalComponent,
+    UserPageComponent
   ],
   imports: [
     BrowserModule,
@@ -37,6 +40,7 @@ function tokenGetter(): string {
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
+    NgSelectModule,
     BrowserAnimationsModule,
     JwtModule.forRoot({
       config: {

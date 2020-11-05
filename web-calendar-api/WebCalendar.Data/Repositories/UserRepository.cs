@@ -25,5 +25,16 @@ namespace WebCalendar.Data.Repositories
       _context.Calendars.Add(defaultCalendar);
       _context.SaveChanges();
     }
+
+    public bool Edit(User user)
+    {
+      var editUser = _context.Users.Find(user.Id);
+      if (editUser == null)
+        return false;
+      editUser.FirstName = user.FirstName;
+      editUser.LastName = user.LastName;
+      editUser.ReceiveEmailNotifications = user.ReceiveEmailNotifications;
+      return _context.SaveChanges() > 0;
+    }
   }
 }
