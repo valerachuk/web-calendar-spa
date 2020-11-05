@@ -81,10 +81,15 @@ namespace WebCalendar.Api
       services.AddTransient<IUserDomain, UserDomain>();
       services.AddTransient<ICalendarDomain, CalendarDomain>();
       services.AddTransient<IEventDomain, EventDomain>();
+      services.AddTransient<INotificationSenderDomain, NotificationSenderDomain>();
 
       // AutoMapper
       var mapConfig = new MapperConfiguration(mc => mc.AddProfile(new MappingProfile()));
       services.AddSingleton(mapConfig.CreateMapper());
+
+      // Email notifications
+      var emailSenderSection = Configuration.GetSection("EmailNotifications");
+      services.Configure<EmailNotificationsOptions>(emailSenderSection);
 
     }
 

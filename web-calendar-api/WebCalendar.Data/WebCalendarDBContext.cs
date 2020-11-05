@@ -37,6 +37,10 @@ namespace WebCalendar.Data
         .IsRequired();
 
       userModelBuilder
+        .Property(user => user.ReceiveEmailNotifications)
+        .HasDefaultValue(true);
+
+      userModelBuilder
         .HasData(new[]
         {
           new User
