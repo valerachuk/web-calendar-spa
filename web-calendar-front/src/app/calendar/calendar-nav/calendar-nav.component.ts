@@ -6,8 +6,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EventFormComponent } from './nav-components/event-form/event-form.component';
 import { AddUpdateModalComponent } from './nav-components/add-update-modal/add-update-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
-import { CalendarComponent } from '../calendar.component';
 import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { CalendarComponent } from '../calendar.component';
 
 @Component({
   selector: 'app-calendar-nav',
@@ -18,18 +18,20 @@ import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-i
 export class CalendarNavComponent implements OnInit {
   public calendars: Calendar[];
   public userName = this.authService.firstName;
-  selectedItems = [];
-  
+  selectedCalendars = [];
+
   faPlus = faPlus;
   faTrash = faTrash;
   faPencil = faEdit;
   faSearch = faSearch;
+
   constructor(
     private modalService: NgbModal,
     private calendarService: CalendarService,
-    private authService: AuthService
+    private authService: AuthService,
+    public calendarComponent: CalendarComponent
   ) { }
- 
+
   ngOnInit(): void {
     this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
@@ -37,7 +39,10 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openEventModal() {
-    this.modalService.open(EventFormComponent, { centered: true });
+    this.modalService.open(EventFormComponent, { centered: true }).result
+      .then(closeData => {
+        this.updateCalendarItems();
+      }, () => { });;
   }
 
   openAddModal() {
@@ -48,8 +53,8 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openDeleteModal(calendarId) {
-    let modalRef = this.modalService.open(DeleteModalComponent, { centered: true, size: 'sm'});
-    if(this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
+    let modalRef = this.modalService.open(DeleteModalComponent, { centered: true, size: 'sm' });
+    if (this.calendars.find(c => c.id === calendarId).userId !== this.authService.userId) {
       modalRef.componentInstance.isCalendarOwner = false;
       return;
     }
@@ -59,9 +64,10 @@ export class CalendarNavComponent implements OnInit {
       let index = this.calendars.findIndex(calendar => calendar.id === closeData);
       this.calendars.splice(index, 1);
       this.calendars = [...this.calendars];
-      index = this.selectedItems.findIndex(calendar => calendar.id === closeData);
-      this.selectedItems.splice(index, 1);
-      this.selectedItems = [...this.selectedItems];
+      index = this.selectedCalendars.findIndex(calendar => calendar.id === closeData);
+      this.selectedCalendars.splice(index, 1);
+      this.selectedCalendars = [...this.selectedCalendars];
+      this.updateCalendarItems();
     }, () => { });
   }
 
@@ -79,23 +85,20 @@ export class CalendarNavComponent implements OnInit {
   }
   
   calendarIsChecked(calendarId: number) {
-    return this.selectedItems.includes(calendarId);
+    return this.selectedCalendars.includes(calendarId);
   }
 
   setSelectedCalendars(calendarId: number) {
-    if (this.selectedItems.includes(calendarId)) {
-      this.selectedItems = this.selectedItems.filter(x => x !== calendarId);
+    if (this.selectedCalendars.includes(calendarId)) {
+      this.selectedCalendars = this.selectedCalendars.filter(x => x !== calendarId);
     } else {
-      this.selectedItems = [...this.selectedItems, calendarId];
+      this.selectedCalendars = [...this.selectedCalendars, calendarId];
     }
     this.updateCalendarItems();
   }
 
   updateCalendarItems() {
-    this.calendarService.getCalendarsItems(this.selectedItems)
-      .subscribe(calendarItems => {
-        var calendarMatrix = {} as CalendarComponent;
-        calendarMatrix.events = calendarItems;
-      });
+    this.calendarComponent.selectedCalendars = this.selectedCalendars;
+    this.calendarComponent.updateCalendarItems();
   }
 }

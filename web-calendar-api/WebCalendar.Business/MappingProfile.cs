@@ -12,6 +12,7 @@ namespace WebCalendar.Business
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
       CreateMap<Event, EventViewModel>().ReverseMap();
+      CreateMap<Event, CalendarItemViewModel>();
     }
   }
 }
