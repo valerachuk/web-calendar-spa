@@ -4,7 +4,7 @@ import { CalendarService } from 'src/app/services/calendar.service';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { EventFormComponent } from './nav-components/event-form/event-form.component';
-import { AddModalComponent } from './nav-components/add-modal/add-modal.component';
+import { AddUpdateModalComponent } from './nav-components/add-update-modal/add-update-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
 import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { CalendarComponent } from '../calendar.component';
@@ -46,7 +46,7 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openAddModal() {
-    this.modalService.open(AddModalComponent, { centered: true, size: 'md' }).result
+    this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md'}).result
       .then(closeData => {
         this.calendars = [...this.calendars, closeData];
       }, () => { });
@@ -71,6 +71,19 @@ export class CalendarNavComponent implements OnInit {
     }, () => { });
   }
 
+  openEditModal(calendar) {
+    let modalRef = this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md'});
+    if(calendar.userId !== this.authService.userId) {
+      modalRef.componentInstance.isCalendarOwner = false;
+      return;
+    }
+    modalRef.componentInstance.isCalendarOwner = true;
+    modalRef.componentInstance.calendar = calendar;
+    modalRef.result.then(closeData => {
+      this.calendars.splice(this.calendars.findIndex(c => c.id === calendar.id), 1, closeData);
+    }, () => { });
+  }
+  
   calendarIsChecked(calendarId: number) {
     return this.selectedCalendars.includes(calendarId);
   }

@@ -9,7 +9,7 @@ import { adapterFactory } from 'angular-calendar/date-adapters/moment';
 
 import { WebCalendarRoutingModule } from './web-calendar-routing.module';
 import { EventFormComponent } from './calendar-nav/nav-components/event-form/event-form.component';
-import { AddModalComponent } from './calendar-nav/nav-components/add-modal/add-modal.component';
+import { AddUpdateModalComponent } from './calendar-nav/nav-components/add-update-modal/add-update-modal.component';
 import { DeleteModalComponent } from './calendar-nav/nav-components/delete-modal/delete-modal.component';
 import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
@@ -23,7 +23,7 @@ export function momentAdapterFactory() {
 @NgModule({
   declarations: [
     EventFormComponent,
-    AddModalComponent,
+    AddUpdateModalComponent,
     DeleteModalComponent,
     CalendarComponent,
     CalendarNavComponent

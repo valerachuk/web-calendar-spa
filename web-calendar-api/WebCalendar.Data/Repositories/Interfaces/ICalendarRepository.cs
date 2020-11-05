@@ -9,5 +9,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
     Calendar GetCalendar(int id);
     int AddCalendar(Calendar calendar);
     bool DeleteCalendar(int id);
+    bool EditCalendar(Calendar calendar);
   }
 }
