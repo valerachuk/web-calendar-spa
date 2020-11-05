@@ -64,7 +64,7 @@ export class UserPageComponent implements OnInit {
       firstName: this.firstName.value,
       lastName: this.lastName.value,
       email: this.authService.userEmail,
-      ReceiveEmailNotifications: this.notifications.value
+      receiveEmailNotifications: this.notifications.value
     }
     this.authService.editUser(userInfo).subscribe(data => {
       this.savedChanges = true;
