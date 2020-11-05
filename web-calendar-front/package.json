@@ -29,7 +29,6 @@
     "@ng-select/ng-select": "^5.0.8",
     "angular-calendar": "^0.28.20",
     "bootstrap": "^4.5.0",
-    "date-fns": "^2.16.1",
     "jquery": "^3.5.1",
     "moment": "^2.29.1",
     "ng-bootstrap": "^1.6.3",

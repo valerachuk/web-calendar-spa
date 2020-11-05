@@ -21,8 +21,8 @@ namespace WebCalendar.Business.Domains
     }
     public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
     {
-      List<CalendarItemViewModel>  сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable <CalendarItemViewModel>>(
-        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId)).ToList();
+      IEnumerable<CalendarItemViewModel>  сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable <CalendarItemViewModel>>(
+        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId));
 
       return сalendarItems;
     }
