@@ -29,8 +29,11 @@ namespace WebCalendar.Data.Repositories
     public bool Edit(User user)
     {
       var editUser = _context.Users.Find(user.Id);
+      if (editUser == null)
+        return false;
       editUser.FirstName = user.FirstName;
       editUser.LastName = user.LastName;
+      editUser.ReceiveEmailNotifications = user.ReceiveEmailNotifications;
       return _context.SaveChanges() > 0;
     }
   }

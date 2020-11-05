@@ -2,5 +2,6 @@ export interface UserInfo {
   id: number,
   firstName: string,
   lastName: string,
-  email: string
+  email: string,
+  ReceiveEmailNotifications: boolean
 }

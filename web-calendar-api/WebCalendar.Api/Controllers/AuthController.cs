@@ -26,11 +26,9 @@ namespace WebCalendar.Api.Controllers
 
     private IActionResult GenerateUserInfo(int id)
 		{
-      var userDomain = _userDomain.GetUser(id);
-
       return Ok(new
       {
-        access_token = _userDomain.GenerateJWT(userDomain)
+        access_token = _userDomain.GenerateJWT(id)
       });
     }
 
@@ -62,11 +60,8 @@ namespace WebCalendar.Api.Controllers
     [HttpPut("edit")]
     public IActionResult EditUser(UserViewModel user)
     {
-      if (_userDomain.EditUser(user))
-        return Ok(new
-        {
-          access_token = _userDomain.GenerateJWT(user)
-        });
+      if (_userDomain.EditUser(user, User.GetId()))
+        return GenerateUserInfo(User.GetId());
 
       return BadRequest();
     }

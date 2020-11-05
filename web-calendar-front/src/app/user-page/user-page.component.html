@@ -46,7 +46,10 @@
               </div>
             </div>
             <div class="form-check">
-              <input type="checkbox" id="emailCheckBox" class="form-check-input">
+              <input type="checkbox" 
+                class="form-check-input"
+                [formControl]="notifications"
+                id="emailCheckBox">
               <label for="emailCheckBox">Enable email notifications</label>
             </div>
           </form>
@@ -54,6 +57,9 @@
             <button type="submit" (click)="saveChanges()" class="btn btn-danger">Save changes</button>
             <div *ngIf="savedChanges" class="alert alert-success mt-2">
               Changes saved
+            </div>
+            <div *ngIf="errors.length > 0" class="alert alert-danger mt-2">
+              {{errors.toString()}}
             </div>
           </div>
         </ng-template>

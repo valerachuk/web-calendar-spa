@@ -22,6 +22,7 @@ export class AuthService {
   public firstName: string;
   public lastName: string;
   public userEmail: string;
+  public userNotify: boolean;
   
   constructor(
     private httpClient: HttpClient,
@@ -40,6 +41,7 @@ export class AuthService {
       this.firstName = tokenInfo.firstName;
       this.lastName = tokenInfo.lastName;
       this.userEmail = tokenInfo.email;
+      this.userNotify = (tokenInfo.notifications === 'True');
     }
     catch {
       this.router.navigate(['auth']);
