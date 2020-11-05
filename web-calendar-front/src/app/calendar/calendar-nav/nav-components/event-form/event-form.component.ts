@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal, NgbDateStruct, NgbModal, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
-
 import { Calendar } from 'src/app/interfaces/calendar.interface';
-import { NotificationTime, Reiteration, CalendarEvent } from 'src/app/interfaces/event.interface';
+import { CalendarEvent } from 'src/app/interfaces/event.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
@@ -27,6 +26,8 @@ export class EventFormComponent implements OnInit {
 
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
+
+  @Output() isSucsses = false;
 
   eventForm = new FormGroup({
     eventName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
@@ -88,7 +89,7 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
-
+    this.isSucsses = false;
     this.calendarEvent.startDateTime = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     this.calendarEvent.endDateTime = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
     this.eventForm.disable();
@@ -96,16 +97,19 @@ export class EventFormComponent implements OnInit {
     this.eventService.addEvent(this.calendarEvent)
       .subscribe(response => {
         this.addedNewCalendarEvent = true;
+
         setTimeout(() => this.addedNewCalendarEvent = false, 2500);
       },
         error => {
           this.error = error.error;
           this.eventForm.enable();
+          this.isSucsses = false;
         }, () => {
           this.error = null;
           this.eventForm.reset();
           this.dateTimeInit();
           this.eventForm.enable();
+          this.isSucsses = true;
         });
     this.error = null;
   }

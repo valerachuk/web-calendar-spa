@@ -30,7 +30,7 @@
       </table>
       <div class="d-flex">
         <ng-select [items]="calendars" bindLabel="name" bindValue="id" placeholder="Search calendar"
-          [(ngModel)]="selectedItems" [multiple]="true" class="w-100" (change)="updateCalendarItems()">
+          [(ngModel)]="selectedCalendars" [multiple]="true" class="w-100" (change)="updateCalendarItems()">
         </ng-select>
       </div>
       <table class="table table-fixed">

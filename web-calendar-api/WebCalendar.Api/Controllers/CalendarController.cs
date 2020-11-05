@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Api.Extensions;
-using WebCalendar.Business.Domains;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 
@@ -9,6 +8,7 @@ namespace WebCalendar.Api.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [Authorize]
   public class CalendarController : ControllerBase
   {
     private readonly ICalendarDomain _caDomain;
@@ -20,13 +20,6 @@ namespace WebCalendar.Api.Controllers
 
     [HttpGet("{id}")]
     public IActionResult GetUserCalendars(int id) => Ok(_caDomain.GetUserCalendars(id));
-
-    [HttpGet]
-    [Route ("Items")]
-    public IActionResult GetCalendarsItems([FromQuery]int[] id)
-    {
-      return Ok(id); // will get CalendarItemViewModel
-    }
 
     [HttpPost]
     public IActionResult AddCalendar(CalendarViewModel calendar)

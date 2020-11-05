@@ -14,6 +14,7 @@ import { DefaultLayoutComponent } from './default-layout/default-layout.componen
 import { AuthorizeLayoutComponent } from './authorize-layout/authorize-layout.component';
 import { MyIdComponent } from './my-id/my-id.component';
 import { ToastGlobalComponent } from './toast-global/toast-global.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -36,6 +37,7 @@ function tokenGetter(): string {
     AppRoutingModule,
     HttpClientModule,
     NgbModule,
+    BrowserAnimationsModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

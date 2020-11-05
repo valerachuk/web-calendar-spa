@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 namespace WebCalendar.Api.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [Authorize]
   public class EventController : ControllerBase
   {
     private readonly IEventDomain _evDomain;

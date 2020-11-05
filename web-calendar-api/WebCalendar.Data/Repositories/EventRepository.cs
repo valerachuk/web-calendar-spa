@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
@@ -11,6 +12,11 @@ namespace WebCalendar.Data.Repositories
     {
       _context = context;
     }
+    public Event GetEvent(int id)
+    {
+      return _context.Events.Where(calendarEvent => calendarEvent.Id == id).FirstOrDefault();
+    }
+
     public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int seriesId)
     {
       _context.Events.AddRange(calendarEvents);
