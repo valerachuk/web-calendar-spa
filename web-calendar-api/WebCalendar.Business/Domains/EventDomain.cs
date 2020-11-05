@@ -17,7 +17,10 @@ namespace WebCalendar.Business.Domains
       _evRepository = eventRepository;
       _mapper = mapper;
     }
-
+    public EventViewModel GetEvent(int id)
+    {
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
+    }
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
       int seriesId = AddMainEventOfSeries(calendarEvent);

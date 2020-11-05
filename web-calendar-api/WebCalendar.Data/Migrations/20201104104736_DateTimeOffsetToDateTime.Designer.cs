@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201104104736_DateTimeOffsetToDateTime")]
+    partial class DateTimeOffsetToDateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,11 +114,6 @@ namespace WebCalendar.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<bool>("ReceiveEmailNotifications")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -136,7 +133,6 @@ namespace WebCalendar.Data.Migrations
                             FirstName = "FN1",
                             LastName = "LN1",
                             PasswordHash = new byte[] { 1, 2, 3, 4, 5 },
-                            ReceiveEmailNotifications = false,
                             Salt = new byte[] { 1, 2 }
                         },
                         new
@@ -146,7 +142,6 @@ namespace WebCalendar.Data.Migrations
                             FirstName = "FN2",
                             LastName = "LN2",
                             PasswordHash = new byte[] { 1, 2, 3, 4, 5 },
-                            ReceiveEmailNotifications = false,
                             Salt = new byte[] { 1, 2 }
                         },
                         new
@@ -156,7 +151,6 @@ namespace WebCalendar.Data.Migrations
                             FirstName = "FN3",
                             LastName = "LN3",
                             PasswordHash = new byte[] { 1, 2, 3, 4, 5 },
-                            ReceiveEmailNotifications = false,
                             Salt = new byte[] { 1, 2 }
                         });
                 });

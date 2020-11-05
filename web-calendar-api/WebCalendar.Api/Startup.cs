@@ -76,11 +76,13 @@ namespace WebCalendar.Api
       services.AddTransient<IUserRepository, UserRepository>();
       services.AddTransient<ICalendarRepository, CalendarRepository>();
       services.AddTransient<IEventRepository, EventRepository>();
+      services.AddTransient<ICalendarItemRepository, CalendarItemRepository>();
 
       // Domains
       services.AddTransient<IUserDomain, UserDomain>();
       services.AddTransient<ICalendarDomain, CalendarDomain>();
       services.AddTransient<IEventDomain, EventDomain>();
+      services.AddTransient<ICalendarItemDomain, CalendarItemDomain>();
       services.AddTransient<INotificationSenderDomain, NotificationSenderDomain>();
 
       // AutoMapper
