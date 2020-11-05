@@ -27,8 +27,6 @@ export class EventFormComponent implements OnInit {
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
 
-  @Output() isSucsses = false;
-
   eventForm = new FormGroup({
     eventName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
     eventVenue: new FormControl(null, Validators.maxLength(100)),
@@ -89,7 +87,6 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
-    this.isSucsses = false;
     this.calendarEvent.startDateTime = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     this.calendarEvent.endDateTime = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
     this.eventForm.disable();
@@ -103,13 +100,11 @@ export class EventFormComponent implements OnInit {
         error => {
           this.error = error.error;
           this.eventForm.enable();
-          this.isSucsses = false;
         }, () => {
           this.error = null;
           this.eventForm.reset();
           this.dateTimeInit();
           this.eventForm.enable();
-          this.isSucsses = true;
         });
     this.error = null;
   }

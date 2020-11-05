@@ -13,16 +13,14 @@ namespace WebCalendar.Data.Repositories
     {
       _context = context;
     }
-    public IEnumerable<Event> GetClaendarsEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
+    public IEnumerable<Event> GetCalendarsEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
     {
-      List<Event> calendarEvents = new List<Event>();
       var eventsList = _context.Events.Where(calendarEvent =>
         calendarEvent.StartDateTime >= startDateTime &&
         calendarEvent.EndDateTime <= endDateTime &&
         calendarsId.Contains(calendarEvent.CalendarId)
-     );
-      calendarEvents.AddRange(eventsList);
-      return calendarEvents;
+     ).ToList();
+      return eventsList;
     }
   }
 }

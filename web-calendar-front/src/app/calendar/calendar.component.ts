@@ -7,10 +7,6 @@ import {
   CalendarView,
   CalendarWeekViewBeforeRenderEvent
 } from 'angular-calendar';
-import {
-  isSameDay,
-  isSameMonth
-} from 'date-fns';
 import * as moment from 'moment';
 
 
@@ -32,8 +28,7 @@ export class CalendarComponent implements OnInit {
   CalendarView = CalendarView;
 
   isActiveDayOpen = false;
-  isEventModified = false;
-
+  
   viewDate: Date = new Date();
   events: CalendarEvent[] = [];
 
@@ -55,9 +50,11 @@ export class CalendarComponent implements OnInit {
   }
 
   public updateCalendarItems() {
-    if (this.selectedCalendars.length > 0 || this.isEventModified) {
-      var timeInterval = [this.startDate.toJSON(), this.endDate.toJSON()];
-      this.calendarComponentService.getCalendarsItems(timeInterval, this.selectedCalendars)
+    if (this.selectedCalendars.length > 0) {
+      this.calendarComponentService.getCalendarsItems(
+        this.startDate.toJSON(), 
+        this.endDate.toJSON(), 
+        this.selectedCalendars)
         .subscribe(calendarItems => {
           calendarItems.map(item => {
             item.title = item['name'];
@@ -72,10 +69,9 @@ export class CalendarComponent implements OnInit {
   }
 
   setDateTimeInterval(renderEvent: any) {
-    if (this.startDate.getTime() !== renderEvent.period.start.getTime() || this.isEventModified) {
+    if (this.startDate.getTime() !== renderEvent.period.start.getTime()) {
       this.startDate = renderEvent.period.start;
       this.endDate = renderEvent.period.end;
-      this.isEventModified = false;
       this.updateCalendarItems();
     }
   }
@@ -93,9 +89,9 @@ export class CalendarComponent implements OnInit {
   }
 
   dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
-    if (isSameMonth(date, this.viewDate)) {
+    if (date.getMonth() === this.viewDate.getMonth()) {
       if (
-        (isSameDay(this.viewDate, date) && this.isActiveDayOpen === true) ||
+        (this.viewDate.getDay() === date.getDay() && this.isActiveDayOpen === true) ||
         events.length === 0
       ) {
         this.isActiveDayOpen = false;

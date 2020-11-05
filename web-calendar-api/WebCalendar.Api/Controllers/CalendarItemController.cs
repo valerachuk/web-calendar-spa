@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.ViewModels;
 
 namespace WebCalendar.Api.Controllers
 {
@@ -16,9 +17,9 @@ namespace WebCalendar.Api.Controllers
       _itDomain = calendarItemDomain;
     }
     [HttpGet]
-    public IActionResult GetCalendarsItems([FromQuery] DateTime[] timeInterval, [FromQuery] int[] id)
+    public IActionResult GetCalendarsItems([FromQuery] CalendarItemFilterViewModel filter)
     {
-      var items = _itDomain.GetCalendarsItemsByTimeInterval(timeInterval[0], timeInterval[1], id);
+      var items = _itDomain.GetCalendarsItemsByTimeInterval(filter.Start, filter.End, filter.Id);
       return Ok(items);
     }
   }

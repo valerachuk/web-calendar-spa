@@ -6,6 +6,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
 {
   public interface ICalendarItemRepository
   {
-    IEnumerable<Event> GetClaendarsEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId);
+    IEnumerable<Event> GetCalendarsEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId);
   }
 }

@@ -14,9 +14,10 @@ export class CalendarItemsService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getCalendarsItems(timeInterval: string[], selectedCalendars: number[]): Observable<CalendarEvent[]> {
+  getCalendarsItems(startDate: string, endDate: string,  selectedCalendars: number[]): Observable<CalendarEvent[]> {
     const paramObject = {
-      timeInterval: timeInterval.map(interval => interval),
+      start: startDate,
+      end: endDate,
       id: selectedCalendars.map(calendatId => calendatId)
     };
 

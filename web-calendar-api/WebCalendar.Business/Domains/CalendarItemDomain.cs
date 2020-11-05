@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
@@ -20,12 +21,10 @@ namespace WebCalendar.Business.Domains
     }
     public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
     {
-      List<CalendarItemViewModel> calendarItems = new List<CalendarItemViewModel>();
-      var calendarEvents = _mapper.Map<IEnumerable<Event>, IEnumerable <EventViewModel>>(
-        _itRepository.GetClaendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId));
+      List<CalendarItemViewModel>  сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable <CalendarItemViewModel>>(
+        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId)).ToList();
 
-      calendarItems.AddRange(_mapper.Map<IEnumerable<EventViewModel>, IEnumerable<CalendarItemViewModel>>(calendarEvents));
-      return calendarItems;
+      return сalendarItems;
     }
   }
 }

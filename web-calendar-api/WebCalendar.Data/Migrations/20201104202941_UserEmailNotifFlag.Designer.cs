@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201104202941_UserEmailNotifFlag")]
+    partial class UserEmailNotifFlag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,8 +58,8 @@ namespace WebCalendar.Data.Migrations
                     b.Property<int>("CalendarId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("EndDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -75,8 +77,8 @@ namespace WebCalendar.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq");
 
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("StartDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Venue")
                         .HasColumnType("nvarchar(100)")
