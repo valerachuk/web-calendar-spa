@@ -23,19 +23,7 @@ namespace WebCalendar.Business.Domains
     public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
     {
       IEnumerable<CalendarItemViewModel> сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable<CalendarItemViewModel>>(
-        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId))
-        .Select(ev =>
-        {
-          if (ev.Reiteration == null)
-          {
-            ev.MetaType = CalendarItemType.Event;
-          }
-          else
-          {
-            ev.MetaType = CalendarItemType.RepeatableEvent;
-          }
-          return ev;
-        });
+        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId));
 
       return сalendarItems;
     }

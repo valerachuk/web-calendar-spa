@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
@@ -24,14 +26,15 @@ namespace WebCalendar.Business.Domains
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
       var seriesId = AddMainEventOfSeries(calendarEvent);
-      if (seriesId != null) {
+      if (seriesId != null)
+      {
         GenerateEventsOfSeries(calendarEvent, seriesId.GetValueOrDefault());
       }
     }
 
     private int? AddMainEventOfSeries(EventViewModel calendarEvent)
     {
-     return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -53,14 +56,37 @@ namespace WebCalendar.Business.Domains
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
 
-    public void DeleteCalendarEvent(int id)
+    public void DeleteCalendarEvent(int id, IEnumerable<int> calendarsId)
     {
-      _evRepository.DeleteCalendarEvent(id);
+      try
+      {
+        _evRepository.DeleteCalendarEvent(id, calendarsId);
+      }
+      catch (KeyNotFoundException)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      catch (UnauthorizedAccessException)
+      {
+        throw new ForbiddenException("Not event owner");
+      }
     }
 
-    public void DeleteCalendarEventSeries(int id)
+    public void DeleteCalendarEventSeries(int id, IEnumerable<int> calendarsId)
     {
-      _evRepository.DeleteCalendarEventSeries(id);
+      try
+      {
+        _evRepository.DeleteCalendarEventSeries(id, calendarsId);
+      }
+      catch (KeyNotFoundException)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      catch (UnauthorizedAccessException)
+      {
+        throw new ForbiddenException("Not event owner");
+      }
+
     }
   }
 }

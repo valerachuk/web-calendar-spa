@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WebCalendar.Constants.Enums
+﻿namespace WebCalendar.Constants.Enums
 {
   public enum CalendarItemType
   {

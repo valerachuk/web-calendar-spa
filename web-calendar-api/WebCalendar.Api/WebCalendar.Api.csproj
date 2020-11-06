@@ -5,9 +5,9 @@
     <RootNamespace>WebCalendar.Api</RootNamespace>
     <UserSecretsId>8e77cb57-33a0-41b2-b5da-c7a0e3e9d7f3</UserSecretsId>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <Content Remove="appsettings.json" />
+    <Content Remove="appsettings.Example.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,12 +18,6 @@
     <Content Include="Resources\message.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,5 +32,10 @@
     <ProjectReference Include="..\WebCalendar.Business\WebCalendar.Business.csproj" />
   </ItemGroup>
 
+<ItemGroup>
+    <None Include="appsettings.Example.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+	</ItemGroup>
 
 </Project>

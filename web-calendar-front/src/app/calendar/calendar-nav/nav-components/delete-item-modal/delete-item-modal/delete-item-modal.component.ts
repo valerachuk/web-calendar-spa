@@ -27,7 +27,7 @@ export class DeleteItemModalComponent implements OnInit {
     this.isEventRepeatable = !this.isEventRepeatable;
   }
 
-  deleteSinglEvent() {
+  deleteSingleEvent() {
     this.eventService.deleteEvent(+this.item.id).subscribe(id => {
       this.activeModal.close(id)},
       err => {
@@ -49,13 +49,13 @@ export class DeleteItemModalComponent implements OnInit {
   deleteCalendarItem() {
     switch (this.item.meta) {
       case ItemType.Event:
-        this.deleteSinglEvent();
+        this.deleteSingleEvent();
         break;
       case ItemType.RepeatableEvent:
         if (this.isEventRepeatable) {
           this.deleteEventSeries();
         } else {
-          this.deleteSinglEvent();
+          this.deleteSingleEvent();
         }
         break;
       case ItemType.Task:

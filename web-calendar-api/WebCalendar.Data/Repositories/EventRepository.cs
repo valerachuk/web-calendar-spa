@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
@@ -35,19 +36,33 @@ namespace WebCalendar.Data.Repositories
       return calendarEvent.SeriesId;
     }
 
-    public void DeleteCalendarEvent(int calendarEventId)
+    public void DeleteCalendarEvent(int calendarEventId, IEnumerable<int> calendarsId)
     {
-      var currentEvent = _context.Events.Where(ev => ev.Id == calendarEventId).FirstOrDefault();
+      if (!calendarsId.Contains(_context.Events.Select(x => x.CalendarId).FirstOrDefault()))
+        throw new UnauthorizedAccessException();
+
+      var currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+        throw new KeyNotFoundException();
+
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
+
     }
 
-    public void DeleteCalendarEventSeries(int calendarEventId)
+    public void DeleteCalendarEventSeries(int calendarEventId, IEnumerable<int> calendarsId)
     {
-      Event currentEvent = _context.Events.Where(ev => ev.Id == calendarEventId).FirstOrDefault();
+      if (!calendarsId.Contains(_context.Events.Select(x => x.CalendarId).FirstOrDefault()))
+        throw new UnauthorizedAccessException();
+
+      Event currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+        throw new KeyNotFoundException();
+
       IEnumerable<Event> eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);
       _context.Events.RemoveRange(eventSeries);
       _context.SaveChanges();
+
     }
   }
 }

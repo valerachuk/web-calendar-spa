@@ -1,4 +1,5 @@
-﻿using WebCalendar.Business.ViewModels;
+﻿using System.Collections.Generic;
+using WebCalendar.Business.ViewModels;
 
 namespace WebCalendar.Business.Domains.Interfaces
 {
@@ -6,7 +7,7 @@ namespace WebCalendar.Business.Domains.Interfaces
   {
     EventViewModel GetEvent(int id);
     void AddCalendarEvent(EventViewModel calendarEvent);
-    void DeleteCalendarEvent(int id);
-    void DeleteCalendarEventSeries(int id);
+    void DeleteCalendarEvent(int id, IEnumerable<int> calendarsId);
+    void DeleteCalendarEventSeries(int id, IEnumerable<int> calendarsId);
   }
 }
