@@ -23,19 +23,21 @@ namespace WebCalendar.Business.Domains
     }
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
-      int seriesId = AddMainEventOfSeries(calendarEvent);
-      GenerateEventsOfSeries(calendarEvent, seriesId);
+      var seriesId = AddMainEventOfSeries(calendarEvent);
+      if (seriesId != null) {
+        GenerateEventsOfSeries(calendarEvent, seriesId.GetValueOrDefault());
+      }
     }
 
-    private int AddMainEventOfSeries(EventViewModel calendarEvent)
+    private int? AddMainEventOfSeries(EventViewModel calendarEvent)
     {
-      return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+     return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
     {
       var generatedEvents = new List<Event>();
-      int eventRepetitionsNumber = calendarEvent.Reiteration != null ? 365 : -1;
+      int eventRepetitionsNumber = 365;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
 
       // Create events in one series for a selected time interval for the year ahead
@@ -49,6 +51,16 @@ namespace WebCalendar.Business.Domains
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
+    }
+
+    public void DeleteCalendarEvent(int id)
+    {
+      _evRepository.DeleteCalendarEvent(id);
+    }
+
+    public void DeleteCalendarEventSeries(int id)
+    {
+      _evRepository.DeleteCalendarEventSeries(id);
     }
   }
 }

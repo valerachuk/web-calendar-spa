@@ -8,6 +8,9 @@ import {
   CalendarWeekViewBeforeRenderEvent
 } from 'angular-calendar';
 import * as moment from 'moment';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteItemModalComponent } from './calendar-nav/nav-components/delete-item-modal/delete-item-modal/delete-item-modal.component';
+import { ItemType } from '../enums/calendar-item-type.enum';
 
 
 @Component({
@@ -28,7 +31,7 @@ export class CalendarComponent implements OnInit {
   CalendarView = CalendarView;
 
   isActiveDayOpen = false;
-  
+
   viewDate: Date = new Date();
   events: CalendarEvent[] = [];
 
@@ -37,8 +40,11 @@ export class CalendarComponent implements OnInit {
 
   selectedCalendars = [];
 
+  clickedItem: CalendarEvent;
+
   constructor(
-    private calendarComponentService: CalendarItemsService) { }
+    private calendarComponentService: CalendarItemsService,
+    private modalService: NgbModal) { }
 
   ngOnInit() {
     this.startDate = this.viewDate;
@@ -52,14 +58,25 @@ export class CalendarComponent implements OnInit {
   public updateCalendarItems() {
     if (this.selectedCalendars.length > 0) {
       this.calendarComponentService.getCalendarsItems(
-        this.startDate.toJSON(), 
-        this.endDate.toJSON(), 
+        this.startDate.toJSON(),
+        this.endDate.toJSON(),
         this.selectedCalendars)
         .subscribe(calendarItems => {
           calendarItems.map(item => {
+            item.id = item['id'];
             item.title = item['name'];
             item.start = new Date(item['startDateTime']);
             item.end = new Date(item['endDateTime']);
+            item.meta = item['metaType'] as ItemType;
+            item.actions = [
+              {
+                label: '<i class="fas fa-fw fa-trash-alt"></i>',
+                a11yLabel: 'Delete',
+                onClick: ({ event }: { event: CalendarEvent }): void => {
+                  this.clickedItem = event;
+                  this.openDeleteItemModal(event);
+                }
+              }]
           });
           this.events = calendarItems;
         });
@@ -104,5 +121,14 @@ export class CalendarComponent implements OnInit {
 
   closeOpenMonthViewDay() {
     this.isActiveDayOpen = false;
+  }
+
+  openDeleteItemModal(calendarItem: CalendarEvent) {
+    let modalRef = this.modalService.open(DeleteItemModalComponent, { centered: true, size: 'sm' });
+    modalRef.componentInstance.item = calendarItem;
+    modalRef.result.then(() => {
+      this.updateCalendarItems();
+      this.closeOpenMonthViewDay();
+    });
   }
 }

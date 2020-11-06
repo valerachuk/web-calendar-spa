@@ -44,5 +44,20 @@ namespace WebCalendar.Api.Controllers
 
       return Ok(calendarEvent);
     }
+
+    [HttpDelete]
+    public IActionResult DeleteEvent(int id)
+    {
+      _evDomain.DeleteCalendarEvent(id);
+      return Ok();
+    }
+
+    [HttpDelete]
+    [Route("DeleteSeries")]
+    public IActionResult DeleteEventSeries([FromQuery] int id)
+    {
+      _evDomain.DeleteCalendarEventSeries(id);
+      return Ok();
+    }
   }
 }

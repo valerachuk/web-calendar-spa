@@ -6,5 +6,7 @@ namespace WebCalendar.Business.Domains.Interfaces
   {
     EventViewModel GetEvent(int id);
     void AddCalendarEvent(EventViewModel calendarEvent);
+    void DeleteCalendarEvent(int id);
+    void DeleteCalendarEventSeries(int id);
   }
 }

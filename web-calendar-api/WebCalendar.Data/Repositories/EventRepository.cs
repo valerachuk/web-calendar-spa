@@ -17,16 +17,37 @@ namespace WebCalendar.Data.Repositories
       return _context.Events.Where(calendarEvent => calendarEvent.Id == id).FirstOrDefault();
     }
 
-    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int seriesId)
+    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
     {
       _context.Events.AddRange(calendarEvents);
       _context.SaveChanges();
     }
-    public int AddCalendarEvents(Event calendarEvent)
+    public int? AddCalendarEvents(Event calendarEvent)
     {
       _context.Events.Add(calendarEvent);
       _context.SaveChanges();
+
+      // If it has no reiteration, seriesId must to be null 
+      if (calendarEvent.Reiteration == null)
+      {
+        return null;
+      }
       return calendarEvent.SeriesId;
+    }
+
+    public void DeleteCalendarEvent(int calendarEventId)
+    {
+      var currentEvent = _context.Events.Where(ev => ev.Id == calendarEventId).FirstOrDefault();
+      _context.Events.Remove(currentEvent);
+      _context.SaveChanges();
+    }
+
+    public void DeleteCalendarEventSeries(int calendarEventId)
+    {
+      Event currentEvent = _context.Events.Where(ev => ev.Id == calendarEventId).FirstOrDefault();
+      IEnumerable<Event> eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);
+      _context.Events.RemoveRange(eventSeries);
+      _context.SaveChanges();
     }
   }
 }
