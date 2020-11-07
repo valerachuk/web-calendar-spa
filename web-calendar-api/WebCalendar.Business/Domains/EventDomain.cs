@@ -62,7 +62,7 @@ namespace WebCalendar.Business.Domains
       {
         throw new NotFoundException("Event not found");
       }
-      if (UserId == currentEvent.Item2)
+      if (UserId != currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }
@@ -76,7 +76,7 @@ namespace WebCalendar.Business.Domains
       {
         throw new NotFoundException("Event not found");
       }
-      if (UserId == currentEvent.Item2)
+      if (UserId != currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }

@@ -19,7 +19,7 @@ namespace WebCalendar.Data.Repositories
         .Join(_context.Calendars,
         ev => ev.CalendarId,
         cal => cal.Id,
-        (ev, cal) => new { ev, cal.Id }).Select(c => new Tuple<Event, int>(c.ev, c.Id)).FirstOrDefault();
+        (ev, cal) => new { ev, cal.UserId }).Select(c => new Tuple<Event, int>(c.ev, c.UserId)).FirstOrDefault();
     }
 
     public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
