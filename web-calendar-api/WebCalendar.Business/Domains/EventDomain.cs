@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
@@ -22,7 +20,7 @@ namespace WebCalendar.Business.Domains
     }
     public EventViewModel GetEvent(int id)
     {
-      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
     }
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
@@ -57,30 +55,32 @@ namespace WebCalendar.Business.Domains
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
 
-    public void DeleteCalendarEvent(int id, IEnumerable<int> calendarsId)
+    public void DeleteCalendarEvent(int id, int UserId)
     {
-      if (_evRepository.GetEvent(id) == null)
+      var currentEvent = _evRepository.GetEvent(id);
+      if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (!calendarsId.Contains(_evRepository.GetEvent(id).CalendarId))
+      if (UserId == currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }
-      _evRepository.DeleteCalendarEvent(id, calendarsId);
+      _evRepository.DeleteCalendarEvent(id);
     }
 
-    public void DeleteCalendarEventSeries(int id, IEnumerable<int> calendarsId)
+    public void DeleteCalendarEventSeries(int id, int UserId)
     {
-      if (_evRepository.GetEvent(id) == null)
+      var currentEvent = _evRepository.GetEvent(id);
+      if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (!calendarsId.Contains(_evRepository.GetEvent(id).CalendarId))
+      if (UserId == currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }
-      _evRepository.DeleteCalendarEventSeries(id, calendarsId);
+      _evRepository.DeleteCalendarEventSeries(id);
     }
   }
 }

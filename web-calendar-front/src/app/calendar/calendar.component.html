@@ -37,13 +37,20 @@
     </div>
     <br>
     <div [ngSwitch]="view">
+      <ng-template #customTitleTemplate let-event="event" let-eventClicked="eventClicked">
+        <span class="font-weight-bold">{{event.title}}</span>
+        <button (click)="openDeleteItemModal(event)" class="btn">
+          <fa-icon [icon]="faTrash" class="text-danger"></fa-icon>
+        </button>
+      </ng-template>
       <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
         [activeDayIsOpen]="isActiveDayOpen" [refresh]="refresh" (beforeViewRender)="beforeMonthViewRender($event);"
-        (dayClicked)="dayClicked($event.day)"></mwl-calendar-month-view>
+        (dayClicked)="dayClicked($event.day)" [eventTitleTemplate]="customTitleTemplate"></mwl-calendar-month-view>
       <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
-        (beforeViewRender)="beforeWeekViewRender($event)"></mwl-calendar-week-view>
+        (beforeViewRender)="beforeWeekViewRender($event)" [eventTitleTemplate]="customTitleTemplate">
+      </mwl-calendar-week-view>
       <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events"
-        (beforeViewRender)="beforeDayViewRender($event)">
+        (beforeViewRender)="beforeDayViewRender($event)" [eventTitleTemplate]="customTitleTemplate">
       </mwl-calendar-day-view>
     </div>
   </main>

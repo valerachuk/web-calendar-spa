@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
@@ -14,13 +13,11 @@ namespace WebCalendar.Api.Controllers
   {
     private readonly IEventDomain _evDomain;
     private readonly INotificationSenderDomain _notificationSender;
-    private readonly ICalendarDomain _calendarDomain;
 
-    public EventController(IEventDomain eventDomain, INotificationSenderDomain notificationSender, ICalendarDomain calendarDomain)
+    public EventController(IEventDomain eventDomain, INotificationSenderDomain notificationSender)
     {
       _evDomain = eventDomain;
       _notificationSender = notificationSender;
-      _calendarDomain = calendarDomain;
     }
 
     [HttpPost]
@@ -51,8 +48,7 @@ namespace WebCalendar.Api.Controllers
     [HttpDelete]
     public IActionResult DeleteEvent(int id)
     {
-      var userCalendarsId = _calendarDomain.GetUserCalendars(User.GetId()).Select(c => c.Id);
-      _evDomain.DeleteCalendarEvent(id, userCalendarsId);
+      _evDomain.DeleteCalendarEvent(id, User.GetId());
       return Ok();
     }
 
@@ -60,8 +56,7 @@ namespace WebCalendar.Api.Controllers
     [Route("DeleteSeries")]
     public IActionResult DeleteEventSeries([FromQuery] int id)
     {
-      var userCalendarsId = _calendarDomain.GetUserCalendars(User.GetId()).Select(c => c.Id);
-      _evDomain.DeleteCalendarEventSeries(id, userCalendarsId);
+      _evDomain.DeleteCalendarEventSeries(id, User.GetId());
       return Ok();
     }
   }

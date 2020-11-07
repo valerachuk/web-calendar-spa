@@ -13,9 +13,13 @@ namespace WebCalendar.Data.Repositories
     {
       _context = context;
     }
-    public Event GetEvent(int id)
+    public Tuple<Event, int> GetEvent(int id)
     {
-      return _context.Events.Where(calendarEvent => calendarEvent.Id == id).FirstOrDefault();
+        return _context.Events.Where(calendarEvent => calendarEvent.Id == id)
+        .Join(_context.Calendars,
+        ev => ev.CalendarId,
+        cal => cal.Id,
+        (ev, cal) => new { ev, cal.Id }).Select(c => new Tuple<Event, int>(c.ev, c.Id)).FirstOrDefault();
     }
 
     public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
@@ -28,7 +32,6 @@ namespace WebCalendar.Data.Repositories
       _context.Events.Add(calendarEvent);
       _context.SaveChanges();
 
-      // If it has no reiteration, seriesId must to be null 
       if (calendarEvent.Reiteration == null)
       {
         return null;
@@ -36,14 +39,14 @@ namespace WebCalendar.Data.Repositories
       return calendarEvent.SeriesId;
     }
 
-    public void DeleteCalendarEvent(int calendarEventId, IEnumerable<int> calendarsId)
+    public void DeleteCalendarEvent(int calendarEventId)
     {
       var currentEvent = _context.Events.Find(calendarEventId);
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
     }
 
-    public void DeleteCalendarEventSeries(int calendarEventId, IEnumerable<int> calendarsId)
+    public void DeleteCalendarEventSeries(int calendarEventId)
     {
       Event currentEvent = _context.Events.Find(calendarEventId);
       IEnumerable<Event> eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);

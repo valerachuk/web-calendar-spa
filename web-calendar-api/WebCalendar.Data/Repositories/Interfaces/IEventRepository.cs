@@ -6,10 +6,10 @@ namespace WebCalendar.Data.Repositories.Interfaces
 {
   public interface IEventRepository
   {
-    Event GetEvent(int id);
+    Tuple<Event, int> GetEvent(int id);
     void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int? seriesId);
     int? AddCalendarEvents(Event calendarEvent);
-    void DeleteCalendarEvent(int calendarEventId, IEnumerable<int> calendarsId);
-    void DeleteCalendarEventSeries(int calendarEventId, IEnumerable<int> calendarsId);
+    void DeleteCalendarEvent(int calendarEventId);
+    void DeleteCalendarEventSeries(int calendarEventId);
   }
 }

@@ -11,6 +11,7 @@ import * as moment from 'moment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteItemModalComponent } from './calendar-nav/nav-components/delete-item-modal/delete-item-modal/delete-item-modal.component';
 import { ItemType } from '../enums/calendar-item-type.enum';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -31,6 +32,7 @@ export class CalendarComponent implements OnInit {
   CalendarView = CalendarView;
 
   isActiveDayOpen = false;
+  faTrash = faTrash;
 
   viewDate: Date = new Date();
   events: CalendarEvent[] = [];
@@ -68,15 +70,6 @@ export class CalendarComponent implements OnInit {
             item.start = new Date(item['startDateTime']);
             item.end = new Date(item['endDateTime']);
             item.meta = item['metaType'] as ItemType;
-            item.actions = [
-              {
-                label: '<i class="fas fa-fw fa-trash-alt"></i>',
-                a11yLabel: 'Delete',
-                onClick: ({ event }: { event: CalendarEvent }): void => {
-                  this.clickedItem = event;
-                  this.openDeleteItemModal(event);
-                }
-              }]
           });
           this.events = calendarItems;
         });
