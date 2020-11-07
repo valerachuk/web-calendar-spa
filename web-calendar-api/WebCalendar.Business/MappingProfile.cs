@@ -12,7 +12,11 @@ namespace WebCalendar.Business
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
       CreateMap<Event, EventViewModel>().ReverseMap();
-      CreateMap<Event, CalendarItemViewModel>();
+      CreateMap<Event, CalendarItemViewModel>().BeforeMap((ev, it) => 
+      _ = ev.Reiteration == null ? 
+      it.MetaType = Constants.Enums.CalendarItemType.Event : 
+      it.MetaType = Constants.Enums.CalendarItemType.RepeatableEvent
+      );
     }
   }
 }

@@ -102,8 +102,7 @@ namespace WebCalendar.Data
 
       eventModelBuilder
         .Property(calendarEvent => calendarEvent.SeriesId)
-        .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq")
-        .IsRequired();
+        .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq");
 
       eventModelBuilder
       .HasOne(calendarEvent => calendarEvent.Calendar)

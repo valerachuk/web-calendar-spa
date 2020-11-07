@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using WebCalendar.Constants.Enums;
 
 namespace WebCalendar.Business.ViewModels
 {
@@ -13,5 +14,8 @@ namespace WebCalendar.Business.ViewModels
     public DateTime StartDateTime { get; set; }
     [Required]
     public DateTime EndDateTime { get; set; }
+    [Required]
+    public CalendarItemType MetaType { get; set; }
+    public Reiteration? Reiteration { get; set; }
   }
 }

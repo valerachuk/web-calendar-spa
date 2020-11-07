@@ -14,6 +14,14 @@ export class CalendarEventService {
   constructor(private httpClient: HttpClient) { }
 
   addEvent(calendarEvent: CalendarEvent): Observable<string> {
-     return this.httpClient.post<string>(this.apiUrl, calendarEvent);
+    return this.httpClient.post<string>(this.apiUrl, calendarEvent);
+  }
+
+  deleteEvent(id: number): Observable<string> {
+    return this.httpClient.delete<string>(this.apiUrl + "?id=" + +id);
+  }
+
+  deleteEventSeries(id: number): Observable<string> {
+    return this.httpClient.delete<string>(this.apiUrl + "/DeleteSeries?id=" + id);
   }
 }

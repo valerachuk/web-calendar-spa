@@ -5,7 +5,7 @@
     <RootNamespace>WebCalendar.Api</RootNamespace>
     <UserSecretsId>8e77cb57-33a0-41b2-b5da-c7a0e3e9d7f3</UserSecretsId>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Content Remove="appsettings.Example.json" />
   </ItemGroup>
@@ -21,12 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="appsettings.Example.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.9">
       <PrivateAssets>all</PrivateAssets>
@@ -38,5 +32,10 @@
     <ProjectReference Include="..\WebCalendar.Business\WebCalendar.Business.csproj" />
   </ItemGroup>
 
+<ItemGroup>
+    <None Include="appsettings.Example.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+	</ItemGroup>
 
 </Project>
