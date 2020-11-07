@@ -8,6 +8,7 @@ namespace WebCalendar.Data.Repositories.Interfaces
   {
     Event GetEvent(int id);
     void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int seriesId);
-    int AddCalendarEvents(Event calendarEvent);
+    Event AddCalendarEvents(Event calendarEvent);
+    void UpdateEvent(Event calendarEvent);
   }
 }

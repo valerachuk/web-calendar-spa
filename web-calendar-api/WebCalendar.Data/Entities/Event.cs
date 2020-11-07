@@ -15,5 +15,6 @@ namespace WebCalendar.Data.Entities
     public NotificationTime? NotificationTime { get; set; } // Minutes
     public Reiteration? Reiteration { get; set; }
     public int SeriesId { get; set; }
+    public string NotificationJobId { get; set; }
   }
 }

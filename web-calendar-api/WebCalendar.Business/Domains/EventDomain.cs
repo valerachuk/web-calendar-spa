@@ -11,23 +11,32 @@ namespace WebCalendar.Business.Domains
   {
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
+    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper)
+    public EventDomain(IEventRepository eventRepository,
+      IMapper mapper,
+      INotificationSenderDomain notificationSender
+      )
     {
       _evRepository = eventRepository;
       _mapper = mapper;
+      _notificationSender = notificationSender;
     }
+
     public EventViewModel GetEvent(int id)
     {
       return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
     }
+
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
-      int seriesId = AddMainEventOfSeries(calendarEvent);
-      GenerateEventsOfSeries(calendarEvent, seriesId);
+      var @event = AddMainEventOfSeries(calendarEvent);
+      GenerateEventsOfSeries(calendarEvent, @event.SeriesId);
+      _notificationSender.ScheduleEventCreatedNotification(@event.Id);
+      _notificationSender.ScheduleEventStartedNotification(@event.Id);
     }
 
-    private int AddMainEventOfSeries(EventViewModel calendarEvent)
+    private Event AddMainEventOfSeries(EventViewModel calendarEvent)
     {
       return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
     }

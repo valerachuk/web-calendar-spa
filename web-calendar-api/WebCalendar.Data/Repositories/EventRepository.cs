@@ -22,11 +22,18 @@ namespace WebCalendar.Data.Repositories
       _context.Events.AddRange(calendarEvents);
       _context.SaveChanges();
     }
-    public int AddCalendarEvents(Event calendarEvent)
+
+    public Event AddCalendarEvents(Event calendarEvent)
     {
       _context.Events.Add(calendarEvent);
       _context.SaveChanges();
-      return calendarEvent.SeriesId;
+      return calendarEvent;
+    }
+
+    public void UpdateEvent(Event calendarEvent)
+    {
+      _context.Events.Update(calendarEvent);
+      _context.SaveChanges();
     }
   }
 }

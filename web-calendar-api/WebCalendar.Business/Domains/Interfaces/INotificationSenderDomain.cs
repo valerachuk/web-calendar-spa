@@ -2,6 +2,7 @@
 {
   public interface INotificationSenderDomain
   {
-    void NotifyEventCreated(string eventName, int userId);
+    void ScheduleEventCreatedNotification(int eventId);
+    void ScheduleEventStartedNotification(int eventId);
   }
 }
