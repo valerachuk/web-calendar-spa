@@ -42,11 +42,11 @@ export class CalendarNavComponent implements OnInit {
     this.modalService.open(EventFormComponent, { centered: true }).result
       .then(closeData => {
         this.updateCalendarItems();
-      }, () => { });;
+      }, () => { });
   }
 
   openAddModal() {
-    this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md'}).result
+    this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md' }).result
       .then(closeData => {
         this.calendars = [...this.calendars, closeData];
       }, () => { });
@@ -72,8 +72,8 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openEditModal(calendar) {
-    let modalRef = this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md'});
-    if(calendar.userId !== this.authService.userId) {
+    let modalRef = this.modalService.open(AddUpdateModalComponent, { centered: true, size: 'md' });
+    if (calendar.userId !== this.authService.userId) {
       modalRef.componentInstance.isCalendarOwner = false;
       return;
     }
@@ -83,7 +83,7 @@ export class CalendarNavComponent implements OnInit {
       this.calendars.splice(this.calendars.findIndex(c => c.id === calendar.id), 1, closeData);
     }, () => { });
   }
-  
+
   calendarIsChecked(calendarId: number) {
     return this.selectedCalendars.includes(calendarId);
   }

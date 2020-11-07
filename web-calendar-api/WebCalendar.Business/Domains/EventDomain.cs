@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
@@ -11,32 +12,26 @@ namespace WebCalendar.Business.Domains
   {
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
-    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventDomain(IEventRepository eventRepository,
-      IMapper mapper,
-      INotificationSenderDomain notificationSender
-      )
+    public EventDomain(IEventRepository eventRepository, IMapper mapper)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
-      _notificationSender = notificationSender;
     }
-
     public EventViewModel GetEvent(int id)
     {
-      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
     }
-
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
-      var @event = AddMainEventOfSeries(calendarEvent);
-      GenerateEventsOfSeries(calendarEvent, @event.SeriesId);
-      _notificationSender.ScheduleEventCreatedNotification(@event.Id);
-      _notificationSender.ScheduleEventStartedNotification(@event.Id);
+      var seriesId = AddMainEventOfSeries(calendarEvent);
+      if (seriesId != null)
+      {
+        GenerateEventsOfSeries(calendarEvent, seriesId.GetValueOrDefault());
+      }
     }
 
-    private Event AddMainEventOfSeries(EventViewModel calendarEvent)
+    private int? AddMainEventOfSeries(EventViewModel calendarEvent)
     {
       return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
     }
@@ -44,7 +39,7 @@ namespace WebCalendar.Business.Domains
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
     {
       var generatedEvents = new List<Event>();
-      int eventRepetitionsNumber = calendarEvent.Reiteration != null ? 365 : -1;
+      int eventRepetitionsNumber = 365;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
 
       // Create events in one series for a selected time interval for the year ahead
@@ -58,7 +53,34 @@ namespace WebCalendar.Business.Domains
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
-      generatedEvents.ForEach(evt => _notificationSender.ScheduleEventStartedNotification(evt.Id)); // 2 sec for execution
+    }
+
+    public void DeleteCalendarEvent(int id, int UserId)
+    {
+      var currentEvent = _evRepository.GetEvent(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      if (UserId != currentEvent.Item2)
+      {
+        throw new ForbiddenException("Not event owner");
+      }
+      _evRepository.DeleteCalendarEvent(id);
+    }
+
+    public void DeleteCalendarEventSeries(int id, int UserId)
+    {
+      var currentEvent = _evRepository.GetEvent(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      if (UserId != currentEvent.Item2)
+      {
+        throw new ForbiddenException("Not event owner");
+      }
+      _evRepository.DeleteCalendarEventSeries(id);
     }
   }
 }

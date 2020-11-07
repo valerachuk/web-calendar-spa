@@ -15,6 +15,7 @@ import { CalendarComponent } from '../calendar/calendar.component';
 import { CalendarNavComponent } from './calendar-nav/calendar-nav.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DeleteItemModalComponent } from './calendar-nav/nav-components/delete-item-modal/delete-item-modal/delete-item-modal.component';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -26,7 +27,8 @@ export function momentAdapterFactory() {
     AddUpdateModalComponent,
     DeleteModalComponent,
     CalendarComponent,
-    CalendarNavComponent
+    CalendarNavComponent,
+    DeleteItemModalComponent
   ],
   exports: [EventFormComponent],
   entryComponents: [EventFormComponent],
