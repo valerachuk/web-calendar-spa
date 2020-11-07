@@ -58,6 +58,7 @@ namespace WebCalendar.Business.Domains
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
+      generatedEvents.ForEach(evt => _notificationSender.ScheduleEventStartedNotification(evt.Id)); // 2 sec for execution
     }
   }
 }

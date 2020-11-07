@@ -56,16 +56,13 @@ namespace WebCalendar.Data.Migrations
                     b.Property<int>("CalendarId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("EndDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
-
-                    b.Property<string>("NotificationJobId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("NotificationTime")
                         .HasColumnType("int");
@@ -78,8 +75,8 @@ namespace WebCalendar.Data.Migrations
                         .HasColumnType("int")
                         .HasDefaultValueSql("NEXT VALUE FOR shared.SeriesId_seq");
 
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("StartDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Venue")
                         .HasColumnType("nvarchar(100)")

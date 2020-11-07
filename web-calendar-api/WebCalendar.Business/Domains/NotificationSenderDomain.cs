@@ -87,7 +87,8 @@ namespace WebCalendar.Business.Domains
 
       var notificationMessage = $@"
         Hello <i>{ user.FirstName },</i>
-        <br>Event <b>{ @event.Name }</b> has been created successfully
+        <br>Event {(@event.Reiteration != null ? "series" : "")}
+        <b>{ @event.Name }</b> has been created successfully
         in calendar <b>{ calendar.Name }</b>.
       ";
 
