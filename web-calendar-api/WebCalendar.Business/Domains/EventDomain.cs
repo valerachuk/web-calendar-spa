@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
@@ -58,35 +59,28 @@ namespace WebCalendar.Business.Domains
 
     public void DeleteCalendarEvent(int id, IEnumerable<int> calendarsId)
     {
-      try
-      {
-        _evRepository.DeleteCalendarEvent(id, calendarsId);
-      }
-      catch (KeyNotFoundException)
+      if (_evRepository.GetEvent(id) == null)
       {
         throw new NotFoundException("Event not found");
       }
-      catch (UnauthorizedAccessException)
+      if (!calendarsId.Contains(_evRepository.GetEvent(id).CalendarId))
       {
         throw new ForbiddenException("Not event owner");
       }
+      _evRepository.DeleteCalendarEvent(id, calendarsId);
     }
 
     public void DeleteCalendarEventSeries(int id, IEnumerable<int> calendarsId)
     {
-      try
-      {
-        _evRepository.DeleteCalendarEventSeries(id, calendarsId);
-      }
-      catch (KeyNotFoundException)
+      if (_evRepository.GetEvent(id) == null)
       {
         throw new NotFoundException("Event not found");
       }
-      catch (UnauthorizedAccessException)
+      if (!calendarsId.Contains(_evRepository.GetEvent(id).CalendarId))
       {
         throw new ForbiddenException("Not event owner");
       }
-
+      _evRepository.DeleteCalendarEventSeries(id, calendarsId);
     }
   }
 }

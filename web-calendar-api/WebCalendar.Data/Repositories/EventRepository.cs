@@ -38,31 +38,17 @@ namespace WebCalendar.Data.Repositories
 
     public void DeleteCalendarEvent(int calendarEventId, IEnumerable<int> calendarsId)
     {
-      if (!calendarsId.Contains(_context.Events.Select(x => x.CalendarId).FirstOrDefault()))
-        throw new UnauthorizedAccessException();
-
       var currentEvent = _context.Events.Find(calendarEventId);
-      if (currentEvent == null)
-        throw new KeyNotFoundException();
-
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
-
     }
 
     public void DeleteCalendarEventSeries(int calendarEventId, IEnumerable<int> calendarsId)
     {
-      if (!calendarsId.Contains(_context.Events.Select(x => x.CalendarId).FirstOrDefault()))
-        throw new UnauthorizedAccessException();
-
       Event currentEvent = _context.Events.Find(calendarEventId);
-      if (currentEvent == null)
-        throw new KeyNotFoundException();
-
       IEnumerable<Event> eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);
       _context.Events.RemoveRange(eventSeries);
       _context.SaveChanges();
-
     }
   }
 }
