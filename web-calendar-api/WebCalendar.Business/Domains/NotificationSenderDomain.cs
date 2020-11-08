@@ -14,23 +14,17 @@ namespace WebCalendar.Business.Domains
   {
     private readonly IOptions<EmailNotificationsOptions> _emailSenderOptions;
     private readonly IBackgroundJobClient _backgroundJobClient;
-    private readonly IUserRepository _userRepository;
     private readonly IEventRepository _eventRepository;
-    private readonly ICalendarRepository _calendarRepository;
 
     public NotificationSenderDomain(
       IOptions<EmailNotificationsOptions> emailSenderOptions,
-      IUserRepository userRepository,
-      IBackgroundJobClient backgroundJobClient,
       IEventRepository eventRepository,
-      ICalendarRepository calendarRepository
-      )
+      IBackgroundJobClient backgroundJobClient
+    )
     {
       _backgroundJobClient = backgroundJobClient;
-      _userRepository = userRepository;
       _emailSenderOptions = emailSenderOptions;
       _eventRepository = eventRepository;
-      _calendarRepository = calendarRepository;
     }
 
     private void SendEmail(string recipientEmail, string message)
@@ -68,10 +62,10 @@ namespace WebCalendar.Business.Domains
 
     public void ScheduleEventStartedNotification(int eventId)
     {
-      var @event = _eventRepository.GetEvent(eventId);
+      var (@event, _) = _eventRepository.GetEvent(eventId);
       if (@event.NotificationTime == null) return;
 
-      @event.NotificationJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
+      @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
         => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime) - DateTimeOffset.Now.Offset);
       // - DateTimeOffset.Now.Offset, because date in database contains as local, but EF thinks that it is UTC
 
@@ -80,36 +74,32 @@ namespace WebCalendar.Business.Domains
 
     public void NotifyEventCreated(int eventId)
     {
-      var @event = _eventRepository.GetEvent(eventId);  // can't name variable "event"
-      var calendar = _calendarRepository.GetCalendar(@event.CalendarId);
-      var user = _userRepository.GetUser(calendar.UserId);
-      if (!user.ReceiveEmailNotifications) return;
+      var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
       var notificationMessage = $@"
-        Hello <i>{ user.FirstName },</i>
-        <br>Event {(@event.Reiteration != null ? "series" : "")}
-        <b>{ @event.Name }</b> has been created successfully
-        in calendar <b>{ calendar.Name }</b>.
+        Hello <i>{ eventNotificationInfo.UserFirstName },</i>
+        <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
+        <b>{ eventNotificationInfo.EventName }</b> has been created successfully
+        in calendar <b>{ eventNotificationInfo.CalendarName }</b>.
       ";
 
-      SendEmail(user.Email, notificationMessage);
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
     }
 
     public void NotifyEventStarted(int eventId)
     {
-      var @event = _eventRepository.GetEvent(eventId);  // can't name variable "event"
-      var calendar = _calendarRepository.GetCalendar(@event.CalendarId);
-      var user = _userRepository.GetUser(calendar.UserId);
-      if (!user.ReceiveEmailNotifications) return;
+      var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
       var notificationMessage = $@"
-        Hello <i>{ user.FirstName },</i>
-        <br>Event <b>{ @event.Name }</b>
-        in calendar <b>{ calendar.Name }</b>
-        will begin at <b>{ @event.StartDateTime:g}</b>.
+        Hello <i>{ eventNotificationInfo.UserFirstName },</i>
+        <br>Event <b>{ eventNotificationInfo.EventName }</b>
+        in calendar <b>{ eventNotificationInfo.CalendarName }</b>
+        will begin at <b>{ eventNotificationInfo.StartDateTime:g}</b>.
       ";
 
-      SendEmail(user.Email, notificationMessage);
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
     }
 
   }

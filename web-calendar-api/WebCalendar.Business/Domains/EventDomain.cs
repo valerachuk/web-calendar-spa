@@ -12,28 +12,30 @@ namespace WebCalendar.Business.Domains
   {
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
+    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
+      _notificationSender = notificationSender;
     }
+
     public EventViewModel GetEvent(int id)
     {
       return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
     }
+
     public void AddCalendarEvent(EventViewModel calendarEvent)
     {
-      var seriesId = AddMainEventOfSeries(calendarEvent);
-      if (seriesId != null)
-      {
-        GenerateEventsOfSeries(calendarEvent, seriesId.GetValueOrDefault());
-      }
-    }
+      var @event = _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      _notificationSender.ScheduleEventCreatedNotification(@event.Id);
+      _notificationSender.ScheduleEventStartedNotification(@event.Id);
 
-    private int? AddMainEventOfSeries(EventViewModel calendarEvent)
-    {
-      return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      if (@event.Reiteration != null)
+      {
+        GenerateEventsOfSeries(calendarEvent, @event.SeriesId.GetValueOrDefault());
+      }
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -53,30 +55,31 @@ namespace WebCalendar.Business.Domains
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
+      generatedEvents.ForEach(evt => _notificationSender.ScheduleEventStartedNotification(evt.Id)); // executes for ~2sec. Will be moved to schedule, that schedules each event of series
     }
 
-    public void DeleteCalendarEvent(int id, int UserId)
+    public void DeleteCalendarEvent(int id, int userId)
     {
       var currentEvent = _evRepository.GetEvent(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (UserId != currentEvent.Item2)
+      if (userId != currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }
       _evRepository.DeleteCalendarEvent(id);
     }
 
-    public void DeleteCalendarEventSeries(int id, int UserId)
+    public void DeleteCalendarEventSeries(int id, int userId)
     {
       var currentEvent = _evRepository.GetEvent(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (UserId != currentEvent.Item2)
+      if (userId != currentEvent.Item2)
       {
         throw new ForbiddenException("Not event owner");
       }

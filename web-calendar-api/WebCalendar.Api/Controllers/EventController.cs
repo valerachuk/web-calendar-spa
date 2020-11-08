@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 
