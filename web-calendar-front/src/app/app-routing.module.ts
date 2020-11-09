@@ -7,6 +7,8 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { SignInFormComponent } from './sign-in-form/sign-in-form.component';
 import { SignUpFormComponent } from './sign-up-form/sign-up-form.component';
 import { UserPageComponent } from './user-page/user-page.component';
+import { NotFoundPageComponent } from './global-error-handler/error-pages/not-found-page/not-found-page.component';
+import { ServerErrorPageComponent } from './global-error-handler/error-pages/server-error-page/server-error-page.component';
 
 const routes: Routes = [
   {
@@ -35,6 +37,14 @@ const routes: Routes = [
       {
         path: 'user',
         component: UserPageComponent
+      },
+      {
+        path: '404',
+        component: NotFoundPageComponent
+      },
+      { 
+        path: '500',
+        component: ServerErrorPageComponent
       }
     ]
   },
@@ -62,6 +72,10 @@ const routes: Routes = [
         component: SignUpFormComponent
       }
     ]
+  },
+  {
+    path: '**',
+    redirectTo: '404',
   }
 ];
 

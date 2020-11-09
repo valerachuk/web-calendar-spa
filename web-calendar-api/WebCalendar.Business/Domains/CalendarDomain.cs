@@ -38,7 +38,7 @@ namespace WebCalendar.Business.Domains
 
     public bool DeleteCalendar(int id, int userId) 
     {
-      if (_caRepository.GetCalendar(id).UserId != userId)
+      if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
       return _caRepository.DeleteCalendar(id);

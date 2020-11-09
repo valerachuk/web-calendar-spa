@@ -17,6 +17,7 @@ import { ToastGlobalComponent } from './toast-global/toast-global.component';
 import { UserPageComponent } from './user-page/user-page.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ErrorHandlerModule } from './global-error-handler/error-handler.module';
 
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -41,6 +42,7 @@ function tokenGetter(): string {
     HttpClientModule,
     NgbModule,
     NgSelectModule,
+    ErrorHandlerModule,
     BrowserAnimationsModule,
     JwtModule.forRoot({
       config: {
