@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using Hangfire;
 using Microsoft.Extensions.Options;
 using WebCalendar.Business.Common;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
 namespace WebCalendar.Business.Domains
@@ -63,13 +65,32 @@ namespace WebCalendar.Business.Domains
     public void ScheduleEventStartedNotification(int eventId)
     {
       var (@event, _) = _eventRepository.GetEvent(eventId);
-      if (@event.NotificationTime == null) return;
 
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
-        => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime) - DateTimeOffset.Now.Offset);
+        => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault()));
       // - DateTimeOffset.Now.Offset, because date in database contains as local, but EF thinks that it is UTC
 
       _eventRepository.UpdateEvent(@event);
+    }
+
+    public void ScheduleEventSeriesStartedNotification(int seriesId)
+      => _backgroundJobClient.Enqueue<NotificationSenderDomain>(notificationSender =>
+        notificationSender.EventSeriesStartedNotification(seriesId));
+
+    public void EventSeriesStartedNotification(int seriesId)
+    {
+      foreach (var @event in _eventRepository.GetSeries(seriesId))
+      {
+        ScheduleEventStartedNotification(@event.Id);
+      }
+    }
+
+    public void CancelScheduledNotification(params Event[] events)
+    {
+      foreach (var jobId in events.Where(evt => evt.NotificationScheduleJobId != null).Select(evt => evt.NotificationScheduleJobId))
+      {
+        _backgroundJobClient.Delete(jobId);
+      }
     }
 
     public void NotifyEventCreated(int eventId)
@@ -97,6 +118,22 @@ namespace WebCalendar.Business.Domains
         <br>Event <b>{ eventNotificationInfo.EventName }</b>
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>
         will begin at <b>{ eventNotificationInfo.StartDateTime:g}</b>.
+      ";
+
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+    }
+
+    public void NotifyEventDeleted(int eventId, bool isSeries)
+    {
+      var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+      
+      var notificationMessage = $@"
+        Hello <i>{ eventNotificationInfo.UserFirstName },</i>
+        <br>Event {(isSeries ? "series" : "")} 
+        <b>{ eventNotificationInfo.EventName }</b>
+        in calendar <b>{ eventNotificationInfo.CalendarName }</b>
+        has been deleted.
       ";
 
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);

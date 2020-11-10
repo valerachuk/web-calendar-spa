@@ -24,6 +24,9 @@ namespace WebCalendar.Data.Repositories
         (ev, cal) => new { ev, cal.UserId }).Select(c => new Tuple<Event, int>(c.ev, c.UserId)).FirstOrDefault();
     }
 
+    public IEnumerable<Event> GetSeries(int seriesId)
+      => _context.Events.Where(evt => evt.SeriesId == seriesId).ToArray();
+
     public EventNotificationDTO GetEventNotificationInfo(int id) =>
       _context.Events
         .Where(evt => evt.Id == id)
@@ -59,19 +62,21 @@ namespace WebCalendar.Data.Repositories
       _context.SaveChanges();
     }
 
-    public void DeleteCalendarEvent(int calendarEventId)
+    public Event DeleteCalendarEvent(int calendarEventId)
     {
       var currentEvent = _context.Events.Find(calendarEventId);
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
+      return currentEvent;
     }
 
-    public void DeleteCalendarEventSeries(int calendarEventId)
+    public IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId)
     {
       Event currentEvent = _context.Events.Find(calendarEventId);
-      IEnumerable<Event> eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);
+      var eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToArray();
       _context.Events.RemoveRange(eventSeries);
       _context.SaveChanges();
+      return eventSeries;
     }
   }
 }

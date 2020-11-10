@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WebCalendar.Data.Entities;
+﻿using WebCalendar.Data.Entities;
 
 namespace WebCalendar.Data.Repositories.Interfaces
 {

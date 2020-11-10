@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
+using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
@@ -30,11 +31,16 @@ namespace WebCalendar.Business.Domains
     {
       var @event = _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
       _notificationSender.ScheduleEventCreatedNotification(@event.Id);
-      _notificationSender.ScheduleEventStartedNotification(@event.Id);
 
+      var seriesId = @event.SeriesId.GetValueOrDefault();
       if (@event.Reiteration != null)
       {
-        GenerateEventsOfSeries(calendarEvent, @event.SeriesId.GetValueOrDefault());
+        GenerateEventsOfSeries(calendarEvent, seriesId);
+      }
+
+      if (@event.NotificationTime != null)
+      {
+        _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
       }
     }
 
@@ -55,7 +61,6 @@ namespace WebCalendar.Business.Domains
         generatedEvents.Add(newCalendarEvent);
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
-      generatedEvents.ForEach(evt => _notificationSender.ScheduleEventStartedNotification(evt.Id)); // executes for ~2sec. Will be moved to schedule, that schedules each event of series
     }
 
     public void DeleteCalendarEvent(int id, int userId)
@@ -69,7 +74,10 @@ namespace WebCalendar.Business.Domains
       {
         throw new ForbiddenException("Not event owner");
       }
-      _evRepository.DeleteCalendarEvent(id);
+
+      _notificationSender.NotifyEventDeleted(id, false);
+      var @event = _evRepository.DeleteCalendarEvent(id);
+      _notificationSender.CancelScheduledNotification(@event);
     }
 
     public void DeleteCalendarEventSeries(int id, int userId)
@@ -83,7 +91,10 @@ namespace WebCalendar.Business.Domains
       {
         throw new ForbiddenException("Not event owner");
       }
-      _evRepository.DeleteCalendarEventSeries(id);
+
+      _notificationSender.NotifyEventDeleted(id, true);
+      var eventSeries = _evRepository.DeleteCalendarEventSeries(id);
+      _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
     }
   }
 }
