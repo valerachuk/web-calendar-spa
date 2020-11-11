@@ -7,13 +7,17 @@ namespace WebCalendar.Data.Repositories.Interfaces
 {
   public interface IEventRepository
   {
-    Tuple<Event, int> GetEvent(int id);
+    Event GetEvent(int id);
+    Event GetMainEvent(int id);
     IEnumerable<Event> GetSeries(int seriesId);
-    EventNotificationDTO GetEventNotificationInfo(int id);
+    UserEventDTO GetEventInfo(int id);
     void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int? seriesId);
     Event AddCalendarEvents(Event calendarEvent);
+    Event UpdateCalendarEvent(Event calendarEvent);
+    void UpdateCalendarEventSeries(Event calendarEvent);
     void UpdateEvent(Event calendarEvent);
     Event DeleteCalendarEvent(int calendarEventId);
     IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId);
+    EventNotificationDTO GetEventNotificationInfo(int id);
   }
 }

@@ -18,26 +18,47 @@ namespace WebCalendar.Api.Controllers
       _evDomain = eventDomain;
     }
 
+    [HttpGet]
+    public IActionResult GetEvent(int id)
+    {
+      return Ok(_evDomain.GetEvent(id));
+    }
+
     [HttpPost]
     public IActionResult AddCalendarEvent(EventViewModel calendarEvent)
     {
-      var totalTime = calendarEvent.EndDateTime - calendarEvent.StartDateTime;
+      string error = ValidateData(calendarEvent);
+      if (error == string.Empty)
+      {
+        _evDomain.AddCalendarEvent(calendarEvent);
+        return Ok(calendarEvent);
+      }
+      return BadRequest(error);
+    }
 
-      if (calendarEvent.EndDateTime < calendarEvent.StartDateTime)
+    [HttpPut]
+    public IActionResult UpdateCalendarEvent(EventViewModel calendarEvent)
+    {
+      string error = ValidateData(calendarEvent);
+      if (error == string.Empty)
       {
-        return BadRequest("End date/time was less than start date/time");
+        _evDomain.UpdateCalendarEvent(calendarEvent, User.GetId());
+        return Ok(calendarEvent);
       }
-      if (calendarEvent.EndDateTime == calendarEvent.StartDateTime)
-      {
-        return BadRequest("The beginning and end of the event cannot be at the same time");
-      }
-      if (calendarEvent.Reiteration != null && totalTime.TotalDays > (int)calendarEvent.Reiteration)
-      {
-        return BadRequest("Reiteration must be less or equal to the time interval");
-      }
-      _evDomain.AddCalendarEvent(calendarEvent);
+      return BadRequest(error);
+    }
 
-      return Ok(calendarEvent);
+    [HttpPut]
+    [Route("EditEventSeries")]
+    public IActionResult UpdateCalendarEventSeries(EventViewModel calendarEvent)
+    {
+      string error = ValidateData(calendarEvent);
+      if (error == string.Empty)
+      {
+        _evDomain.UpdateCalendarEventSeries(calendarEvent, User.GetId());
+        return Ok(calendarEvent);
+      }
+      return BadRequest(error);
     }
 
     [HttpDelete]
@@ -53,6 +74,25 @@ namespace WebCalendar.Api.Controllers
     {
       _evDomain.DeleteCalendarEventSeries(id, User.GetId());
       return Ok();
+    }
+
+    string ValidateData(EventViewModel calendarEvent)
+    {
+      var totalTime = calendarEvent.EndDateTime - calendarEvent.StartDateTime;
+
+      if (calendarEvent.EndDateTime < calendarEvent.StartDateTime)
+      {
+        return "End date/time was less than start date/time";
+      }
+      if (calendarEvent.EndDateTime == calendarEvent.StartDateTime)
+      {
+        return "The beginning and end of the event cannot be at the same time";
+      }
+      if (calendarEvent.Reiteration != null && totalTime.TotalDays > (int)calendarEvent.Reiteration)
+      {
+        return "Reiteration must be less or equal to the time interval";
+      }
+      return string.Empty;
     }
   }
 }

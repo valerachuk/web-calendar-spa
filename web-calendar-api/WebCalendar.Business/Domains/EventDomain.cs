@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
@@ -24,7 +25,7 @@ namespace WebCalendar.Business.Domains
 
     public EventViewModel GetEvent(int id)
     {
-      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
     }
 
     public void AddCalendarEvent(EventViewModel calendarEvent)
@@ -36,11 +37,11 @@ namespace WebCalendar.Business.Domains
       if (@event.Reiteration != null)
       {
         GenerateEventsOfSeries(calendarEvent, seriesId);
-      }
 
-      if (@event.NotificationTime != null)
-      {
-        _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
+        if (@event.NotificationTime != null)
+        {
+          _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
+        }
       }
     }
 
@@ -62,18 +63,53 @@ namespace WebCalendar.Business.Domains
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
+    public void UpdateCalendarEvent(EventViewModel calendarEvent, int userId)
+    {
+      CheckRightsToModify(calendarEvent.Id, userId);
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
+      if (oldReiteration == calendarEvent.Reiteration)
+      {
+        var oldEvent = _evRepository.GetEvent(calendarEvent.Id);
+        _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
+      }
+      else
+      {
+        _evRepository.DeleteCalendarEvent(calendarEvent.Id);
+        calendarEvent.Id = default;
+        AddCalendarEvent(calendarEvent);
+      }
+    }
+
+    public void UpdateCalendarEventSeries(EventViewModel calendarEvent, int userId)
+    {
+      CheckRightsToModify(calendarEvent.Id, userId);
+
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
+      if (oldReiteration == calendarEvent.Reiteration)
+      {
+        _evRepository.UpdateCalendarEventSeries(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      }
+      else
+      {
+        // find main (first) event of the series
+        var mainSeriesEvent = _evRepository.GetMainEvent(calendarEvent.Id);
+        // update main event, except dates 
+        var updatedMainSeriesEvent = _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
+        updatedMainSeriesEvent.StartDateTime = mainSeriesEvent.StartDateTime.Date
+          + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
+        updatedMainSeriesEvent.EndDateTime = mainSeriesEvent.EndDateTime.Date
+          + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+        // delete series
+        _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
+        //add new event series
+        updatedMainSeriesEvent.Id = default;
+        AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent));
+      }
+    }
 
     public void DeleteCalendarEvent(int id, int userId)
     {
-      var currentEvent = _evRepository.GetEvent(id);
-      if (currentEvent == null)
-      {
-        throw new NotFoundException("Event not found");
-      }
-      if (userId != currentEvent.Item2)
-      {
-        throw new ForbiddenException("Not event owner");
-      }
+      CheckRightsToModify(id, userId);
 
       _notificationSender.NotifyEventDeleted(id, false);
       var @event = _evRepository.DeleteCalendarEvent(id);
@@ -82,19 +118,24 @@ namespace WebCalendar.Business.Domains
 
     public void DeleteCalendarEventSeries(int id, int userId)
     {
-      var currentEvent = _evRepository.GetEvent(id);
-      if (currentEvent == null)
-      {
-        throw new NotFoundException("Event not found");
-      }
-      if (userId != currentEvent.Item2)
-      {
-        throw new ForbiddenException("Not event owner");
-      }
+      CheckRightsToModify(id, userId);
 
       _notificationSender.NotifyEventDeleted(id, true);
       var eventSeries = _evRepository.DeleteCalendarEventSeries(id);
       _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
+    }
+
+    private void CheckRightsToModify(int id, int userId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      if (userId != currentEvent.UserId)
+      {
+        throw new ForbiddenException("Not event owner");
+      }
     }
   }
 }

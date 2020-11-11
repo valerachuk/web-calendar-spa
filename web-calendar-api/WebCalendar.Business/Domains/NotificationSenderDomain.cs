@@ -64,7 +64,7 @@ namespace WebCalendar.Business.Domains
 
     public void ScheduleEventStartedNotification(int eventId)
     {
-      var (@event, _) = _eventRepository.GetEvent(eventId);
+      var @event = _eventRepository.GetEvent(eventId);
 
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
         => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault()));

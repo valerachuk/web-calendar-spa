@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h4 class="modal-title">Create new event</h4>
+  <h4 class="modal-title">{{title}}</h4>
   <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -132,8 +132,8 @@
       </div>
     </div>
   </form>
-  <div *ngIf="addedNewCalendarEvent" class="alert alert-success mb-0">
-    Added new event!
+  <div *ngIf="successfullySavedEvent" class="alert alert-success mb-0">
+    Successfully saved!
   </div>
   <div *ngIf="error !== null" class="alert alert-danger mb-0">
     {{error}}

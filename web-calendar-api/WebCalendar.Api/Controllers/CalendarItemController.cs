@@ -22,5 +22,12 @@ namespace WebCalendar.Api.Controllers
       var items = _itDomain.GetCalendarsItemsByTimeInterval(filter.Start, filter.End, filter.Id);
       return Ok(items);
     }
+
+    [HttpPut]
+    public IActionResult PutCalendarsItems(CalendarItemViewModel calendarItem)
+    {
+      _itDomain.UpdateCalendarsItem(calendarItem);
+      return Ok();
+    }
   }
 }
