@@ -27,6 +27,8 @@ export class DeleteModalComponent implements OnInit {
       if(err.status === 403) {
         this.isCalendarOwner = false;
       }
+    }).add(()=> {
+      setTimeout(()=> this.activeModal.dismiss(), 2000); 
     });
   }
 }
