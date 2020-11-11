@@ -12,12 +12,10 @@ namespace WebCalendar.Api.Controllers
   public class EventController : ControllerBase
   {
     private readonly IEventDomain _evDomain;
-    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventController(IEventDomain eventDomain, INotificationSenderDomain notificationSender)
+    public EventController(IEventDomain eventDomain)
     {
       _evDomain = eventDomain;
-      _notificationSender = notificationSender;
     }
 
     [HttpPost]
@@ -38,9 +36,6 @@ namespace WebCalendar.Api.Controllers
         return BadRequest("Reiteration must be less or equal to the time interval");
       }
       _evDomain.AddCalendarEvent(calendarEvent);
-
-      var userId = User.GetId();
-      _notificationSender.NotifyEventCreated(calendarEvent.Name, userId);
 
       return Ok(calendarEvent);
     }
