@@ -97,23 +97,15 @@ namespace WebCalendar.Data.Repositories
 
     public Event UpdateCalendarEvent(Event calendarEvent)
     {
-      Event currentEvent = _context.Events.Find(calendarEvent.Id);
-      currentEvent.Calendar = calendarEvent.Calendar;
-      currentEvent.CalendarId = calendarEvent.CalendarId;
-      currentEvent.EndDateTime = calendarEvent.EndDateTime;
-      currentEvent.Name = calendarEvent.Name;
-      currentEvent.Venue = calendarEvent.Venue;
-      currentEvent.NotificationTime = calendarEvent.NotificationTime;
-      currentEvent.Reiteration = calendarEvent.Reiteration;
-      currentEvent.StartDateTime = calendarEvent.StartDateTime;
+      _context.Events.Update(calendarEvent);
       _context.SaveChanges();
-      return currentEvent;
+      return calendarEvent;
     }
 
     public void UpdateCalendarEventSeries(Event calendarEvent)
     {
       var currentEvent = _context.Events.Find(calendarEvent.Id);
-      var currentEventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId);
+      var currentEventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
       foreach (var item in currentEventSeries)
       {
         item.Calendar = calendarEvent.Calendar;

@@ -23,7 +23,7 @@ export class CalendarItemsService {
   }
 
   updateCalendarItem(event: CalendarEvent): Observable<string> {
-    var timeOffsetInMS = new Date().getTimezoneOffset() * 60000;
+    let timeOffsetInMS = new Date().getTimezoneOffset() * 60000;
     const sendEvent = {
       id: event.id,
       name: event.title,

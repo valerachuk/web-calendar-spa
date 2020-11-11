@@ -60,7 +60,7 @@ export class EventFormComponent implements OnInit {
     this.title = "Edit the event";
     this.eventService.getEvent(id).subscribe(data => {
       this.calendarEvent = data;
-      var date = new Date(data.startDateTime);
+      let date = new Date(data.startDateTime);
       this.startDate = { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
       this.startTime = { hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds() };
       date = new Date(data.endDateTime);
@@ -83,8 +83,8 @@ export class EventFormComponent implements OnInit {
   }
 
   dateTimeInit() {
-    var currentDate = moment.utc();
-    var currentTime = new Date();
+    let currentDate = moment.utc();
+    let currentTime = new Date();
 
     this.startDate = { day: currentDate.date(), month: currentDate.month() + 1, year: currentDate.year() };
     this.endDate = { day: currentDate.date(), month: currentDate.month() + 1, year: currentDate.year() };
@@ -106,18 +106,18 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
-    var start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
-    var end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
+    let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
+    let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 
-    var isDateChanged =
-      new Date(start).toDateString() !== new Date(this.calendarEvent.startDateTime).toDateString()
-      && new Date(end).toDateString() !== new Date(this.calendarEvent.endDateTime).toDateString();
+    let isDateChanged =
+      moment(start).isSame(this.calendarEvent.startDateTime)
+      && moment(end).isSame(this.calendarEvent.endDateTime)
 
     this.calendarEvent.startDateTime = start;
     this.calendarEvent.endDateTime = end;
 
     this.eventForm.disable();
-    var httpMethod;
+    let httpMethod;
     if (!this.calendarEvent.id) {
       httpMethod = this.eventService.addEvent(this.calendarEvent);
       this.httpRequest(httpMethod);

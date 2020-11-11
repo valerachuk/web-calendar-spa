@@ -69,7 +69,8 @@ namespace WebCalendar.Business.Domains
       var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
       if (oldReiteration == calendarEvent.Reiteration)
       {
-        _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
+        var oldEvent = _evRepository.GetEvent(calendarEvent.Id);
+        _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
       }
       else
       {
