@@ -15,16 +15,9 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
-    public Tuple<Event, int> GetEvent(int id)
+    public Event GetEvent(int id)
     {
-      return _context.Events
-        .Where(calendarEvent => calendarEvent.Id == id)
-        .Join(_context.Calendars,
-        ev => ev.CalendarId,
-        cal => cal.Id,
-        (ev, cal) => new { ev, cal.UserId })
-        .Select(c => new Tuple<Event, int>(c.ev, c.UserId))
-        .FirstOrDefault();
+      return _context.Events.Find(id);
     }
 
     public Event GetMainEvent(int id)
@@ -54,6 +47,16 @@ namespace WebCalendar.Data.Repositories
           UserEmail = evt.Calendar.User.Email
         })
         .FirstOrDefault();
+
+    public UserEventDTO GetEventInfo(int id) =>
+     _context.Events
+       .Where(evt => evt.Id == id)
+       .Select(evt => new UserEventDTO
+       {
+         Reiteration = evt.Reiteration,
+         UserId = evt.Calendar.UserId
+       })
+       .FirstOrDefault();
 
     public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
     {

@@ -25,7 +25,7 @@ namespace WebCalendar.Business.Domains
 
     public EventViewModel GetEvent(int id)
     {
-      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
     }
 
     public void AddCalendarEvent(EventViewModel calendarEvent)
@@ -66,7 +66,7 @@ namespace WebCalendar.Business.Domains
     public void UpdateCalendarEvent(EventViewModel calendarEvent, int userId)
     {
       CheckRightsToModify(calendarEvent.Id, userId);
-      var oldReiteration = _evRepository.GetEvent(calendarEvent.Id).Item1.Reiteration;
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
       if (oldReiteration == calendarEvent.Reiteration)
       {
         _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
@@ -83,7 +83,7 @@ namespace WebCalendar.Business.Domains
     {
       CheckRightsToModify(calendarEvent.Id, userId);
 
-      var oldReiteration = _evRepository.GetEvent(calendarEvent.Id).Item1.Reiteration;
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
       if (oldReiteration == calendarEvent.Reiteration)
       {
         _evRepository.UpdateCalendarEventSeries(_mapper.Map<EventViewModel, Event>(calendarEvent));
@@ -126,12 +126,12 @@ namespace WebCalendar.Business.Domains
 
     private void CheckRightsToModify(int id, int userId)
     {
-      var currentEvent = _evRepository.GetEvent(id);
+      var currentEvent = _evRepository.GetEventInfo(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (userId != currentEvent.Item2)
+      if (userId != currentEvent.UserId)
       {
         throw new ForbiddenException("Not event owner");
       }
