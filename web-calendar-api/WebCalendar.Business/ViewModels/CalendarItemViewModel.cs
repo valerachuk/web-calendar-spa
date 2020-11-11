@@ -16,6 +16,5 @@ namespace WebCalendar.Business.ViewModels
     public DateTime EndDateTime { get; set; }
     [Required]
     public CalendarItemType MetaType { get; set; }
-    public Reiteration? Reiteration { get; set; }
   }
 }

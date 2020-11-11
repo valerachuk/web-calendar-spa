@@ -1,12 +1,13 @@
-import { Component, Injector, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal, NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateStruct, NgbModal, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { CalendarEvent } from 'src/app/interfaces/event.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { EditEventModalComponent } from '../edit-event-modal/edit-event-modal.component';
 
 @Component({
   selector: 'app-event-form',
@@ -16,7 +17,7 @@ import { CalendarService } from 'src/app/services/calendar.service';
 
 export class EventFormComponent implements OnInit {
 
-  public addedNewCalendarEvent = false;
+  public successfullySavedEvent = false;
   public error: string;
 
   startDate: NgbDateStruct;
@@ -26,6 +27,8 @@ export class EventFormComponent implements OnInit {
 
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
+  title = "Create new event";
+  isRepeatable = false;
 
   eventForm = new FormGroup({
     eventName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
@@ -43,12 +46,28 @@ export class EventFormComponent implements OnInit {
     public activeModal: NgbActiveModal,
     private calendarService: CalendarService,
     private authService: AuthService,
-    private eventService: CalendarEventService
-  ) { }
+    private eventService: CalendarEventService,
+    private modalService: NgbModal
+  ) {
+  }
 
   ngOnInit() {
     this.dateTimeInit();
     this.calendarEventInit();
+  }
+
+  getcalendarEvent(id: number) {
+    this.title = "Edit the event";
+    this.eventService.getEvent(id).subscribe(data => {
+      this.calendarEvent = data;
+      var date = new Date(data.startDateTime);
+      this.startDate = { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
+      this.startTime = { hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds() };
+      date = new Date(data.endDateTime);
+      this.endDate = { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
+      this.endTime = { hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds() };
+      this.isRepeatable = data.reiteration ? true : false;
+    });
   }
 
   calendarEventInit() {
@@ -87,15 +106,44 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
-    this.calendarEvent.startDateTime = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
-    this.calendarEvent.endDateTime = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
+    var start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
+    var end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
+
+    var isDateChanged =
+      new Date(start).toDateString() !== new Date(this.calendarEvent.startDateTime).toDateString()
+      && new Date(end).toDateString() !== new Date(this.calendarEvent.endDateTime).toDateString();
+
+    this.calendarEvent.startDateTime = start;
+    this.calendarEvent.endDateTime = end;
+
     this.eventForm.disable();
+    var httpMethod;
+    if (!this.calendarEvent.id) {
+      httpMethod = this.eventService.addEvent(this.calendarEvent);
+      this.httpRequest(httpMethod);
+    } else {
+      // dates have impact on event series, so if user change event date - edit only this event 
+      if (this.isRepeatable && !isDateChanged) {
+        let modalRef = this.modalService.open(EditEventModalComponent, { centered: true, size: 'sm' });
+        modalRef.result.then(
+          isSeriesEdit => {
+            httpMethod = isSeriesEdit ?
+              this.eventService.updateEventSeries(this.calendarEvent) :
+              this.eventService.updateEvent(this.calendarEvent);
+            this.httpRequest(httpMethod);
+          });
+      } else {
+        httpMethod = this.eventService.updateEvent(this.calendarEvent);
+        this.httpRequest(httpMethod);
+      }
+    }
+  }
 
-    this.eventService.addEvent(this.calendarEvent)
+  httpRequest(httpMethod) {
+    httpMethod
       .subscribe(response => {
-        this.addedNewCalendarEvent = true;
-
-        setTimeout(() => this.addedNewCalendarEvent = false, 2500);
+        this.successfullySavedEvent = true;
+        setTimeout(() => { this.successfullySavedEvent = false; this.activeModal.close() }, 1500);
       },
         error => {
           this.error = error.error;
@@ -106,6 +154,7 @@ export class EventFormComponent implements OnInit {
           this.dateTimeInit();
           this.eventForm.enable();
         });
+
     this.error = null;
   }
 }

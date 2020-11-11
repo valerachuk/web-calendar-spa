@@ -27,5 +27,25 @@ namespace WebCalendar.Business.Domains
 
       return сalendarItems;
     }
+    public void UpdateCalendarsItem(CalendarItemViewModel calendarItem)
+    {
+      switch (calendarItem.MetaType)
+      {
+        case CalendarItemType.Event:
+          _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+          break;
+        case CalendarItemType.RepeatableEvent:
+          _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+          break;
+        case CalendarItemType.Task:
+
+          break;
+        case CalendarItemType.Reminder:
+
+          break;
+        default:
+          break;
+      }
+    }
   }
 }
