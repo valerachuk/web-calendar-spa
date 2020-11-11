@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WebCalendar.Data.DTO;
 using WebCalendar.Data.Entities;
 
 namespace WebCalendar.Data.Repositories.Interfaces
@@ -8,11 +9,14 @@ namespace WebCalendar.Data.Repositories.Interfaces
   {
     Tuple<Event, int> GetEvent(int id);
     Event GetMainEvent(int id);
+    IEnumerable<Event> GetSeries(int seriesId);
     void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int? seriesId);
-    int? AddCalendarEvents(Event calendarEvent);
+    Event AddCalendarEvents(Event calendarEvent);
     Event UpdateCalendarEvent(Event calendarEvent);
     void UpdateCalendarEventSeries(Event calendarEvent);
-    void DeleteCalendarEvent(int calendarEventId);
-    void DeleteCalendarEventSeries(int calendarEventId);
+    void UpdateEvent(Event calendarEvent);
+    Event DeleteCalendarEvent(int calendarEventId);
+    IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId);
+    EventNotificationDTO GetEventNotificationInfo(int id);
   }
 }

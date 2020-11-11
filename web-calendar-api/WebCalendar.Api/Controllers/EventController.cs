@@ -12,12 +12,10 @@ namespace WebCalendar.Api.Controllers
   public class EventController : ControllerBase
   {
     private readonly IEventDomain _evDomain;
-    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventController(IEventDomain eventDomain, INotificationSenderDomain notificationSender)
+    public EventController(IEventDomain eventDomain)
     {
       _evDomain = eventDomain;
-      _notificationSender = notificationSender;
     }
 
     [HttpGet]
@@ -33,10 +31,6 @@ namespace WebCalendar.Api.Controllers
       if (error == string.Empty)
       {
         _evDomain.AddCalendarEvent(calendarEvent);
-
-        var userId = User.GetId();
-        _notificationSender.NotifyEventCreated(calendarEvent.Name, userId);
-
         return Ok(calendarEvent);
       }
       return BadRequest(error);
