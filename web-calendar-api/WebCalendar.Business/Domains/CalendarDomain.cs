@@ -13,13 +13,13 @@ namespace WebCalendar.Business.Domains
   {
     private readonly ICalendarRepository _caRepository;
     private readonly IMapper _mapper;
-    private Logger logger;
+    private Logger _logger;
 
     public CalendarDomain(ICalendarRepository calendarRepository, IMapper mapper)
     {
       _caRepository = calendarRepository;
       _mapper = mapper;
-      logger = LogManager.GetCurrentClassLogger();
+      _logger = LogManager.GetCurrentClassLogger();
     }
 
     public IEnumerable<CalendarViewModel> GetUserCalendars(int id) =>
@@ -44,7 +44,7 @@ namespace WebCalendar.Business.Domains
       if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
-      logger.Info($"Delete calendar {id}");
+      _logger.Info($"Delete calendar {id}");
 
       return _caRepository.DeleteCalendar(id);
     }
