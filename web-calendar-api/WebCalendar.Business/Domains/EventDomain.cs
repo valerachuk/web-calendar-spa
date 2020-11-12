@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
@@ -12,28 +14,35 @@ namespace WebCalendar.Business.Domains
   {
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
+    private readonly INotificationSenderDomain _notificationSender;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
-    }
-    public EventViewModel GetEvent(int id)
-    {
-      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id).Item1);
-    }
-    public void AddCalendarEvent(EventViewModel calendarEvent)
-    {
-      var seriesId = AddMainEventOfSeries(calendarEvent);
-      if (seriesId != null)
-      {
-        GenerateEventsOfSeries(calendarEvent, seriesId.GetValueOrDefault());
-      }
+      _notificationSender = notificationSender;
     }
 
-    private int? AddMainEventOfSeries(EventViewModel calendarEvent)
+    public EventViewModel GetEvent(int id)
     {
-      return _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
+    }
+
+    public void AddCalendarEvent(EventViewModel calendarEvent)
+    {
+      var @event = _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      _notificationSender.ScheduleEventCreatedNotification(@event.Id);
+
+      var seriesId = @event.SeriesId.GetValueOrDefault();
+      if (@event.Reiteration != null)
+      {
+        GenerateEventsOfSeries(calendarEvent, seriesId);
+
+        if (@event.NotificationTime != null)
+        {
+          _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
+        }
+      }
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -54,33 +63,79 @@ namespace WebCalendar.Business.Domains
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
-
-    public void DeleteCalendarEvent(int id, int UserId)
+    public void UpdateCalendarEvent(EventViewModel calendarEvent, int userId)
     {
-      var currentEvent = _evRepository.GetEvent(id);
-      if (currentEvent == null)
+      CheckRightsToModify(calendarEvent.Id, userId);
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
+      if (oldReiteration == calendarEvent.Reiteration)
       {
-        throw new NotFoundException("Event not found");
+        var oldEvent = _evRepository.GetEvent(calendarEvent.Id);
+        _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
       }
-      if (UserId != currentEvent.Item2)
+      else
       {
-        throw new ForbiddenException("Not event owner");
+        _evRepository.DeleteCalendarEvent(calendarEvent.Id);
+        calendarEvent.Id = default;
+        AddCalendarEvent(calendarEvent);
       }
-      _evRepository.DeleteCalendarEvent(id);
     }
 
-    public void DeleteCalendarEventSeries(int id, int UserId)
+    public void UpdateCalendarEventSeries(EventViewModel calendarEvent, int userId)
     {
-      var currentEvent = _evRepository.GetEvent(id);
+      CheckRightsToModify(calendarEvent.Id, userId);
+
+      var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
+      if (oldReiteration == calendarEvent.Reiteration)
+      {
+        _evRepository.UpdateCalendarEventSeries(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      }
+      else
+      {
+        // find main (first) event of the series
+        var mainSeriesEvent = _evRepository.GetMainEvent(calendarEvent.Id);
+        // update main event, except dates 
+        var updatedMainSeriesEvent = _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
+        updatedMainSeriesEvent.StartDateTime = mainSeriesEvent.StartDateTime.Date
+          + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
+        updatedMainSeriesEvent.EndDateTime = mainSeriesEvent.EndDateTime.Date
+          + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+        // delete series
+        _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
+        //add new event series
+        updatedMainSeriesEvent.Id = default;
+        AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent));
+      }
+    }
+
+    public void DeleteCalendarEvent(int id, int userId)
+    {
+      CheckRightsToModify(id, userId);
+
+      _notificationSender.NotifyEventDeleted(id, false);
+      var @event = _evRepository.DeleteCalendarEvent(id);
+      _notificationSender.CancelScheduledNotification(@event);
+    }
+
+    public void DeleteCalendarEventSeries(int id, int userId)
+    {
+      CheckRightsToModify(id, userId);
+
+      _notificationSender.NotifyEventDeleted(id, true);
+      var eventSeries = _evRepository.DeleteCalendarEventSeries(id);
+      _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
+    }
+
+    private void CheckRightsToModify(int id, int userId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
-      if (UserId != currentEvent.Item2)
+      if (userId != currentEvent.UserId)
       {
         throw new ForbiddenException("Not event owner");
       }
-      _evRepository.DeleteCalendarEventSeries(id);
     }
   }
 }

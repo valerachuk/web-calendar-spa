@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201108012848_EventNotificationScheduleJobId")]
+    partial class EventNotificationScheduleJobId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,29 +92,6 @@ namespace WebCalendar.Data.Migrations
                     b.HasIndex("CalendarId");
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("WebCalendar.Data.Entities.Log", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Log");
                 });
 
             modelBuilder.Entity("WebCalendar.Data.Entities.User", b =>

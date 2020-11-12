@@ -1,4 +1,7 @@
+using System;
 using AutoMapper;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -74,6 +77,24 @@ namespace WebCalendar.Api
           };
         });
 
+
+      // Hangfire
+      services.AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+        {
+          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+          QueuePollInterval = TimeSpan.Zero,
+          UseRecommendedIsolationLevel = true,
+          DisableGlobalLocks = true
+        }));
+
+      services.AddHangfireServer();
+
+
       // Repositories
       services.AddTransient<IUserRepository, UserRepository>();
       services.AddTransient<ICalendarRepository, CalendarRepository>();
@@ -100,7 +121,7 @@ namespace WebCalendar.Api
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
     {
       if (env.IsDevelopment())
       {
@@ -117,9 +138,13 @@ namespace WebCalendar.Api
       app.UseAuthentication();
       app.UseAuthorization();
 
+      GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
+      app.UseHangfireDashboard();
+
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
+        endpoints.MapHangfireDashboard();
       });
     }
   }
