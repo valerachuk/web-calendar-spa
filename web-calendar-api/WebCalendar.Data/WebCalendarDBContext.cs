@@ -109,6 +109,20 @@ namespace WebCalendar.Data
       .WithMany(calendar => calendar.Events)
       .HasForeignKey(calendarEvent => calendarEvent.CalendarId)
       .IsRequired();
+
+      var logModelBuilder = modelBuilder.Entity<Log>();
+
+      logModelBuilder
+        .Property(log => log.Message)
+        .IsRequired();
+
+      logModelBuilder
+        .Property(log => log.Level)
+        .IsRequired();
+
+      logModelBuilder
+        .Property(log => log.DateTime)
+        .IsRequired();
     }
 
     public DbSet<User> Users { get; set; }
