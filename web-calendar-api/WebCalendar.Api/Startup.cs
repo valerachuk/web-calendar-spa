@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using NLog.Extensions.Logging;
 using WebCalendar.Api.Middleware;
 using WebCalendar.Business;
 using WebCalendar.Business.Common;
@@ -114,6 +116,8 @@ namespace WebCalendar.Api
       var emailSenderSection = Configuration.GetSection("EmailNotifications");
       services.Configure<EmailNotificationsOptions>(emailSenderSection);
 
+      var logConfig = Configuration.GetSection("NLog");
+      LogManager.Configuration = new NLogLoggingConfiguration(logConfig);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

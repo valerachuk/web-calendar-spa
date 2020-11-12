@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using NLog;
 using System;
 using System.Net;
 using System.Text.Json;
@@ -48,6 +49,9 @@ namespace WebCalendar.Api.Middleware
         message = exception.Message;
         status = HttpStatusCode.InternalServerError;
       }
+
+      Logger logger = LogManager.GetCurrentClassLogger();
+      logger.Error(message);
 
       var result = JsonSerializer.Serialize(new { error = message, errorStatus = status });
       context.Response.ContentType = "application/json";
