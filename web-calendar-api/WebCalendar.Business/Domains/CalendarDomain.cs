@@ -34,8 +34,11 @@ namespace WebCalendar.Business.Domains
       return calendar;
     }
 
-    public int AddCalendar(CalendarViewModel calendar)
+    public int AddCalendar(CalendarViewModel calendar, int userId)
     {
+      if (calendar.UserId != userId)
+        throw new ForbiddenException("Not calendar owner");
+
       return _caRepository.AddCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendar));
     }
 
