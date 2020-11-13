@@ -66,11 +66,16 @@ namespace WebCalendar.Business.Domains
     public void UpdateCalendarEvent(EventViewModel calendarEvent, int userId)
     {
       CheckRightsToModify(calendarEvent.Id, userId);
+      var oldEvent = _evRepository.GetEvent(calendarEvent.Id);
+      _notificationSender.CancelScheduledNotification(oldEvent);
       var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
       if (oldReiteration == calendarEvent.Reiteration)
       {
-        var oldEvent = _evRepository.GetEvent(calendarEvent.Id);
         _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
+        _notificationSender.ScheduleEventEditedNotification(oldEvent.Id);
+
+        if (oldEvent.NotificationTime != null)
+          _notificationSender.ScheduleEventStartedNotification(oldEvent.Id);
       }
       else
       {
@@ -87,7 +92,10 @@ namespace WebCalendar.Business.Domains
       var oldReiteration = _evRepository.GetEventInfo(calendarEvent.Id).Reiteration;
       if (oldReiteration == calendarEvent.Reiteration)
       {
-        _evRepository.UpdateCalendarEventSeries(_mapper.Map<EventViewModel, Event>(calendarEvent));
+        var eventSeries = _evRepository.UpdateCalendarEventSeries(_mapper.Map<EventViewModel, Event>(calendarEvent))
+          .ToArray();
+        _notificationSender.CancelScheduledNotification(eventSeries);
+        _notificationSender.ScheduleEventSeriesStartedNotification(eventSeries.First().SeriesId.GetValueOrDefault());
       }
       else
       {
@@ -100,6 +108,8 @@ namespace WebCalendar.Business.Domains
         updatedMainSeriesEvent.EndDateTime = mainSeriesEvent.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
         // delete series
+        var eventSeries = _evRepository.GetSeries(mainSeriesEvent.SeriesId.GetValueOrDefault()).ToArray();
+        _notificationSender.CancelScheduledNotification(eventSeries);
         _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
         //add new event series
         updatedMainSeriesEvent.Id = default;

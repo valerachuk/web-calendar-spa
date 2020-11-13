@@ -102,7 +102,7 @@ namespace WebCalendar.Data.Repositories
       return calendarEvent;
     }
 
-    public void UpdateCalendarEventSeries(Event calendarEvent)
+    public IEnumerable<Event> UpdateCalendarEventSeries(Event calendarEvent)
     {
       var currentEvent = _context.Events.Find(calendarEvent.Id);
       var currentEventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
@@ -119,6 +119,7 @@ namespace WebCalendar.Data.Repositories
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
       }
       _context.SaveChanges();
+      return currentEventSeries;
     }
   }
 }

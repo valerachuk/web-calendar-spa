@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Mail;
 using Hangfire;
 using Microsoft.Extensions.Options;
+using NLog;
 using WebCalendar.Business.Common;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Data.Entities;
@@ -17,6 +18,7 @@ namespace WebCalendar.Business.Domains
     private readonly IOptions<EmailNotificationsOptions> _emailSenderOptions;
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly IEventRepository _eventRepository;
+    private readonly ILogger _logger;
 
     public NotificationSenderDomain(
       IOptions<EmailNotificationsOptions> emailSenderOptions,
@@ -27,6 +29,7 @@ namespace WebCalendar.Business.Domains
       _backgroundJobClient = backgroundJobClient;
       _emailSenderOptions = emailSenderOptions;
       _eventRepository = eventRepository;
+      _logger = LogManager.GetCurrentClassLogger();
     }
 
     private void SendEmail(string recipientEmail, string message)
@@ -55,12 +58,15 @@ namespace WebCalendar.Business.Domains
       }
       catch (Exception e)
       {
-        Console.WriteLine($"Cannot send email to ${recipientEmail} cause: {e.Message}");
+        _logger.Warn($"Cannot send email to {recipientEmail} cause: {e.Message}");
       }
     }
 
-    public void ScheduleEventCreatedNotification(int eventId) =>
-      _backgroundJobClient.Enqueue<NotificationSenderDomain>(notificationSender => notificationSender.NotifyEventCreated(eventId));
+    public void ScheduleEventCreatedNotification(int eventId)
+      => _backgroundJobClient.Enqueue<NotificationSenderDomain>(notificationSender => notificationSender.NotifyEventCreated(eventId));
+
+    public void ScheduleEventEditedNotification(int eventId)
+      => _backgroundJobClient.Enqueue<NotificationSenderDomain>(notificationSender => notificationSender.NotifyEventEdited(eventId));
 
     public void ScheduleEventStartedNotification(int eventId)
     {
@@ -68,7 +74,6 @@ namespace WebCalendar.Business.Domains
 
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
         => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault()));
-      // - DateTimeOffset.Now.Offset, because date in database contains as local, but EF thinks that it is UTC
 
       _eventRepository.UpdateEvent(@event);
     }
@@ -102,6 +107,21 @@ namespace WebCalendar.Business.Domains
         Hello <i>{ eventNotificationInfo.UserFirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been created successfully
+        in calendar <b>{ eventNotificationInfo.CalendarName }</b>.
+      ";
+
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+    }
+
+    public void NotifyEventEdited(int eventId)
+    {
+      var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+
+      var notificationMessage = $@"
+        Hello <i>{ eventNotificationInfo.UserFirstName },</i>
+        <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
+        <b>{ eventNotificationInfo.EventName }</b> has been edited successfully
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>.
       ";
 
