@@ -14,7 +14,7 @@ namespace WebCalendar.Data.Repositories.Interfaces
     void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int? seriesId);
     Event AddCalendarEvents(Event calendarEvent);
     Event UpdateCalendarEvent(Event calendarEvent);
-    void UpdateCalendarEventSeries(Event calendarEvent);
+    IEnumerable<Event> UpdateCalendarEventSeries(Event calendarEvent);
     void UpdateEvent(Event calendarEvent);
     Event DeleteCalendarEvent(int calendarEventId);
     IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId);
