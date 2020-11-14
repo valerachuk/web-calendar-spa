@@ -4,8 +4,7 @@
 
 .table-fixed tbody{
   height: 350px;
-  overflow-y:auto;
-  width: 100%;
+  overflow-y: auto;
 }
 
 thead,tbody,tr,td,th{
