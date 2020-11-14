@@ -68,14 +68,14 @@ export class UserPageComponent implements OnInit {
     }
     this.authService.editUser(userInfo).subscribe(data => {
       this.savedChanges = true;
-      setTimeout(()=> this.savedChanges = false, 1000);
+      setTimeout(()=> this.savedChanges = false, 2000);
     }, err => {
       if(err.status === 403)
         this.errors.push(err.error.error);
       else
         this.errors.push(err.error.title);
 
-      setTimeout(() => this.errors = [], 1000);
+      setTimeout(() => this.errors = [], 2000);
     })
     .add(()=> {
       this.resetForm();

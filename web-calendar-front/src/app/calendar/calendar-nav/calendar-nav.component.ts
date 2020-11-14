@@ -6,7 +6,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EventFormComponent } from './nav-components/event-form/event-form.component';
 import { AddUpdateModalComponent } from './nav-components/add-update-modal/add-update-modal.component';
 import { DeleteModalComponent } from './nav-components/delete-modal/delete-modal.component';
-import { faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faEdit, faPlus, faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { CalendarComponent } from '../calendar.component';
 
 @Component({
@@ -16,14 +16,15 @@ import { CalendarComponent } from '../calendar.component';
 })
 
 export class CalendarNavComponent implements OnInit {
-  public calendars: Calendar[];
-  public userName = this.authService.firstName;
-  selectedCalendars = [];
+  public calendars: Calendar[] = [];
+  public userName = this.authService.firstName + " " + this.authService.lastName;
+  selectedCalendars: number[] = [];
 
   faPlus = faPlus;
   faTrash = faTrash;
   faPencil = faEdit;
   faSearch = faSearch;
+  faCog = faCog;
 
   constructor(
     private modalService: NgbModal,
@@ -35,6 +36,8 @@ export class CalendarNavComponent implements OnInit {
   ngOnInit(): void {
     this.calendarService.get(this.authService.userId).subscribe(data => {
       this.calendars = data;
+      if (data.length > 0)
+        this.setSelectedCalendars(data[0].id);
     });
   }
 
@@ -60,14 +63,12 @@ export class CalendarNavComponent implements OnInit {
     }
     modalRef.componentInstance.isCalendarOwner = true;
     modalRef.componentInstance.calendarId = calendarId;
-    modalRef.result.then(closeData => {
-      let index = this.calendars.findIndex(calendar => calendar.id === closeData);
-      this.calendars.splice(index, 1);
-      this.calendars = [...this.calendars];
-      index = this.selectedCalendars.findIndex(calendar => calendar.id === closeData);
-      this.selectedCalendars.splice(index, 1);
-      this.selectedCalendars = [...this.selectedCalendars];
-      this.updateCalendarItems();
+    modalRef.result.then(deletedId => {
+      this.calendars = [... this.calendars.filter(c => c.id !== deletedId)];
+      this.selectedCalendars = [...this.selectedCalendars.filter(c => c !== deletedId)];
+      for (let selCalendar of this.selectedCalendars) {
+        this.calendarIsChecked(selCalendar);
+      }
     }, () => { });
   }
 
@@ -81,6 +82,7 @@ export class CalendarNavComponent implements OnInit {
     modalRef.componentInstance.calendar = calendar;
     modalRef.result.then(closeData => {
       this.calendars.splice(this.calendars.findIndex(c => c.id === calendar.id), 1, closeData);
+      this.calendars = [... this.calendars];
     }, () => { });
   }
 

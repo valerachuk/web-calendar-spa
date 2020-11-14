@@ -27,7 +27,7 @@ namespace WebCalendar.Api.Controllers
       if (!ModelState.IsValid)
         return BadRequest(ModelState);
 
-      int id = _caDomain.AddCalendar(calendar);
+      int id = _caDomain.AddCalendar(calendar, User.GetId());
       if (id > 0)
       {
         calendar.Id = id;

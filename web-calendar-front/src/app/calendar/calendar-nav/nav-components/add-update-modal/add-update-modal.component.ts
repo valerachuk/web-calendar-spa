@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { ToastGlobalService } from 'src/app/services/toast-global.service';
 
 @Component({
   selector: 'app-add-update-modal',
@@ -12,7 +13,7 @@ import { CalendarService } from 'src/app/services/calendar.service';
 })
 export class AddUpdateModalComponent implements OnInit {
   public form = new FormGroup({
-    calendarName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+    calendarName: new FormControl(null, [Validators.required, Validators.maxLength(100), this.noWhitespaceValidator]),
     calendarDesc: new FormControl(null, Validators.maxLength(1000))
   });
   calendarName = this.form.get('calendarName');
@@ -30,27 +31,34 @@ export class AddUpdateModalComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private calendarService: CalendarService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastGlobalService
   ) { }
 
   ngOnInit(): void {
-    if(typeof this.calendar === 'undefined' || typeof this.isCalendarOwner === 'undefined') {
+    if (typeof this.calendar === 'undefined' || typeof this.isCalendarOwner === 'undefined') {
       this.addMode = true;
       this.modalTitle = "Add new calendar";
     }
     else {
       this.calendarName.setValue(this.calendar.name);
       this.calendarDesc.setValue(this.calendar.description);
-      if(!this.isCalendarOwner)
+      if (!this.isCalendarOwner)
         this.notOwner();
       this.addMode = false;
       this.modalTitle = "Edit calendar";
     }
   }
 
+  public noWhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    return isValid ? null : { 'whitespace': true };
+}
+
   notOwner() {
     this.errors.push("Not calendar owner");
-    setTimeout(()=> this.activeModal.dismiss(), 1000);
+    setTimeout(() => this.activeModal.dismiss(), 1000);
   }
 
   submit() {
@@ -66,7 +74,7 @@ export class AddUpdateModalComponent implements OnInit {
       description: this.form.value.calendarDesc,
       userId: this.authService.userId
     }
-    if(this.addMode) 
+    if (this.addMode)
       this.addCalendar(newCalendar);
     else
       this.editCalendar(newCalendar);
@@ -75,30 +83,42 @@ export class AddUpdateModalComponent implements OnInit {
   addCalendar(newCalendar) {
     this.calendarService.addCalendar(newCalendar).subscribe(calendar => {
       this.addedNewCalendar = true;
+      this.toastService.add({
+        delay: 5000,
+        title: 'Success!',
+        content: 'Calendar was added successfully',
+        className: "bg-success text-light"
+      });
       setTimeout(() => this.activeModal.close(calendar), 500);
     }, err => {
       if (err.status == 400)
-        this.errors.push("Calendar not added");
+        this.errors.push("Calendar was not added");
     })
-    .add(()=> {
-      this.form.reset();
-      this.form.enable();
-    });
+      .add(() => {
+        this.form.reset();
+        this.form.enable();
+      });
   }
 
   editCalendar(newCalendar) {
     this.calendarService.editCalendar(newCalendar).subscribe(calendar => {
       this.activeModal.close(calendar);
+      this.toastService.add({
+        delay: 5000,
+        title: 'Success!',
+        content: 'Calendar was edited successfully',
+        className: "bg-success text-light"
+      });
     }, err => {
-      if(err.status === 403) {
+      if (err.status === 403) {
         this.isCalendarOwner = false;
         this.notOwner();
       }
-      else if(err.status === 404)
-        this.errors.push("Calendar not found");
+      else if (err.status === 404)
+        this.errors.push("Calendar was not found");
     })
-    .add(()=> {
-      setTimeout(() => this.activeModal.dismiss(), 500);
-    });
+      .add(() => {
+        setTimeout(() => this.activeModal.dismiss(), 500);
+      });
   }
 }

@@ -1,10 +1,12 @@
 <nav class="navbar-nav h-100 container">
-  <div class="sticky-top pt-5">
-    <div class="container d-flex align-items-center justify-content-between p-3">
+  <div class="sticky-top pt-3">
+    <div class="container d-flex align-items-center justify-content-center p-4">
       <h4 class="sidebar-heading">{{userName}}</h4>
-      <button class="btn btn-link btn-sm" routerLink="/user">User settings</button>
+      <sup><button class="btn btn-link btn-sm" routerLink="/user">
+          <fa-icon [icon]="faCog"></fa-icon>
+        </button></sup>
     </div>
-    <div class="dropdown dropright d-flex align-items-center justify-content-center align-self-center p-3">
+    <div class="dropdown dropright d-flex align-items-center justify-content-center align-self-center p-4">
       <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCalendarItems" data-toggle="dropdown"
         aria-haspopup="true" aria-expanded="false">
         <fa-icon [icon]="faPlus"></fa-icon>
@@ -33,6 +35,9 @@
           [(ngModel)]="selectedCalendars" [multiple]="true" class="w-100" (change)="updateCalendarItems()">
         </ng-select>
       </div>
+      <p *ngIf="calendars.length === 0" class="align-items-center p-3 text-secondary">
+        You have no calendars
+      </p>
       <table class="table table-fixed">
         <tbody>
           <tr>
