@@ -72,8 +72,11 @@ namespace WebCalendar.Business.Domains
     {
       var @event = _eventRepository.GetEvent(eventId);
 
+      var notifyTime = @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault());
+      var notifyTimeUTC = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
+
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
-        => notificationSender.NotifyEventStarted(eventId), @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault()));
+        => notificationSender.NotifyEventStarted(eventId), notifyTimeUTC);
 
       _eventRepository.UpdateEvent(@event);
     }
