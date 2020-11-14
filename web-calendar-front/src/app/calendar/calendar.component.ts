@@ -45,8 +45,6 @@ export class CalendarComponent implements OnInit {
 
   selectedCalendars = [];
 
-  clickedItem: CalendarEvent;
-
   constructor(
     private calendarComponentService: CalendarItemsService,
     private modalService: NgbModal) { }
