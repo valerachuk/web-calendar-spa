@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Data.DTO;
@@ -17,7 +18,9 @@ namespace WebCalendar.Data.Repositories
 
     public Event GetEvent(int id)
     {
-      return _context.Events.Find(id);
+      var @event =_context.Events.Find(id);
+      _context.Entry(@event).State = EntityState.Detached;
+      return @event;
     }
 
     public Event GetMainEvent(int id)
@@ -97,17 +100,9 @@ namespace WebCalendar.Data.Repositories
 
     public Event UpdateCalendarEvent(Event calendarEvent)
     {
-      var oldCalendarEvent = _context.Events.Find(calendarEvent.Id);
-      oldCalendarEvent.Calendar = calendarEvent.Calendar;
-      oldCalendarEvent.CalendarId = calendarEvent.CalendarId;
-      oldCalendarEvent.Name = calendarEvent.Name;
-      oldCalendarEvent.Venue = calendarEvent.Venue;
-      oldCalendarEvent.NotificationTime = calendarEvent.NotificationTime;
-      oldCalendarEvent.Reiteration = calendarEvent.Reiteration;
-      oldCalendarEvent.StartDateTime = calendarEvent.StartDateTime;
-      oldCalendarEvent.EndDateTime = calendarEvent.EndDateTime;
+      _context.Events.Update(calendarEvent);
       _context.SaveChanges();
-      return oldCalendarEvent;
+      return calendarEvent;
     }
 
     public IEnumerable<Event> UpdateCalendarEventSeries(Event calendarEvent)
