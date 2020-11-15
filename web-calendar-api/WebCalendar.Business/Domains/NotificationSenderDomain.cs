@@ -72,6 +72,9 @@ namespace WebCalendar.Business.Domains
     {
       var @event = _eventRepository.GetEvent(eventId);
 
+      if (@event.StartDateTime < DateTime.Now)
+        return;
+
       var notifyTime = @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault());
       var notifyTimeUTC = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
 

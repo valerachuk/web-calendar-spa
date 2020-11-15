@@ -148,6 +148,9 @@ export class CalendarComponent implements OnInit {
     newStart,
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
+    if(+event.start === +newStart && +event.end === +newEnd)
+      return;
+
     event.start = newStart;
     event.end = newEnd;
 

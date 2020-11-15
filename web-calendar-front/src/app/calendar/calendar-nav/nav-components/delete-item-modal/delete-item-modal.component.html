@@ -32,6 +32,6 @@
   <small  class="text-danger">{{error}}</small>
 </div>
 <div class="modal-footer">
-  <button type="submit" form="addCalendarForm" (click)="deleteCalendarItem()" class="btn btn-danger" (disabled)="error.length > 0">Delete</button>
+  <button type="submit" form="addCalendarForm" (click)="deleteCalendarItem()" class="btn btn-danger" [disabled]="error.length > 0 || btnDisabled">Delete</button>
   <button type="button" class="btn btn-secondary" ngbAutofocus (click)="activeModal.dismiss()">Cancel</button>
 </div>

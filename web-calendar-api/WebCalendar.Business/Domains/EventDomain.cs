@@ -43,6 +43,10 @@ namespace WebCalendar.Business.Domains
           _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
         }
       }
+      else if(@event.NotificationTime != null && @event.NotificationScheduleJobId == null)
+      {
+        _notificationSender.ScheduleEventStartedNotification(@event.Id);
+      }
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
