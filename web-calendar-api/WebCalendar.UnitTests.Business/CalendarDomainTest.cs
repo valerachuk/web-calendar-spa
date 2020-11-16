@@ -8,7 +8,7 @@ using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 using Xunit;
 
-namespace WebCalendar.TestBusiness
+namespace WebCalendar.UnitTests.Business
 {
   public class CalendarDomainTest
   {
@@ -25,7 +25,7 @@ namespace WebCalendar.TestBusiness
     [InlineData(-1)]
     [InlineData(128)]
     [InlineData(int.MinValue)]
-    public void GetCalendar_GettingUnknownCalendarShouldFail(int calendarId)
+    public void GetCalendar_GettingUnknownCalendar_ShouldFail(int calendarId)
     {
       // Arrange
       var mockCalendarRepo = new Mock<ICalendarRepository>();
@@ -38,14 +38,14 @@ namespace WebCalendar.TestBusiness
       Assert.Throws<NotFoundException>(() => calendarDomain.GetCalendar(calendarId));
 
       // Assert
-      mockCalendarRepo.Verify(cr => cr.GetCalendar(calendarId), Times.Once);
+      mockCalendarRepo.Verify(cr => cr.GetCalendar(calendarId), Times.Once());
     }
 
     [Theory]
     [InlineData(int.MinValue)]
     [InlineData(66)]
     [InlineData(13)]
-    public void GetCalendar_GettingCalendarShouldReturnCalendar(int calendarId)
+    public void GetCalendar_GettingCalendar_ShouldReturnCalendar(int calendarId)
     {
       // Arrange
       var actual = new Calendar();
@@ -63,14 +63,13 @@ namespace WebCalendar.TestBusiness
       // Assert
       Assert.Equal(expected, actual);
       mockCalendarRepo.Verify(cr => cr.GetCalendar(calendarId), Times.Once());
-
     }
 
     [Theory]
     [InlineData(3, 444)]
     [InlineData(int.MinValue, 0)]
     [InlineData(33, 22)]
-    public void AddCalendar_AddingCalendarForInvalidUserFails(int calendarUserId, int actualUserId)
+    public void AddCalendar_AddingCalendarForInvalidUser_ShouldFail(int calendarUserId, int actualUserId)
     {
       // Arrange
       var calendarViewModel = new CalendarViewModel
@@ -92,7 +91,7 @@ namespace WebCalendar.TestBusiness
     [InlineData(12, -12)]
     [InlineData(33, int.MinValue)]
     [InlineData(int.MaxValue, 0)]
-    public void AddCalendar_AddingCalendarShouldReturnCalendarId(int userId, int calendarId)
+    public void AddCalendar_AddingCalendar_ShouldReturnCalendarId(int userId, int calendarId)
     {
       // Arrange
       var calendarViewModel = new CalendarViewModel

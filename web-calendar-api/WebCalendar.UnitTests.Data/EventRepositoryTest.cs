@@ -1,23 +1,31 @@
 ﻿using System;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using WebCalendar.Data;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories;
 using Xunit;
 
-namespace WebCalendar.TestData
+namespace WebCalendar.UnitTests.Data
 {
-  public class EventRepositoryTest : IClassFixture<WebCalendarInMemoryDbContextFixture>
+  public class EventRepositoryTest : IDisposable
   {
     private readonly WebCalendarDbContext _context;
 
-    public EventRepositoryTest(WebCalendarInMemoryDbContextFixture dbFixture)
+    public EventRepositoryTest()
     {
-      _context = dbFixture.Context;
+      var options = new DbContextOptionsBuilder();
+      options.UseInMemoryDatabase("WebCalendarTestInMemoryDatabase");
+
+      _context = new WebCalendarDbContext(options.Options);
+    }
+
+    public void Dispose()
+    {
+      _context.Dispose();
     }
 
     [Fact]
-    public void GetEventNotificationInfo_GettingEventInfoShouldReturnFullEventInfo()
+    public void GetEventNotificationInfo_GettingEventInfo_ShouldReturnFullEventInfo()
     {
       // Arrange
       var user = new User
@@ -38,7 +46,8 @@ namespace WebCalendar.TestData
         Name = "myEvent1_1492132193",
         StartDateTime = new DateTime(2020, 5, 6),
         Reiteration = null,
-        Calendar = calendar
+        Calendar = calendar,
+        Id = 3
       };
 
       _context.Events.Add(@event);
@@ -47,8 +56,7 @@ namespace WebCalendar.TestData
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var expectedEventNotificationInfo =
-        eventRepository.GetEventNotificationInfo(_context.Events.First(evt => evt.Name == @event.Name).Id);
+      var expectedEventNotificationInfo = eventRepository.GetEventNotificationInfo(3);
 
       // Assert
       Assert.NotNull(expectedEventNotificationInfo);
@@ -58,19 +66,17 @@ namespace WebCalendar.TestData
       Assert.Equal(expectedEventNotificationInfo.CalendarName, calendar.Name);
       Assert.Equal(expectedEventNotificationInfo.EventName, @event.Name);
       Assert.Equal(expectedEventNotificationInfo.StartDateTime, @event.StartDateTime);
-      Assert.Equal(expectedEventNotificationInfo.IsSeries, @event.Reiteration != null);
-
+      Assert.False(expectedEventNotificationInfo.IsSeries);
     }
 
     [Fact]
-    public void GetEventNotificationInfo_GettingInvalidEventInfoReturnsNull()
+    public void GetEventNotificationInfo_GettingInvalidEventInfo_ShouldReturnNull()
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      var invalidIndex = _context.Events.Select(evt => evt.Id).DefaultIfEmpty().Max() + 1;
 
       // Act
-      var expectedEventNotificationInfo = eventRepository.GetEventNotificationInfo(invalidIndex);
+      var expectedEventNotificationInfo = eventRepository.GetEventNotificationInfo(125134);
 
       // Assert
       Assert.Null(expectedEventNotificationInfo);
