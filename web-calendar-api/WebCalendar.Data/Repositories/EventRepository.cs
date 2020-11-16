@@ -20,6 +20,9 @@ namespace WebCalendar.Data.Repositories
       return _context.Events.Find(id);
     }
 
+    public IEnumerable<Event> GetCalendarEvents(int calendarId)
+      => _context.Events.Where(evt => evt.CalendarId == calendarId).ToArray();
+
     public Event GetMainEvent(int id)
     {
       var seriesEvent = _context.Events.Find(id);

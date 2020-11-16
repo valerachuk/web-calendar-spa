@@ -8,6 +8,7 @@ namespace WebCalendar.Data.Repositories.Interfaces
   public interface IEventRepository
   {
     Event GetEvent(int id);
+    IEnumerable<Event> GetCalendarEvents(int calendarId);
     Event GetMainEvent(int id);
     IEnumerable<Event> GetSeries(int seriesId);
     UserEventDTO GetEventInfo(int id);

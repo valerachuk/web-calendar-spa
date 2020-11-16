@@ -69,6 +69,7 @@ export class CalendarNavComponent implements OnInit {
       for (let selCalendar of this.selectedCalendars) {
         this.calendarIsChecked(selCalendar);
       }
+      this.updateCalendarItems();
     }, () => { });
   }
 
