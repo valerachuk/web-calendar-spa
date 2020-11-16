@@ -28,10 +28,13 @@ namespace WebCalendar.Business.Domains
       return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
     }
 
-    public void AddCalendarEvent(EventViewModel calendarEvent)
+    public void AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
     {
       var @event = _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
-      _notificationSender.ScheduleEventCreatedNotification(@event.Id);
+      if (isUpdated)
+        _notificationSender.ScheduleEventEditedNotification(@event.Id);
+      else
+        _notificationSender.ScheduleEventCreatedNotification(@event.Id);
 
       var seriesId = @event.SeriesId.GetValueOrDefault();
       if (@event.Reiteration != null)
@@ -42,6 +45,10 @@ namespace WebCalendar.Business.Domains
         {
           _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
         }
+      }
+      else if(@event.NotificationTime != null && @event.NotificationScheduleJobId == null)
+      {
+        _notificationSender.ScheduleEventStartedNotification(@event.Id);
       }
     }
 
@@ -63,6 +70,7 @@ namespace WebCalendar.Business.Domains
       }
       _evRepository.AddSeriesOfCalendarEvents(generatedEvents, seriesId);
     }
+
     public void UpdateCalendarEvent(EventViewModel calendarEvent, int userId)
     {
       CheckRightsToModify(calendarEvent.Id, userId);
@@ -81,7 +89,7 @@ namespace WebCalendar.Business.Domains
       {
         _evRepository.DeleteCalendarEvent(calendarEvent.Id);
         calendarEvent.Id = default;
-        AddCalendarEvent(calendarEvent);
+        AddCalendarEvent(calendarEvent, true);
       }
     }
 
@@ -113,7 +121,7 @@ namespace WebCalendar.Business.Domains
         _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
         //add new event series
         updatedMainSeriesEvent.Id = default;
-        AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent));
+        AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent), true);
       }
     }
 

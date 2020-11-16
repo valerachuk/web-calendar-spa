@@ -15,6 +15,7 @@ export class DeleteItemModalComponent implements OnInit {
   isEventRepeatable = true;
   repeatableEvent = ItemType.RepeatableEvent;
   error = "";
+  public btnDisabled = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -47,6 +48,7 @@ export class DeleteItemModalComponent implements OnInit {
   }
 
   deleteCalendarItem() {
+    this.btnDisabled = true;
     switch (this.item.meta) {
       case ItemType.Event:
         this.deleteSingleEvent();

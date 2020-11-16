@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Data.DTO;
@@ -17,7 +18,9 @@ namespace WebCalendar.Data.Repositories
 
     public Event GetEvent(int id)
     {
-      return _context.Events.Find(id);
+      var @event =_context.Events.Find(id);
+      _context.Entry(@event).State = EntityState.Detached;
+      return @event;
     }
 
     public Event GetMainEvent(int id)

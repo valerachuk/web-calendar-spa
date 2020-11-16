@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using WebCalendar.Data.Entities;
 
 namespace WebCalendar.Data
@@ -10,5 +11,6 @@ namespace WebCalendar.Data
     DbSet<Event> Events { get; set; }
 
     int SaveChanges();
+    EntityEntry Entry(object entity);
   }
 }
