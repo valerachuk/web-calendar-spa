@@ -17,8 +17,8 @@ namespace WebCalendar.Data.Repositories
     {
       var eventsList = _context.Events
         .Where(calendarEvent =>
-        calendarEvent.StartDateTime >= startDateTime &&
-        calendarEvent.EndDateTime <= endDateTime &&
+        calendarEvent.EndDateTime >= startDateTime &&
+        calendarEvent.StartDateTime <= endDateTime &&
         calendarsId
         .Contains(calendarEvent.CalendarId))
         .ToList();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using NLog;
 using WebCalendar.Business.Domains.Interfaces;
@@ -12,13 +13,22 @@ namespace WebCalendar.Business.Domains
   public class CalendarDomain : ICalendarDomain
   {
     private readonly ICalendarRepository _caRepository;
+    private readonly IEventRepository _eventRepository;
+    private readonly INotificationSenderDomain _notificationSender;
     private readonly IMapper _mapper;
     private Logger _logger;
 
-    public CalendarDomain(ICalendarRepository calendarRepository, IMapper mapper)
+    public CalendarDomain(
+      ICalendarRepository calendarRepository,
+      IMapper mapper,
+      INotificationSenderDomain notificationSender,
+      IEventRepository eventRepository
+      )
     {
+      _eventRepository = eventRepository;
       _caRepository = calendarRepository;
       _mapper = mapper;
+      _notificationSender = notificationSender;
       _logger = LogManager.GetCurrentClassLogger();
     }
 
@@ -47,8 +57,9 @@ namespace WebCalendar.Business.Domains
       if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
-      _logger.Info($"Delete calendar {id}");
+      _notificationSender.CancelScheduledNotification(_eventRepository.GetCalendarEvents(id).ToArray());
 
+      _logger.Info($"Delete calendar {id}");
       return _caRepository.DeleteCalendar(id);
     }
 
