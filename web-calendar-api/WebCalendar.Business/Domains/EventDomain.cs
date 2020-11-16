@@ -104,6 +104,7 @@ namespace WebCalendar.Business.Domains
           .ToArray();
         _notificationSender.CancelScheduledNotification(eventSeries);
         _notificationSender.ScheduleEventSeriesStartedNotification(eventSeries.First().SeriesId.GetValueOrDefault());
+        _notificationSender.ScheduleEventEditedNotification(calendarEvent.Id);
       }
       else
       {

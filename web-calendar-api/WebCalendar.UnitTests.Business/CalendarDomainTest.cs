@@ -32,7 +32,7 @@ namespace WebCalendar.UnitTests.Business
       mockCalendarRepo
         .Setup(x => x.GetCalendar(It.IsAny<int>()))
         .Returns(() => null);
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
 
       // Act
       Assert.Throws<NotFoundException>(() => calendarDomain.GetCalendar(calendarId));
@@ -55,7 +55,7 @@ namespace WebCalendar.UnitTests.Business
         .Setup(x => x.GetCalendar(It.IsAny<int>()))
         .Returns(() => actual);
 
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
 
       // Act
       var expected = calendarDomain.GetCalendar(calendarId);
@@ -78,7 +78,7 @@ namespace WebCalendar.UnitTests.Business
       };
 
       var mockCalendarRepo = new Mock<ICalendarRepository>();
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
 
       // Act
       Assert.Throws<ForbiddenException>(() => calendarDomain.AddCalendar(calendarViewModel, actualUserId));
@@ -104,7 +104,7 @@ namespace WebCalendar.UnitTests.Business
         .Setup(x => x.AddCalendar(It.IsAny<Calendar>()))
         .Returns(() => calendarId);
 
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, _mapper);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, _mapper, null, null);
 
       // Act
       var actualCalendarId = calendarDomain.AddCalendar(calendarViewModel, userId);
