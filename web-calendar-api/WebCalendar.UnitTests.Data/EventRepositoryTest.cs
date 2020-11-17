@@ -14,13 +14,14 @@ namespace WebCalendar.UnitTests.Data
     public EventRepositoryTest()
     {
       var options = new DbContextOptionsBuilder();
-      options.UseInMemoryDatabase("WebCalendarTestInMemoryDatabase");
+      options.UseInMemoryDatabase("WebCalendarEventRepositoryTestInMemoryDatabase");
 
       _context = new WebCalendarDbContext(options.Options);
     }
 
     public void Dispose()
     {
+      _context.Database.EnsureDeleted();
       _context.Dispose();
     }
 
