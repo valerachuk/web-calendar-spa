@@ -28,15 +28,7 @@ namespace WebCalendar.UnitTests.Data
 
     [Fact]
     [Trait("Repositories", "CalendarRepository")]
-    public void GetUserCalendars_EmptyRepository_ReturnEmpty()
-    {
-      var calendarRepo = new CalendarRepository(_context);
-      Assert.Empty(calendarRepo.GetUserCalendars(1));
-    }
-
-    [Fact]
-    [Trait("Repositories", "CalendarRepository")]
-    public void GetUserCalendars_ReturnUserCalendars()
+    public void GetUserCalendars_CalendarsForMultipleUsers_ReturnsOnlyCalendarsForGivenUser()
     {
       var calendar1 = new Calendar
       {
@@ -51,27 +43,18 @@ namespace WebCalendar.UnitTests.Data
         Name = "Calendar 2",
         Description = "Description 2",
         User = null,
-        UserId = 1,
-        Events = null
-      };      
-      var calendar3 = new Calendar
-      {
-        Name = "Calendar 3",
-        Description = "Description 3",
-        User = null,
         UserId = 2,
         Events = null
       };
 
-      _context.AddRange(calendar1, calendar2, calendar3);
+      _context.AddRange(calendar1, calendar2);
       _context.SaveChanges();
       var calendarRepo = new CalendarRepository(_context);
 
       var actual = calendarRepo.GetUserCalendars(1);
 
       Assert.Collection(actual, 
-        calendar => Assert.Contains("Calendar 1", calendar.Name),
-        calendar => Assert.Contains("Calendar 2", calendar.Name));
+        calendar => Assert.Contains("Calendar 1", calendar.Name));
     }
 
     [Fact]
@@ -128,22 +111,12 @@ namespace WebCalendar.UnitTests.Data
         UserId = 1,
         Events = null
       };
-      var calendar2 = new Calendar
-      {
-        Name = "Calendar 2",
-        Description = "",
-        User = null,
-        UserId = 1,
-        Events = null
-      };
 
       var calendarRepo = new CalendarRepository(_context);
 
       var actualId = calendarRepo.AddCalendar(calendar1);
-      var actualId2 = calendarRepo.AddCalendar(calendar2);
 
       Assert.Equal(1, actualId);
-      Assert.Equal(2, actualId2);
     }
 
     [Fact]
