@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using WebCalendar.Data;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories;
