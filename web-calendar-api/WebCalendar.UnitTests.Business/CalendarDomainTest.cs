@@ -48,17 +48,17 @@ namespace WebCalendar.UnitTests.Business
     public void GetCalendar_GettingCalendar_ShouldReturnCalendar(int calendarId)
     {
       // Arrange
-      var actual = new Calendar();
+      var expected = new Calendar();
 
       var mockCalendarRepo = new Mock<ICalendarRepository>();
       mockCalendarRepo
         .Setup(x => x.GetCalendar(It.IsAny<int>()))
-        .Returns(() => actual);
+        .Returns(() => expected);
 
       var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
 
       // Act
-      var expected = calendarDomain.GetCalendar(calendarId);
+      var actual = calendarDomain.GetCalendar(calendarId);
 
       // Assert
       Assert.Equal(expected, actual);
