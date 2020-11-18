@@ -21,6 +21,7 @@ namespace WebCalendar.UnitTests.Business
     }
 
     [Theory]
+    [Trait("Domains", "CalendarDomain")]
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(128)]
@@ -42,6 +43,7 @@ namespace WebCalendar.UnitTests.Business
     }
 
     [Theory]
+    [Trait("Domains", "CalendarDomain")]
     [InlineData(int.MinValue)]
     [InlineData(66)]
     [InlineData(13)]
@@ -66,6 +68,7 @@ namespace WebCalendar.UnitTests.Business
     }
 
     [Theory]
+    [Trait("Domains", "CalendarDomain")]
     [InlineData(3, 444)]
     [InlineData(int.MinValue, 0)]
     [InlineData(33, 22)]
@@ -86,8 +89,9 @@ namespace WebCalendar.UnitTests.Business
       // Assert
       mockCalendarRepo.Verify(cr => cr.AddCalendar(It.IsAny<Calendar>()), Times.Never());
     }
-    
+
     [Theory]
+    [Trait("Domains", "CalendarDomain")]
     [InlineData(12, -12)]
     [InlineData(33, int.MinValue)]
     [InlineData(int.MaxValue, 0)]
@@ -114,5 +118,52 @@ namespace WebCalendar.UnitTests.Business
       mockCalendarRepo.Verify(cr => cr.AddCalendar(It.IsNotNull<Calendar>()), Times.Once());
     }
 
+    [Fact]
+    [Trait("Domains", "CalendarDomain")]
+    public void DeleteCalendar_UserNotOwner_ThrowsForbiddenExceptions()
+    {
+      var calendar = new Calendar
+      {
+        Id = 3,
+        UserId = 2
+      };
+
+      var mockCalendarRepo = new Mock<ICalendarRepository>();
+      mockCalendarRepo
+        .Setup(cr => cr.GetCalendar(It.IsAny<int>()))
+        .Returns(() => calendar);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
+
+      Assert.Throws<ForbiddenException>(() => calendarDomain.DeleteCalendar(3, 5));
+
+      mockCalendarRepo.Verify(cr => cr.GetCalendar(It.IsAny<int>()), Times.Once());
+    }
+
+    [Fact]
+    [Trait("Domains", "CalendarDomain")]
+    public void EditCalendar_UserNotOwner_ThrowsForbiddenExceptions()
+    {
+      var calendarVM = new CalendarViewModel
+      {
+        Id = 3,
+        UserId = 2
+      };
+
+      var calendar = new Calendar
+      {
+        Id = 3,
+        UserId = 2
+      };
+
+      var mockCalendarRepo = new Mock<ICalendarRepository>();
+      mockCalendarRepo
+        .Setup(cr => cr.GetCalendar(It.IsAny<int>()))
+        .Returns(() => calendar);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
+
+      Assert.Throws<ForbiddenException>(() => calendarDomain.EditCalendar(calendarVM, 5));
+
+      mockCalendarRepo.Verify(cr => cr.GetCalendar(It.IsAny<int>()), Times.Once());
+    }
   }
 }
