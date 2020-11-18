@@ -25,15 +25,12 @@ namespace WebCalendar.Business.Domains
 
     public EventViewModel GetEvent(int id)
     {
-      try
-      {
-        var currentEvent = _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
-        return currentEvent;
-      }
-      catch (NullReferenceException)
+      var currentEvent = _evRepository.GetEvent(id);
+      if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
       }
+      return _mapper.Map<Event, EventViewModel>(currentEvent);
     }
 
     public void AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
@@ -54,7 +51,7 @@ namespace WebCalendar.Business.Domains
           _notificationSender.ScheduleEventSeriesStartedNotification(seriesId);
         }
       }
-      else if(@event.NotificationTime != null && @event.NotificationScheduleJobId == null)
+      else if (@event.NotificationTime != null && @event.NotificationScheduleJobId == null)
       {
         _notificationSender.ScheduleEventStartedNotification(@event.Id);
       }

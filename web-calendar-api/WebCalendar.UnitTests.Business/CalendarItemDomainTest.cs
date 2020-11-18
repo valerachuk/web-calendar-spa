@@ -6,13 +6,13 @@ using WebCalendar.Business;
 using WebCalendar.Business.Domains;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
+using WebCalendar.Constants.Enums;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 using Xunit;
 
 namespace WebCalendar.UnitTests.Business
 {
-  [Collection("Sequential")]
   public class CalendarItemDomainTest
   {
     private readonly IMapper _mapper;
@@ -24,62 +24,53 @@ namespace WebCalendar.UnitTests.Business
     }
 
     [Fact]
-    public void GetCalendarsItemsByTimeInterval_GettingCalendarItems_ShouldReturnItems()
+    public void GetCalendarsItemsByTimeInterval_GettingCalendarItems_ShouldCallMethod()
     {
       // Arrange
-      List<CalendarItemViewModel> actualVM = new List<CalendarItemViewModel>();
-      List<Event> actual = new List<Event>();
+      List<Event> expected = new List<Event>();
 
       var mockEventRepo = new Mock<ICalendarItemRepository>();
-      mockEventRepo
-        .Setup(x => x.GetCalendarsEventsByTimeInterval(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int[]>()))
-        .Returns(() => actual);
-
-      var itemDomain = new CalendarItemDomain(mockEventRepo.Object, _mapper, null);
+      var itemDomain = new CalendarItemDomain(mockEventRepo.Object, _mapper, null, null);
 
       DateTime start = new DateTime(2020, 4, 5);
       DateTime end = new DateTime(2020, 4, 6);
-      int[] id = new int[] { 1, 2};
+      int[] id = new int[] { 1, 2 };
+
+      mockEventRepo
+        .Setup(x => x.GetCalendarsEventsByTimeInterval(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int[]>()))
+        .Returns(() => expected);
 
       // Act
-      var expected = itemDomain.GetCalendarsItemsByTimeInterval(start, end, id);
-
-      actualVM = _mapper.Map(actual, actualVM);
+      var actual = itemDomain.GetCalendarsItemsByTimeInterval(start, end, id);
 
       // Assert
-      Assert.Equal(expected, _mapper.Map<IEnumerable<Event>, IEnumerable<CalendarItemViewModel>>(actual));
+      mockEventRepo.Verify(item => item.GetCalendarsEventsByTimeInterval(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int[]>()), Times.Once());
+
     }
 
-    [Fact]
-    public void UpdateCalendarsItem_UpdateEvent_ShouldUpdateEvent()
+    [Theory]
+    [InlineData(CalendarItemType.Event)]
+    [InlineData(CalendarItemType.RepeatableEvent)]
+    public void UpdateCalendarsItem_UpdateNotExistingEvent_ShouldThrowException(CalendarItemType type)
     {
       //Arrange
+      var actualUpdatedEvent = new Event()
+      {
+        StartDateTime = new DateTime(2020, 4, 5),
+        EndDateTime = new DateTime(2020, 4, 6)
+      };
       var actualItem = new CalendarItemViewModel()
       {
-        MetaType = Constants.Enums.CalendarItemType.Event
+        MetaType = type
       };
-      var mockEventRepo = new Mock<ICalendarItemRepository>();
-      var itemDomain = new CalendarItemDomain(mockEventRepo.Object, _mapper, null);
+      var mockItemRepo = new Mock<ICalendarItemRepository>();
+      var mockEventRepo = new Mock<IEventRepository>();
+      var itemDomain = new CalendarItemDomain(mockItemRepo.Object, _mapper, null, mockEventRepo.Object);
+      mockEventRepo.Setup(x => x.UpdateCalendarEvent(actualUpdatedEvent)).Verifiable();
 
       // Act and Assert
       Assert.Throws<NotFoundException>(() => itemDomain.UpdateCalendarsItem(actualItem));
-      mockEventRepo.Verify(cr => cr.UpdateCalendarsEventTime(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()), Times.Once());
-    }
-
-    [Fact]
-    public void UpdateCalendarsItem_UpdateNotExistingItem_ShouldThrowException()
-    {
-      //Arrange
-      var actualItem = new CalendarItemViewModel()
-      {
-        MetaType = Constants.Enums.CalendarItemType.RepeatableEvent
-      };
-      var mockEventRepo = new Mock<ICalendarItemRepository>();
-      var itemDomain = new CalendarItemDomain(mockEventRepo.Object, _mapper, null);
-
-      // Act and Assert
-      Assert.Throws<NotFoundException>(() => itemDomain.UpdateCalendarsItem(actualItem));
-      mockEventRepo.Verify(cr => cr.UpdateCalendarsEventTime(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()), Times.Once());
+      mockEventRepo.Verify(item => item.UpdateCalendarEvent(actualUpdatedEvent), Times.Never());
     }
   }
 }

@@ -8,7 +8,6 @@ using Xunit;
 
 namespace WebCalendar.UnitTests.Data
 {
-  [Collection("Sequential")]
   public class CalendarItemRepositoryTest : IDisposable
   {
     private readonly WebCalendarDbContext _context;
@@ -16,7 +15,7 @@ namespace WebCalendar.UnitTests.Data
     public CalendarItemRepositoryTest()
     {
       var options = new DbContextOptionsBuilder();
-      options.UseInMemoryDatabase("WebCalendarTestInMemoryDatabase");
+      options.UseInMemoryDatabase("WebCalendarTestInMemoryDatabase_CalendarItemRepo");
 
       _context = new WebCalendarDbContext(options.Options);
     }
@@ -62,7 +61,7 @@ namespace WebCalendar.UnitTests.Data
     public void GetCalendarsEventsByTimeInterval_GettingAllIncludedEvents_ShouldReturnItemsByFilter()
     {
       // Arrange
-      List<Event> items = new List<Event>()
+      List<Event> expectedItems = new List<Event>()
       {
         GetTestEvent(1),
         GetTestEvent(2),
@@ -76,10 +75,10 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, items);
+      Assert.Equal(expectedItems, actualResult);
     }
 
     [Fact]
@@ -100,14 +99,14 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, new Event[] { items[1] });
+      Assert.Equal(new Event[] { items[1] }, actualResult);
     }
 
     [Fact]
-    public void GetCalendarsEventsByTimeInterval_GettingListWithOutRangeDates_ShouldReturnEmptyList()
+    public void GetCalendarsEventsByTimeInterval_GettingListWithOutRangeDates_ShouldReturnEmptyArray()
     {
       // Arrange
       List<Event> items = new List<Event>()
@@ -124,14 +123,14 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, new Event[] { });
+      Assert.Equal(new Event[] { }, actualResult);
     }
 
     [Fact]
-    public void GetCalendarsEventsByTimeInterval_GettingListOfNotExistingCalendar_ShouldReturnEmptyList()
+    public void GetCalendarsEventsByTimeInterval_GettingListOfNotExistingCalendar_ShouldReturnEmptyArray()
     {
       // Arrange
       List<Event> items = new List<Event>()
@@ -148,14 +147,14 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, new Event[] { });
+      Assert.Equal(new Event[] { }, actualResult);
     }
 
     [Fact]
-    public void GetCalendarsEventsByTimeInterval_GettingListWithInvalidDates_ShouldReturnEmptyList()
+    public void GetCalendarsEventsByTimeInterval_GettingListWithInvalidDates_ShouldReturnEmptyArray()
     {
       // Arrange
       List<Event> items = new List<Event>()
@@ -172,14 +171,14 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, new Event[] { });
+      Assert.Equal(new Event[] { }, actualResult);
     }
 
     [Fact]
-    public void GetCalendarsEventsByTimeInterval_GettingListInvalidCalendar_ShouldReturnEmptyList()
+    public void GetCalendarsEventsByTimeInterval_GettingListInvalidCalendar_ShouldReturnEmptyArray()
     {
       // Arrange
       List<Event> items = new List<Event>()
@@ -196,10 +195,10 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, new Event[] { });
+      Assert.Equal(new Event[] { }, actualResult);
     }
 
     [Fact]
@@ -233,10 +232,10 @@ namespace WebCalendar.UnitTests.Data
       CalendarItemRepository itemRepository = new CalendarItemRepository(_context);
 
       // Act
-      var expectedItems = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
+      var actualResult = itemRepository.GetCalendarsEventsByTimeInterval(start, end, calendarId);
 
       // Assert
-      Assert.Equal(expectedItems, items);
+      Assert.Equal(items, actualResult);
     }
 
     [Fact]
@@ -254,12 +253,12 @@ namespace WebCalendar.UnitTests.Data
       itemRepository.UpdateCalendarsEventTime(newStartDate, newEndDate, @event.Id);
 
       // Assert
-      Assert.Equal(_context.Events.Find(@event.Id).StartDateTime, newStartDate);
-      Assert.Equal(_context.Events.Find(@event.Id).EndDateTime, newEndDate);
+      Assert.Equal(newStartDate, _context.Events.Find(@event.Id).StartDateTime);
+      Assert.Equal(newEndDate, _context.Events.Find(@event.Id).EndDateTime);
     }
 
     [Fact]
-    public void UpdateCalendarsEventTime_UpdatingNotExistingEvent_ShouldUpdateEvent()
+    public void UpdateCalendarsEventTime_UpdatingNotExistingEvent_ShouldThrowException()
     {
       // Arrange
       var @event = GetTestEvent(1);

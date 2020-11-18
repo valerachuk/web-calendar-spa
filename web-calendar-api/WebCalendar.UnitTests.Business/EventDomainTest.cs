@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Moq;
-using Newtonsoft.Json;
 using WebCalendar.Business;
 using WebCalendar.Business.Domains;
 using WebCalendar.Business.Exceptions;
@@ -11,7 +10,6 @@ using Xunit;
 
 namespace WebCalendar.UnitTests.Business
 {
-  [Collection("Sequential")]
   public class EventDomainTest
   {
     private readonly IMapper _mapper;
@@ -22,48 +20,20 @@ namespace WebCalendar.UnitTests.Business
       _mapper = mapperConfiguration.CreateMapper();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(128)]
-    public void GetEvent_GettingEvent_ShouldReturnEvent(int id)
-    {
-      // Arrange
-      EventViewModel actualVM = new EventViewModel();
-      Event actual = new Event();
 
-      var mockEventRepo = new Mock<IEventRepository>();
-      mockEventRepo
-        .Setup(x => x.GetEvent(It.IsAny<int>()))
-        .Returns(() => actual);
-
-      var eventDomain = new EventDomain(mockEventRepo.Object, _mapper, null);
-
-      // Act
-      EventViewModel expected = eventDomain.GetEvent(id);
-
-      actualVM = _mapper.Map(actual, actualVM);
-
-      // Assert
-      var expectedJSON = JsonConvert.SerializeObject(expected);
-      var actualJSON = JsonConvert.SerializeObject(actualVM);
-      Assert.Equal(expectedJSON, actualJSON);
-      mockEventRepo.Verify(cr => cr.GetEvent(id), Times.Once());
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(128)]
-    [InlineData(int.MinValue)]
-    public void GetEvent_GettingNotExistingEvent_ShouldThrowEcxeption(int id)
+    [Fact]
+    public void GetEvent_GettingNotExistingEvent_ShouldThrowException()
     {
       //Arrange
       var mockEventRepo = new Mock<IEventRepository>();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null);
+      mockEventRepo
+        .Setup(evrep => evrep.GetEvent(It.IsAny<int>()))
+        .Returns(() => null);
 
       // Act and Assert
-      Assert.Throws<NotFoundException>(() => eventDomain.GetEvent(id));
+      Assert.Throws<NotFoundException>(() => eventDomain.GetEvent(123));
+      mockEventRepo.Verify(evrep => evrep.GetEvent(It.IsAny<int>()), Times.Once());
     }
 
     [Fact]
@@ -71,13 +41,16 @@ namespace WebCalendar.UnitTests.Business
     {
       //Arrange
       int userId = 0;
-      EventViewModel actualVM = new EventViewModel();
+      EventViewModel expectedVM = new EventViewModel();
       var mockEventRepo = new Mock<IEventRepository>();
+      mockEventRepo
+        .Setup(evrep => evrep.UpdateCalendarEvent(It.IsAny<Event>()))
+        .Verifiable();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null);
 
       // Act and Assert
-      Assert.Throws<NotFoundException>(() => eventDomain.UpdateCalendarEvent(actualVM, userId));
-      mockEventRepo.Verify(cr => cr.UpdateCalendarEvent(It.IsAny<Event>()), Times.Never());
+      Assert.Throws<NotFoundException>(() => eventDomain.UpdateCalendarEvent(expectedVM, userId));
+      mockEventRepo.Verify(evrep => evrep.UpdateCalendarEvent(It.IsAny<Event>()), Times.Never());
     }
 
     [Fact]
@@ -87,11 +60,14 @@ namespace WebCalendar.UnitTests.Business
       int userId = 0;
       EventViewModel actualVM = new EventViewModel();
       var mockEventRepo = new Mock<IEventRepository>();
+      mockEventRepo
+        .Setup(x => x.UpdateCalendarEventSeries(It.IsAny<Event>()))
+        .Verifiable();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null);
 
       // Act and Assert
       Assert.Throws<NotFoundException>(() => eventDomain.UpdateCalendarEventSeries(actualVM, userId));
-      mockEventRepo.Verify(cr => cr.UpdateCalendarEventSeries(It.IsAny<Event>()), Times.Never());
+      mockEventRepo.Verify(evrep => evrep.UpdateCalendarEventSeries(It.IsAny<Event>()), Times.Never());
     }
 
     [Fact]
@@ -101,11 +77,16 @@ namespace WebCalendar.UnitTests.Business
       int userId = 0;
       EventViewModel actualVM = new EventViewModel();
       var mockEventRepo = new Mock<IEventRepository>();
+      mockEventRepo
+        .Setup(evrep => evrep.DeleteCalendarEvent(It.IsAny<int>()))
+        .Returns(() => null)
+        .Verifiable();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null);
 
       // Act and Assert
       Assert.Throws<NotFoundException>(() => eventDomain.DeleteCalendarEvent(actualVM.Id, userId));
-      }
+      mockEventRepo.Verify(evrep => evrep.DeleteCalendarEvent(It.IsAny<int>()), Times.Never());
+    }
 
     [Fact]
     public void DeleteCalendarEventSeries_DeleteNotExistingEvents_ShouldThrowException()
@@ -114,10 +95,15 @@ namespace WebCalendar.UnitTests.Business
       int userId = 0;
       EventViewModel actualVM = new EventViewModel();
       var mockEventRepo = new Mock<IEventRepository>();
+      mockEventRepo
+        .Setup(evrep => evrep.DeleteCalendarEventSeries(It.IsAny<int>()))
+        .Returns(() => null)
+        .Verifiable();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null);
 
       // Act and Assert
       Assert.Throws<NotFoundException>(() => eventDomain.DeleteCalendarEventSeries(actualVM.Id, userId));
-      }
+      mockEventRepo.Verify(evrep => evrep.DeleteCalendarEventSeries(It.IsAny<int>()), Times.Never());
+    }
   }
 }

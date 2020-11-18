@@ -16,12 +16,14 @@ namespace WebCalendar.Business.Domains
     private readonly IMapper _mapper;
     private readonly ICalendarItemRepository _itRepository;
     private readonly INotificationSenderDomain _notificationSender;
+    private readonly IEventRepository _eventRepository;
 
-    public CalendarItemDomain(ICalendarItemRepository calendarItemRepository, IMapper mapper, INotificationSenderDomain notificationSender)
+    public CalendarItemDomain(ICalendarItemRepository calendarItemRepository, IMapper mapper, INotificationSenderDomain notificationSender, IEventRepository eventRepository)
     {
       _itRepository = calendarItemRepository;
       _mapper = mapper;
       _notificationSender = notificationSender;
+      _eventRepository = eventRepository;
     }
     public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
     {
@@ -32,31 +34,32 @@ namespace WebCalendar.Business.Domains
     }
     public void UpdateCalendarsItem(CalendarItemViewModel calendarItem)
     {
-      try
+      switch (calendarItem.MetaType)
       {
-        switch (calendarItem.MetaType)
-        {
-          case CalendarItemType.Event:
-            _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
-            _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
-            break;
-          case CalendarItemType.RepeatableEvent:
-            _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
-            _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
-            break;
-          case CalendarItemType.Task:
+        case CalendarItemType.Event:
+          if (_eventRepository.GetEvent(calendarItem.Id) == null)
+          {
+            throw new NotFoundException("Item was not found");
+          }
+           _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+          _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
+          break;
+        case CalendarItemType.RepeatableEvent:
+          if (_eventRepository.GetEvent(calendarItem.Id) == null)
+          {
+            throw new NotFoundException("Item was not found");
+          }
+          _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+          _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
+          break;
+        case CalendarItemType.Task:
 
-            break;
-          case CalendarItemType.Reminder:
+          break;
+        case CalendarItemType.Reminder:
 
-            break;
-          default:
-            break;
-        }
-      }
-      catch (NullReferenceException)
-      {
-        throw new NotFoundException("Item was not found");
+          break;
+        default:
+          break;
       }
     }
   }

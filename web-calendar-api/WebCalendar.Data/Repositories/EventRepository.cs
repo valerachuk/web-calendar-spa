@@ -19,6 +19,10 @@ namespace WebCalendar.Data.Repositories
     public Event GetEvent(int id)
     {
       var @event =_context.Events.Find(id);
+      if (@event == null)
+      {
+        return null;
+      }
       _context.Entry(@event).State = EntityState.Detached;
       return @event;
     }
@@ -81,6 +85,10 @@ namespace WebCalendar.Data.Repositories
     public Event DeleteCalendarEvent(int calendarEventId)
     {
       var currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+      {
+        return null;
+      }
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
       return currentEvent;
