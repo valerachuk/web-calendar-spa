@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Constants.Enums;
 using WebCalendar.Data.Entities;
@@ -31,24 +32,31 @@ namespace WebCalendar.Business.Domains
     }
     public void UpdateCalendarsItem(CalendarItemViewModel calendarItem)
     {
-      switch (calendarItem.MetaType)
+      try
       {
-        case CalendarItemType.Event:
-          _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
-          _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
-          break;
-        case CalendarItemType.RepeatableEvent:
-          _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
-          _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
-          break;
-        case CalendarItemType.Task:
+        switch (calendarItem.MetaType)
+        {
+          case CalendarItemType.Event:
+            _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+            _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
+            break;
+          case CalendarItemType.RepeatableEvent:
+            _itRepository.UpdateCalendarsEventTime(calendarItem.StartDateTime, calendarItem.EndDateTime, calendarItem.Id);
+            _notificationSender.ScheduleEventEditedNotification(calendarItem.Id);
+            break;
+          case CalendarItemType.Task:
 
-          break;
-        case CalendarItemType.Reminder:
+            break;
+          case CalendarItemType.Reminder:
 
-          break;
-        default:
-          break;
+            break;
+          default:
+            break;
+        }
+      }
+      catch (NullReferenceException)
+      {
+        throw new NotFoundException("Item was not found");
       }
     }
   }

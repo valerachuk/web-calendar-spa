@@ -64,24 +64,18 @@ namespace WebCalendar.Data.Repositories
        })
        .FirstOrDefault();
 
-    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
+    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents)
     {
       _context.Events.AddRange(calendarEvents);
       _context.SaveChanges();
     }
 
-    public Event AddCalendarEvents(Event calendarEvent)
+    public Event AddCalendarEvent(Event calendarEvent)
     {
       _context.Events.Add(calendarEvent);
       _context.SaveChanges();
 
       return calendarEvent;
-    }
-
-    public void UpdateEvent(Event calendarEvent)
-    {
-      _context.Events.Update(calendarEvent);
-      _context.SaveChanges();
     }
 
     public Event DeleteCalendarEvent(int calendarEventId)
