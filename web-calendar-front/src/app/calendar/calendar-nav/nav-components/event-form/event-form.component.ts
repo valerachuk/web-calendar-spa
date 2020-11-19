@@ -31,7 +31,7 @@ export class EventFormComponent implements OnInit {
   isRepeatable = false;
 
   eventForm = new FormGroup({
-    eventName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+    eventName: new FormControl(null, [Validators.required, Validators.maxLength(100), this.noWhitespaceValidator]),
     eventVenue: new FormControl(null, Validators.maxLength(100)),
     eventStartDate: new FormControl(null, Validators.required),
     eventStartTime: new FormControl(null, Validators.required),
@@ -49,6 +49,12 @@ export class EventFormComponent implements OnInit {
     private eventService: CalendarEventService,
     private modalService: NgbModal
   ) {
+  }
+
+  public noWhitespaceValidator(control: FormControl) {
+    const targetStr = control.value || '';
+    const isWhitespace = !!targetStr && !targetStr.trim();
+    return isWhitespace ? { whitespace: true } : null;
   }
 
   ngOnInit() {

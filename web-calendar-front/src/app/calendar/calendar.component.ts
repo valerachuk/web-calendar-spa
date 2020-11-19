@@ -140,6 +140,9 @@ export class CalendarComponent implements OnInit {
     modalRef.result.then(() => {
       this.updateCalendarItems();
       this.closeOpenMonthViewDay();
+    })
+    .catch(() => {
+      // on modal close
     });
   }
 
