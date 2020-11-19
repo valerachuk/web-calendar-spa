@@ -1,0 +1,5 @@
+<div class="ngb-toasts">
+    <ngb-toast *ngFor="let toast of toastService.toasts" [header]="toast.title" [delay]="toast.delay" (hide)="toastService.delete(toast)" class="{{toast.className}}">
+        {{toast.content}}
+    </ngb-toast>
+</div>

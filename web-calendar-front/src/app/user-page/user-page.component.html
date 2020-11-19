@@ -1,0 +1,85 @@
+<div class="container">
+  <div class="d-flex justify-content-around">
+    <div ngbNav #nav="ngbNav" class="nav-pills col-md-2" orientation="vertical">
+      <ng-container ngbNavItem>
+        <a ngbNavLink>Account settings</a>
+        <ng-template ngbNavContent>
+          <form [formGroup]="userForm">
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">First name</span>
+                </div>
+                <input type="text" 
+                  class="form-control" 
+                  [formControl]="firstName"
+                  [class.is-invalid]="firstName.invalid && firstName.touched">
+              </div>
+              <small class="form-text text-danger" 
+                *ngIf="firstName.hasError('required') && firstName.touched">
+                User first name is required
+              </small>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Last name</span>
+                </div>
+                <input type="text"
+                  class="form-control" 
+                  [formControl]="lastName" 
+                  [class.is-invalid]="lastName.invalid && lastName.touched">
+              </div>
+              <small class="form-text text-danger" 
+                *ngIf="lastName.hasError('required') && lastName.touched">
+                User last name is required
+              </small>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Email</span>
+                </div>
+                <input type="text"
+                  class="form-control"  
+                  value="{{email}}" disabled>
+              </div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" 
+                class="form-check-input"
+                [formControl]="notifications"
+                id="emailCheckBox">
+              <label for="emailCheckBox">Enable email notifications</label>
+            </div>
+          </form>
+          <div>
+            <button type="submit" (click)="saveChanges()" class="btn btn-primary">Save changes</button>
+            <div *ngIf="savedChanges" class="alert alert-success mt-2">
+              Changes saved
+            </div>
+            <div *ngIf="errors.length > 0" class="alert alert-danger mt-2">
+              {{errors.toString()}}
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-container ngbNavItem>
+        <a ngbNavLink>Calendar export</a>
+        <ng-template ngbNavContent>
+          <ng-select
+            [items]="calendars"
+            [multiple]="true"
+            [closeOnSelect]="false"
+            [searchable]="true"
+            bindLabel="name"
+            placeholder="Select calendar"
+            [(ngModel)]="selectedCalendars">
+          </ng-select>
+          <button class="btn btn-secondary mt-2" [disabled]="selectedCalendars.length <= 0" (click)="exportCalendar()">Export</button>
+        </ng-template>
+      </ng-container>
+    </div>
+    <div [ngbNavOutlet]="nav" class="col-md-9 mr-4"></div>
+  </div>
+</div>
