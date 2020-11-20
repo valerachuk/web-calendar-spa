@@ -7,7 +7,9 @@ import { CalendarEvent } from 'src/app/interfaces/event.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { FileAttachService } from 'src/app/services/file-attach.service';
 import { EditEventModalComponent } from '../edit-event-modal/edit-event-modal.component';
+import { ToastGlobalService } from 'src/app/services/toast-global.service';
 
 @Component({
   selector: 'app-event-form',
@@ -24,6 +26,7 @@ export class EventFormComponent implements OnInit {
   endDate: NgbDateStruct;
   startTime: NgbTimeStruct;
   endTime: NgbTimeStruct;
+  attachedFile: File = null;
 
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
@@ -47,7 +50,9 @@ export class EventFormComponent implements OnInit {
     private calendarService: CalendarService,
     private authService: AuthService,
     private eventService: CalendarEventService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private fileService: FileAttachService,
+    private toastService: ToastGlobalService
   ) {
   }
 
@@ -124,7 +129,7 @@ export class EventFormComponent implements OnInit {
     } else {
       // dates have impact on event series, so if user change event date - edit only this event 
       if (this.isRepeatable && !isDateChanged) {
-        let modalRef = this.modalService.open(EditEventModalComponent, { centered: true, size: 'sm' });
+        let modalRef = this.modalService.open(EditEventModalComponent, { centered: true, size: 'lg' });
         modalRef.result.then(
           isSeriesEdit => {
             httpMethod = isSeriesEdit ?
@@ -141,8 +146,10 @@ export class EventFormComponent implements OnInit {
 
   httpRequest(httpMethod) {
     httpMethod
-      .subscribe(response => {
+      .subscribe(event => {
         this.successfullySavedEvent = true;
+        if(this.attachedFile !== null && this.attachedFile !== undefined)
+          this.uploadFile(event.id);
         setTimeout(() => { this.successfullySavedEvent = false; this.activeModal.close() }, 1500);
       },
         error => {
@@ -156,5 +163,23 @@ export class EventFormComponent implements OnInit {
         });
 
     this.error = null;
+  }
+
+  uploadFile(eventId: number) {
+    this.fileService.uploadFile(this.attachedFile, eventId).subscribe(data => {
+      this.toastService.add({
+        delay: 5000,
+        title: 'Success!',
+        content: `File has been successfully uploaded`,
+        className: "bg-success text-light"
+      });
+    }, err => {
+      this.toastService.add({
+        delay: 5000,
+        title: 'Error!',
+        content: `Upload file error: ${err.message}`,
+        className: "bg-danger text-light"
+      });
+    });
   }
 }

@@ -39,10 +39,15 @@ namespace WebCalendar.Api.Middleware
         message = exception.Message;
         status = HttpStatusCode.Forbidden;
       }
-      else if(exception is NotFoundException)
+      else if (exception is NotFoundException)
       {
         message = exception.Message;
         status = HttpStatusCode.NotFound;
+      }
+      else if(exception is FileSizeException)
+      {
+        message = exception.Message;
+        status = HttpStatusCode.UnsupportedMediaType;
       }
       else
       {

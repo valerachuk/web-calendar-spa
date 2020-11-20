@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 
@@ -12,6 +13,7 @@ namespace WebCalendar.Business
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
       CreateMap<Event, EventViewModel>().ReverseMap();
+      CreateMap<EventFile, EventFileViewModel>().ReverseMap();
       CreateMap<Event, CalendarItemViewModel>().BeforeMap((ev, it) =>
       it.MetaType = ev.Reiteration == null ? 
       Constants.Enums.CalendarItemType.Event : 

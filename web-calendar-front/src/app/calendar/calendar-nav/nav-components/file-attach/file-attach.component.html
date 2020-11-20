@@ -1,0 +1,8 @@
+<ngx-file-drop dropZoneClassName="border border-primary rounded" [multiple]="false" (onFileDrop)="dropped($event)" *ngIf="downloadFile === null">
+  <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+    <span *ngIf="attachedFile !== null">{{attachedFile.name}}</span>
+    <p class="mr-2 mb-0" *ngIf="attachedFile === null"><a class="alert-link cursor-pointer" (click)="openFileSelector()">Choose a file</a> or drag it here</p>
+  </ng-template>
+</ngx-file-drop>
+
+<button *ngIf="downloadFile !== null" class="btn btn-primary" (click)="download()">Download {{downloadFile.name}}</button>

@@ -15,12 +15,14 @@ namespace WebCalendar.Business.Domains
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
     private readonly INotificationSenderDomain _notificationSender;
+    private readonly IEventFileDomain _eventFileDomain;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender, IEventFileDomain eventFileDomain)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
       _notificationSender = notificationSender;
+      _eventFileDomain = eventFileDomain;
     }
 
     public EventViewModel GetEvent(int id)
@@ -28,7 +30,7 @@ namespace WebCalendar.Business.Domains
       return _mapper.Map<Event, EventViewModel>(_evRepository.GetEvent(id));
     }
 
-    public void AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
+    public int AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
     {
       var @event = _evRepository.AddCalendarEvents(_mapper.Map<EventViewModel, Event>(calendarEvent));
       if (isUpdated)
@@ -50,6 +52,8 @@ namespace WebCalendar.Business.Domains
       {
         _notificationSender.ScheduleEventStartedNotification(@event.Id);
       }
+
+      return @event.Id;
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -131,6 +135,7 @@ namespace WebCalendar.Business.Domains
       CheckRightsToModify(id, userId);
 
       _notificationSender.NotifyEventDeleted(id, false);
+      _eventFileDomain.DeleteEventFile(id);
       var @event = _evRepository.DeleteCalendarEvent(id);
       _notificationSender.CancelScheduledNotification(@event);
     }
