@@ -12,11 +12,10 @@ namespace WebCalendar.Data.Repositories.Interfaces
     Event GetMainEvent(int id);
     IEnumerable<Event> GetSeries(int seriesId);
     UserEventDTO GetEventInfo(int id);
-    void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent, int? seriesId);
-    Event AddCalendarEvents(Event calendarEvent);
+    void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvent);
+    Event AddCalendarEvent(Event calendarEvent);
     Event UpdateCalendarEvent(Event calendarEvent);
     IEnumerable<Event> UpdateCalendarEventSeries(Event calendarEvent);
-    void UpdateEvent(Event calendarEvent);
     Event DeleteCalendarEvent(int calendarEventId);
     IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId);
     EventNotificationDTO GetEventNotificationInfo(int id);

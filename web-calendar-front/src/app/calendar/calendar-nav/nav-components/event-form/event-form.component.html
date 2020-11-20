@@ -109,8 +109,12 @@
             </div>
           </div>
           <small class="form-text text-danger"
-            *ngIf="eventForm.getError('required', 'eventCalendar') && eventForm.get('eventCalendar').touched">
-            Calendar is required
+            *ngIf="eventForm.getError('whitespace', 'eventName') && eventForm.get('eventName').touched">
+            Whitespace are not allowed
+          </small>
+          <small class="form-text text-danger"
+            *ngIf="eventForm.getError('maxlength', 'eventName') && eventForm.get('eventName').touched">
+            Name must be less than 100 characters long
           </small>
           <div class="form-row">
             <div class="col">
