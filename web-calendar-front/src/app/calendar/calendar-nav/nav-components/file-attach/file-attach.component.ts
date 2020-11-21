@@ -73,9 +73,7 @@ export class FileAttachComponent implements OnInit {
   }
 
   getFileName(headers) {
-    let contentDispositionHeader = headers.get('content-disposition');
-    let result = contentDispositionHeader.split(';')[1].trim().split('=')[1];
-    return result.replace(/"/g, '');
+    return decodeURI(headers.get('content-disposition').match(/filename\*=UTF-8''(.*?)$/)[1]);
   }
 
   download() {
