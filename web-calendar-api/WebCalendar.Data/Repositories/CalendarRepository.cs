@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
@@ -20,6 +21,9 @@ namespace WebCalendar.Data.Repositories
     }
 
     public Calendar GetCalendar(int id) => _context.Calendars.Find(id);
+
+    public Calendar GetCalendarWithEvents(int id)
+      => _context.Calendars.Include(c => c.Events).FirstOrDefault(c => c.Id == id);
 
     public int AddCalendar(Calendar calendar)
     {

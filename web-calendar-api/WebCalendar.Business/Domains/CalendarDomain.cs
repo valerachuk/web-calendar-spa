@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using NLog;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.Exceptions;
@@ -69,6 +73,38 @@ namespace WebCalendar.Business.Domains
         throw new ForbiddenException("Not calendar owner");
 
       return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
+    }
+
+    public (string, string) CreateICS(int calendarId, int userId)
+    {
+      var calendar = _caRepository.GetCalendarWithEvents(calendarId);
+
+      if (calendar.UserId != userId)
+        throw new ForbiddenException("Not calendar owner");
+
+      var icsCalendar = new Ical.Net.Calendar();
+      icsCalendar.Events.AddRange(calendar.Events.Select(evt =>
+      {
+        var icsEvent = new CalendarEvent
+        {
+          Summary = evt.Name,
+          Location = evt.Venue,
+          Start = new CalDateTime(evt.StartDateTime),
+          End = new CalDateTime(evt.EndDateTime)
+        };
+
+        if (evt.NotificationTime != null)
+        {
+          icsEvent.Alarms.Add(new Alarm
+          {
+            Trigger = new Trigger(TimeSpan.FromMinutes(-(int)evt.NotificationTime))
+          });
+        }
+
+        return icsEvent;
+      }));
+
+      return (new CalendarSerializer(icsCalendar).SerializeToString(), calendar.Name);
     }
   }
 }
