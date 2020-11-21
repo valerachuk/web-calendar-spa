@@ -10,4 +10,5 @@ export interface CalendarEvent {
   endDateTime: string;
   notificationTime: NotificationTime | null;
   reiteration: Reiteration | null;
+  fileId?:number;
 }

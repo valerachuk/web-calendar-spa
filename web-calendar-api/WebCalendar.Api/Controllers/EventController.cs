@@ -30,7 +30,7 @@ namespace WebCalendar.Api.Controllers
       string error = ValidateData(calendarEvent);
       if (error == string.Empty)
       {
-        _evDomain.AddCalendarEvent(calendarEvent);
+        calendarEvent.Id = _evDomain.AddCalendarEvent(calendarEvent);
         return Ok(calendarEvent);
       }
       return BadRequest(error);

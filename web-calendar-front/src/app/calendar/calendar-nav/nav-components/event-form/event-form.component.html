@@ -4,20 +4,110 @@
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<div class="modal-body">
-  <form [formGroup]="eventForm" (submit)="submitEvent()" id="eventForm">
-    <div class="form-row">
-      <div class="col">
-        <div class="form-group">
-          <label for="eventName">Name</label>
-          <span class="text-danger">*</span>
-          <input type="text" class="form-control" formControlName="eventName" name="eventName" placeholder="New Event"
-            [(ngModel)]="calendarEvent.name"
-            [class.is-invalid]="eventForm.controls['eventName'].invalid && eventForm.controls['eventName'].touched" />
-          <small class="form-text text-danger"
-            *ngIf="eventForm.getError('required', 'eventName') && eventForm.get('eventName').touched">
-            Name is required
+<div class="modal-body d-flex">
+  <div ngbNav #nav="ngbNav" class="nav-pills col-md-2" orientation="vertical">
+    <ng-container ngbNavItem>
+      <a ngbNavLink>Event info</a>
+      <ng-template ngbNavContent>
+        <form [formGroup]="eventForm" id="eventForm">
+          <div class="form-row">
+            <div class="col">
+              <div class="form-group">
+                <label for="eventName">Name</label>
+                <span class="text-danger">*</span>
+                <input type="text" class="form-control" formControlName="eventName" name="eventName"
+                  placeholder="New Event" [(ngModel)]="calendarEvent.name"
+                  [class.is-invalid]="eventForm.controls['eventName'].invalid && eventForm.controls['eventName'].touched" />
+                <small class="form-text text-danger"
+                  *ngIf="eventForm.getError('required', 'eventName') && eventForm.get('eventName').touched">
+                  Name is required
+                </small>
+                <small class="form-text text-danger"
+                  *ngIf="eventForm.getError('maxlength', 'eventName') && eventForm.get('eventName').touched">
+                  Name must be less than 100 characters long
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <label for="eventVenue">Venue</label>
+              <input type="text" class="form-control" formControlName="eventVenue" name="eventVenue"
+                placeholder="Indicate the venue" [(ngModel)]="calendarEvent.venue"
+                [class.is-invalid]="eventForm.controls['eventVenue'].invalid && eventForm.controls['eventVenue'].touched" />
+              <small class="form-text text-danger"
+                *ngIf="eventForm.getError('maxlength', 'eventVenue') && eventForm.get('eventVenue').touched">
+                Venue must be less than 100 characters long
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <label for="eventStartDate">Start date</label>
+              <span class="text-danger">*</span>
+              <div class="input-group mb-3">
+                <input class="form-control" formControlName="eventStartDate" name="eventStartDate"
+                  [(ngModel)]="startDate" ngbDatepicker #startdate="ngbDatepicker"
+                  [class.danger-input]="eventForm.controls['eventStartDate'].invalid && eventForm.controls['eventStartDate'].touched" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="startdate.toggle()"
+                    type="button"></button>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <label for="eventStartTime">Start time</label>
+              <span class="text-danger">*</span>
+              <ngb-timepicker [(ngModel)]="startTime" formControlName="eventStartTime" name="eventStartTime"
+                [spinners]="false" id="eventStartTime">
+              </ngb-timepicker>
+            </div>
+          </div>
+          <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventStartDate') && eventForm.get('eventStartDate').touched ||
+      eventForm.getError('required', 'eventStartTime') && eventForm.get('eventStartTime').touched">
+            Start date and time are required
           </small>
+          <div class="form-row">
+            <div class="col">
+              <label for="eventEndDate">End date</label>
+              <span class="text-danger">*</span>
+              <div class="input-group mb-3">
+                <input class="form-control" formControlName="eventEndDate" name="eventEndDate" [(ngModel)]="endDate"
+                  ngbDatepicker #enddate="ngbDatepicker"
+                  [class.danger-input]="eventForm.controls['eventEndDate'].invalid && eventForm.controls['eventEndDate'].touched" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="enddate.toggle()" type="button"></button>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <label for="eventEndTime">End time</label>
+              <span class="text-danger">*</span>
+              <ngb-timepicker [(ngModel)]="endTime" formControlName="eventEndTime" name="eventEndTime"
+                [spinners]="false" id="eventEndTime">
+              </ngb-timepicker>
+            </div>
+          </div>
+          <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventEndDate') && eventForm.get('eventEndDate').touched ||
+      eventForm.getError('required', 'eventEndTime') && eventForm.get('eventEndTime').touched">
+            End date and time are required
+          </small>
+          <div class="form-row">
+            <div class="col">
+              <label>Calendar</label>
+              <span class="text-danger">*</span>
+              <select class="form-control" formControlName="eventCalendar" name="eventCalendar"
+                [(ngModel)]="calendarEvent.calendarId"
+                [class.is-invalid]="eventForm.controls['eventCalendar'].invalid && eventForm.controls['eventCalendar'].touched">
+                <option [ngValue]="undefined" [selected]="calendars[0] == undefined" hidden>
+                  Choose one</option>
+                <option *ngFor="let calendar of calendars" [ngValue]="calendar.id"
+                  [selected]="calendarEvent.calendarId == calendar.id">
+                  {{calendar.name}}
+                </option>
+              </select>
+            </div>
+          </div>
           <small class="form-text text-danger"
             *ngIf="eventForm.getError('whitespace', 'eventName') && eventForm.get('eventName').touched">
             Whitespace are not allowed
@@ -26,125 +116,50 @@
             *ngIf="eventForm.getError('maxlength', 'eventName') && eventForm.get('eventName').touched">
             Name must be less than 100 characters long
           </small>
-        </div>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label for="eventVenue">Venue</label>
-        <input type="text" class="form-control" formControlName="eventVenue" name="eventVenue"
-          placeholder="Indicate the venue" [(ngModel)]="calendarEvent.venue"
-          [class.is-invalid]="eventForm.controls['eventVenue'].invalid && eventForm.controls['eventVenue'].touched" />
-        <small class="form-text text-danger"
-          *ngIf="eventForm.getError('maxlength', 'eventVenue') && eventForm.get('eventVenue').touched">
-          Venue must be less than 100 characters long
-        </small>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label for="eventStartDate">Start date</label>
-        <span class="text-danger">*</span>
-        <div class="input-group mb-3">
-          <input class="form-control" formControlName="eventStartDate" name="eventStartDate" [(ngModel)]="startDate"
-            ngbDatepicker #startdate="ngbDatepicker"
-            [class.danger-input]="eventForm.controls['eventStartDate'].invalid && eventForm.controls['eventStartDate'].touched" />
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary calendar" (click)="startdate.toggle()" type="button"></button>
+          <div class="form-row">
+            <div class="col">
+              <label>Reiteration</label>
+              <select class="form-control" #reiterationInput formControlName="eventReiteration" name="eventReiteration"
+                [(ngModel)]="calendarEvent.reiteration">
+                <option [ngValue]="null" [selected]="calendarEvent.reiteration == null">None</option>
+                <option [ngValue]="1" [selected]="calendarEvent.reiteration == 1">Every day</option>
+                <option [ngValue]="7" [selected]="calendarEvent.reiteration == 7">Every week</option>
+              </select>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="col">
-        <label for="eventStartTime">Start time</label>
-        <span class="text-danger">*</span>
-        <ngb-timepicker [(ngModel)]="startTime" formControlName="eventStartTime" name="eventStartTime"
-          [spinners]="false" id="eventStartTime">
-        </ngb-timepicker>
-      </div>
-    </div>
-    <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventStartDate') && eventForm.get('eventStartDate').touched ||
-      eventForm.getError('required', 'eventStartTime') && eventForm.get('eventStartTime').touched">
-      Start date and time are required
-    </small>
-    <div class="form-row">
-      <div class="col">
-        <label for="eventEndDate">End date</label>
-        <span class="text-danger">*</span>
-        <div class="input-group mb-3">
-          <input class="form-control" formControlName="eventEndDate" name="eventEndDate" [(ngModel)]="endDate"
-            ngbDatepicker #enddate="ngbDatepicker"
-            [class.danger-input]="eventForm.controls['eventEndDate'].invalid && eventForm.controls['eventEndDate'].touched" />
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary calendar" (click)="enddate.toggle()" type="button"></button>
+          <div class="form-row">
+            <div class="col">
+              <label>Notification</label>
+              <select class="form-control" formControlName="eventNotificationTime" name="eventNotificationTime"
+                [(ngModel)]="calendarEvent.notificationTime">
+                <option [ngValue]="null" [selected]="calendarEvent.notificationTime == null">None</option>
+                <option [ngValue]="10" [selected]="calendarEvent.notificationTime == 10">In 10 minutes</option>
+                <option [ngValue]="15" [selected]="calendarEvent.notificationTime == 15">In 15 minutes</option>
+                <option [ngValue]="30" [selected]="calendarEvent.notificationTime == 30">In 30 minutes</option>
+                <option [ngValue]="60" [selected]="calendarEvent.notificationTime == 60">In 1 hour</option>
+              </select>
+            </div>
           </div>
+        </form>
+        <div *ngIf="successfullySavedEvent" class="alert alert-success mb-0">
+          Successfully saved!
         </div>
-      </div>
-      <div class="col">
-        <label for="eventEndTime">End time</label>
-        <span class="text-danger">*</span>
-        <ngb-timepicker [(ngModel)]="endTime" formControlName="eventEndTime" name="eventEndTime" [spinners]="false"
-          id="eventEndTime">
-        </ngb-timepicker>
-      </div>
-    </div>
-    <small class="form-text text-danger" *ngIf="eventForm.getError('required', 'eventEndDate') && eventForm.get('eventEndDate').touched ||
-      eventForm.getError('required', 'eventEndTime') && eventForm.get('eventEndTime').touched">
-      End date and time are required
-    </small>
-    <div class="form-row">
-      <div class="col">
-        <label>Calendar</label>
-        <span class="text-danger">*</span>
-        <select class="form-control" formControlName="eventCalendar" name="eventCalendar"
-          [(ngModel)]="calendarEvent.calendarId"
-          [class.is-invalid]="eventForm.controls['eventCalendar'].invalid && eventForm.controls['eventCalendar'].touched">
-          <option [ngValue]="undefined" [selected]="calendars[0] == undefined" hidden>
-            Choose one</option>
-          <option *ngFor="let calendar of calendars" [ngValue]="calendar.id"
-            [selected]="calendarEvent.calendarId == calendar.id">
-            {{calendar.name}}
-          </option>
-        </select>
-      </div>
-    </div>
-    <small class="form-text text-danger"
-      *ngIf="eventForm.getError('required', 'eventCalendar') && eventForm.get('eventCalendar').touched">
-      Calendar is required
-    </small>
-    <div class="form-row">
-      <div class="col">
-        <label>Reiteration</label>
-        <select class="form-control" #reiterationInput formControlName="eventReiteration" name="eventReiteration"
-          [(ngModel)]="calendarEvent.reiteration">
-          <option [ngValue]="null" [selected]="calendarEvent.reiteration == null">None</option>
-          <option [ngValue]="1" [selected]="calendarEvent.reiteration == 1">Every day</option>
-          <option [ngValue]="7" [selected]="calendarEvent.reiteration == 7">Every week</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Notification</label>
-        <select class="form-control" formControlName="eventNotificationTime" name="eventNotificationTime"
-          [(ngModel)]="calendarEvent.notificationTime">
-          <option [ngValue]="null" [selected]="calendarEvent.notificationTime == null">None</option>
-          <option [ngValue]="10" [selected]="calendarEvent.notificationTime == 10">In 10 minutes</option>
-          <option [ngValue]="15" [selected]="calendarEvent.notificationTime == 15">In 15 minutes</option>
-          <option [ngValue]="30" [selected]="calendarEvent.notificationTime == 30">In 30 minutes</option>
-          <option [ngValue]="60" [selected]="calendarEvent.notificationTime == 60">In 1 hour</option>
-        </select>
-      </div>
-    </div>
-  </form>
-  <div *ngIf="successfullySavedEvent" class="alert alert-success mb-0">
-    Successfully saved!
+        <div *ngIf="error !== null" class="alert alert-danger mb-0">
+          {{error}}
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem>
+      <a ngbNavLink>Attach file</a>
+      <ng-template ngbNavContent>
+        <app-file-attach [(attachedFile)]="attachedFile" [eventId]="calendarEvent.id"></app-file-attach>
+      </ng-template>
+    </ng-container>
   </div>
-  <div *ngIf="error !== null" class="alert alert-danger mb-0">
-    {{error}}
-  </div>
+  <div [ngbNavOutlet]="nav" class="col-md-9 mr-4"></div>
 </div>
 <div class="modal-footer">
-  <button type="submit" form="eventForm" class="btn btn-primary" [disabled]="eventForm.disabled"
+  <button type="submit" (click)="submitEvent()" form="eventForm" class="btn btn-primary" [disabled]="eventForm.disabled"
     ngbAutofocus>Save</button>
   <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
 </div>

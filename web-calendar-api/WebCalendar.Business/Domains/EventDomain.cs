@@ -15,12 +15,14 @@ namespace WebCalendar.Business.Domains
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
     private readonly INotificationSenderDomain _notificationSender;
+    private readonly IFileDomain _fileDomain;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender, IFileDomain fileDomain)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
       _notificationSender = notificationSender;
+      _fileDomain = fileDomain;
     }
 
     public EventViewModel GetEvent(int id)
@@ -33,7 +35,7 @@ namespace WebCalendar.Business.Domains
       return _mapper.Map<Event, EventViewModel>(currentEvent);
     }
 
-    public void AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
+    public int AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
     {
       var @event = _evRepository.AddCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
       if (isUpdated)
@@ -55,6 +57,8 @@ namespace WebCalendar.Business.Domains
       {
         _notificationSender.ScheduleEventStartedNotification(@event.Id);
       }
+
+      return @event.Id;
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -62,6 +66,7 @@ namespace WebCalendar.Business.Domains
       var generatedEvents = new List<Event>();
       int eventRepetitionsNumber = 365;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
+      calendarEvent.FileId = null;
 
       // Create events in one series for a selected time interval for the year ahead
       for (int i = eventFrequency; i < eventRepetitionsNumber; i += eventFrequency)
@@ -137,6 +142,8 @@ namespace WebCalendar.Business.Domains
 
       _notificationSender.NotifyEventDeleted(id, false);
       var @event = _evRepository.DeleteCalendarEvent(id);
+      if(@event.FileId != null)
+        _fileDomain.DeleteFile((int)@event.FileId);
       _notificationSender.CancelScheduledNotification(@event);
     }
 
