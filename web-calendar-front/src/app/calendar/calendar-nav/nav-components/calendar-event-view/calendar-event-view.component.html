@@ -27,11 +27,11 @@
   </div>
   <div class="form-row mb-3">
     <h6 class="mr-2">Reiteration: </h6>
-    <span>{{calendarEvent.reiteration === null ? 'None' : calendarEvent.reiteration}}</span>
+    <span>{{calendarEvent.reiteration === null ? 'None' : 'Every ' + calendarEvent.reiteration + ' day(s)'}}</span>
   </div>
   <div class="form-row mb-3">
     <h6 class="mr-2">Notification: </h6>
-    <span>{{calendarEvent.notificationTime === null ? 'None' : calendarEvent.notificationTime}}</span>
+    <span>{{calendarEvent.notificationTime === null ? 'None' : 'In ' + calendarEvent.notificationTime + ' minutes'}}</span>
   </div>
   <div class="form-row mb-3">
     <h6 class="mr-2">Guests: </h6>

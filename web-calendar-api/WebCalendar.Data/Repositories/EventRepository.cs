@@ -143,15 +143,24 @@ namespace WebCalendar.Data.Repositories
         .ThenInclude(eventGuests => eventGuests.User)
         .Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
 
-      var oldEventGuests = _context.EventGuests.Where(x => x.EventId == calendarEvent.Id).ToList();
-      if (oldEventGuests.Count > 0)
-      {
-        _context.EventGuests.RemoveRange(oldEventGuests);
-        _context.SaveChanges();
-      }
-
       foreach (var item in currentEventSeries)
       {
+        // set new guest list to the event in the series 
+        var oldEventGuests = _context.EventGuests.Where(x => x.EventId == item.Id).ToList();
+        if (oldEventGuests.Count > 0)
+        {
+          _context.EventGuests.RemoveRange(oldEventGuests);
+          _context.SaveChanges();
+        }
+        if (calendarEvent.Guests.Count > 0)
+        {
+          // change the updated event id to current event id in the series
+          item.Guests = calendarEvent.Guests.Select(x => { x.EventId = item.Id; x.Event = item;  return x; }).ToList();
+          // set new list in EventGuests table
+          _context.Entry(item).State = EntityState.Detached;
+          _context.EventGuests.AddRange(calendarEvent.Guests.Select(x => new EventGuests { EventId = item.Id, UserId = x.UserId }).ToList());
+          _context.SaveChanges();
+        }
         item.Calendar = calendarEvent.Calendar;
         item.CalendarId = calendarEvent.CalendarId;
         item.Name = calendarEvent.Name;
@@ -161,10 +170,6 @@ namespace WebCalendar.Data.Repositories
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         item.EndDateTime = item.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
-
-        // set new guest list to the event in the series 
-        item.Guests = calendarEvent.Guests.Select(x => { x.EventId = item.Id; x.Event = item; return x; }).ToList();
-        _context.EventGuests.AddRange(item.Guests);
       }
       _context.SaveChanges();
       return currentEventSeries;

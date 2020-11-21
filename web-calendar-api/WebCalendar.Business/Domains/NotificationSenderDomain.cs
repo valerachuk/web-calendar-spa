@@ -119,7 +119,8 @@ namespace WebCalendar.Business.Domains
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
       foreach (var guest in eventNotificationInfo.Guests)
       {
-        SendEmail(guest.User.Email, notificationMessage);
+        SendEmail(guest.User.Email, notificationMessage 
+          + $@"You were invited by <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})");
       }
     }
 

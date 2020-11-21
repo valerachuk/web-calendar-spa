@@ -13,30 +13,23 @@ namespace WebCalendar.Business
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
 
-
-      //CreateMap<Event, EventViewModel>()
-      //  .ForMember(ev => ev.Guests, opt => opt.MapFrom(x => x.Guests.Select(y => y.User).ToList()));
-      //CreateMap<EventViewModel, Event>()
-      //  .ForMember(ev => ev.Guests, opt => opt.MapFrom(x => x.Guests));
-
-
       CreateMap<Event, EventViewModel>()
-        .ForMember(d => d.Guests, opt => opt.MapFrom(s => s.Guests.Select(x => x.User)));
+        .ForMember(e => e.Guests, opt => opt.MapFrom(s => s.Guests.Select(g => g.User)));
 
       CreateMap<EventGuests, UserViewModel>()
-              .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId));
+              .ForMember(e => e.Id, opt => opt.MapFrom(g => g.UserId));
 
       CreateMap<EventViewModel, Event>()
-            .AfterMap((s, d) =>
+            .AfterMap((evm, e) =>
             {
-              foreach (var guest in d.Guests)
+              foreach (var guest in e.Guests)
               {
-                guest.EventId = s.Id;
+                guest.EventId = evm.Id;
               }
             });
 
       CreateMap<UserViewModel, EventGuests>()
-            .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id));
+            .ForMember(g => g.UserId, opt => opt.MapFrom(uvm => uvm.Id));
 
       CreateMap<Event, CalendarItemViewModel>().BeforeMap((ev, it) =>
         it.MetaType = 
