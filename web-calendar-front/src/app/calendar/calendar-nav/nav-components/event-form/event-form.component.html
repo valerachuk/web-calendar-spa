@@ -19,6 +19,10 @@
             Name is required
           </small>
           <small class="form-text text-danger"
+            *ngIf="eventForm.getError('whitespace', 'eventName') && eventForm.get('eventName').touched">
+            Whitespace are not allowed
+          </small>
+          <small class="form-text text-danger"
             *ngIf="eventForm.getError('maxlength', 'eventName') && eventForm.get('eventName').touched">
             Name must be less than 100 characters long
           </small>

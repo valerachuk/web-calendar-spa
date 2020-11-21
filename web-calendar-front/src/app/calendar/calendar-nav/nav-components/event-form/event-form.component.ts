@@ -34,7 +34,7 @@ export class EventFormComponent implements OnInit {
   selectedUsers: UserInfo[] = null;
 
   eventForm = new FormGroup({
-    eventName: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+    eventName: new FormControl(null, [Validators.required, Validators.maxLength(100), this.noWhitespaceValidator]),
     eventVenue: new FormControl(null, Validators.maxLength(100)),
     eventStartDate: new FormControl(null, Validators.required),
     eventStartTime: new FormControl(null, Validators.required),
@@ -54,6 +54,12 @@ export class EventFormComponent implements OnInit {
     private modalService: NgbModal,
     private toastService: ToastGlobalService
   ) {
+  }
+
+  public noWhitespaceValidator(control: FormControl) {
+    const targetStr = control.value || '';
+    const isWhitespace = !!targetStr && !targetStr.trim();
+    return isWhitespace ? { whitespace: true } : null;
   }
 
   ngOnInit() {

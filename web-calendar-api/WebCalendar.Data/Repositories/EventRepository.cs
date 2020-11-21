@@ -24,7 +24,10 @@ namespace WebCalendar.Data.Repositories
         .ThenInclude(eventGuests => eventGuests.User)
         .Where(ev => ev.Id == id)
         .FirstOrDefault();
-
+      if (@event == null)
+      {
+        return null;
+      }
       _context.Entry(@event).State = EntityState.Detached;
       return @event;
     }
@@ -73,17 +76,19 @@ namespace WebCalendar.Data.Repositories
           UserId = evt.Calendar.UserId
         })
         .FirstOrDefault();
+      if (@event == null)
+        return null;
       _context.Entry(_context.Events.Find(id)).State = EntityState.Detached;
       return @event;
     }
 
-    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents, int? seriesId)
+    public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents)
     {
       _context.Events.AddRange(calendarEvents);
       _context.SaveChanges();
     }
 
-    public Event AddCalendarEvents(Event calendarEvent)
+    public Event AddCalendarEvent(Event calendarEvent)
     {
       _context.Events.Add(calendarEvent);
       _context.SaveChanges();
@@ -91,15 +96,13 @@ namespace WebCalendar.Data.Repositories
       return calendarEvent;
     }
 
-    public void UpdateEvent(Event calendarEvent)
-    {
-      _context.Events.Update(calendarEvent);
-      _context.SaveChanges();
-    }
-
     public Event DeleteCalendarEvent(int calendarEventId)
     {
       var currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+      {
+        return null;
+      }
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
       return currentEvent;

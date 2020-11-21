@@ -57,7 +57,7 @@ namespace WebCalendar.Business.Domains
       if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
-      if(id == _caRepository.GetDefaultCalendar().Id)
+      if (id == _caRepository.GetDefaultCalendar().Id)
       {
         throw new ForbiddenException("You cannot delete 'Default' calendar");
       }

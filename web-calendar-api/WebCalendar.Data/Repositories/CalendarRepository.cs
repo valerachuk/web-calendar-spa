@@ -41,13 +41,18 @@ namespace WebCalendar.Data.Repositories
 
     public bool DeleteCalendar(int id)
     {
-      _context.Calendars.Remove(_context.Calendars.Find(id));
+      var calendar = _context.Calendars.Find(id);
+      if (calendar == null)
+        return false;
+      _context.Calendars.Remove(calendar);
       return _context.SaveChanges() > 0;
     }
 
     public bool EditCalendar(Calendar calendar)
     {
       var oldCalendar = _context.Calendars.Find(calendar.Id);
+      if (oldCalendar == null)
+        return false;
       oldCalendar.Name = calendar.Name;
       oldCalendar.Description = calendar.Description;
       return _context.SaveChanges() > 0;
