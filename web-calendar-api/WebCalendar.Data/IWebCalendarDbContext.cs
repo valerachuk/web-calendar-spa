@@ -9,6 +9,7 @@ namespace WebCalendar.Data
     DbSet<User> Users { get; set; }
     DbSet<Calendar> Calendars { get; set; }
     DbSet<Event> Events { get; set; }
+    DbSet<UserFile> EventFile { get; set; }
 
     int SaveChanges();
     EntityEntry Entry(object entity);

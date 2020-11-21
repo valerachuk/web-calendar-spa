@@ -20,5 +20,6 @@ namespace WebCalendar.Business.ViewModels
     public string Venue { get; set; }
     public NotificationTime? NotificationTime { get; set; }
     public Reiteration? Reiteration { get; set; }
+    public int? FileId { get; set; }
   }
 }

@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import * as moment from 'moment';
 import { adapterFactory } from 'angular-calendar/date-adapters/moment';
+import { NgxFileDropModule } from 'ngx-file-drop';
 
 import { WebCalendarRoutingModule } from './web-calendar-routing.module';
 import { EventFormComponent } from './calendar-nav/nav-components/event-form/event-form.component';
@@ -17,6 +18,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { DeleteItemModalComponent } from './calendar-nav/nav-components/delete-item-modal/delete-item-modal.component';
 import { EditEventModalComponent } from './calendar-nav/nav-components/edit-event-modal/edit-event-modal.component';
+import { FileAttachComponent } from './calendar-nav/nav-components/file-attach/file-attach.component';
 
 export function momentAdapterFactory() {
   return adapterFactory(moment);
@@ -30,7 +32,8 @@ export function momentAdapterFactory() {
     CalendarComponent,
     CalendarNavComponent,
     DeleteItemModalComponent,
-    EditEventModalComponent
+    EditEventModalComponent,
+    FileAttachComponent
   ],
   exports: [EventFormComponent],
   entryComponents: [EventFormComponent],
@@ -42,6 +45,7 @@ export function momentAdapterFactory() {
     ReactiveFormsModule,
     HttpClientModule,
     NgSelectModule,
+    NgxFileDropModule,
     FontAwesomeModule,
     CalendarModule.forRoot({ provide: DateAdapter, useFactory: momentAdapterFactory })
   ]
