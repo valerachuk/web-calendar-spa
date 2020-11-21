@@ -10,8 +10,8 @@ using WebCalendar.Data;
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    [Migration("20201119172818_addEventFileEntity")]
-    partial class addEventFileEntity
+    [Migration("20201121140234_addFileEntity")]
+    partial class addFileEntity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -61,6 +61,9 @@ namespace WebCalendar.Data.Migrations
                     b.Property<DateTime>("EndDateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("FileId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
@@ -91,45 +94,11 @@ namespace WebCalendar.Data.Migrations
 
                     b.HasIndex("CalendarId");
 
+                    b.HasIndex("FileId")
+                        .IsUnique()
+                        .HasFilter("[FileId] IS NOT NULL");
+
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UniqueName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId")
-                        .IsUnique();
-
-                    b.ToTable("EventFile");
                 });
 
             modelBuilder.Entity("WebCalendar.Data.Entities.Log", b =>
@@ -227,6 +196,38 @@ namespace WebCalendar.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WebCalendar.Data.Entities.UserFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UniqueName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventFile");
+                });
+
             modelBuilder.Entity("WebCalendar.Data.Entities.Calendar", b =>
                 {
                     b.HasOne("WebCalendar.Data.Entities.User", "User")
@@ -243,15 +244,10 @@ namespace WebCalendar.Data.Migrations
                         .HasForeignKey("CalendarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventFile", b =>
-                {
-                    b.HasOne("WebCalendar.Data.Entities.Event", "Event")
-                        .WithOne("EventFile")
-                        .HasForeignKey("WebCalendar.Data.Entities.EventFile", "EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("WebCalendar.Data.Entities.UserFile", "File")
+                        .WithOne("Event")
+                        .HasForeignKey("WebCalendar.Data.Entities.Event", "FileId");
                 });
 #pragma warning restore 612, 618
         }

@@ -16,6 +16,7 @@ namespace WebCalendar.Data.Entities
     public Reiteration? Reiteration { get; set; }
     public int? SeriesId { get; set; }
     public string NotificationScheduleJobId { get; set; }
-    public EventFile EventFile { get; set; }
+    public int? FileId { get; set; }
+    public UserFile File { get; set; }
   }
 }

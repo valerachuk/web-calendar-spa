@@ -13,11 +13,10 @@ export class FileAttachService {
     this.httpClient = new HttpClient(handler);
   }
 
-  uploadFile(file: File, eventId: number): Observable<FormData> {
+  uploadFile(file: File): Observable<number> {
     let formData = new FormData();
     formData.append("file", file, file.name);
-    formData.append("eventId", eventId.toString());
-    return this.httpClient.post<FormData>(this.apiUrl, formData);
+    return this.httpClient.post<number>(this.apiUrl, formData);
   }
 
   getEventFile(eventId: number): Observable<HttpResponse<Blob>> {

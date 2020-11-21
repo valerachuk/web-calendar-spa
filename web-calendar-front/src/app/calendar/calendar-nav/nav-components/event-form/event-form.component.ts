@@ -117,6 +117,30 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
+    if(this.attachedFile !== null && this.attachedFile !== undefined) {
+      this.fileService.uploadFile(this.attachedFile).subscribe(data => {
+        this.calendarEvent.fileId = data;
+        this.eventRequest();
+        this.toastService.add({
+          delay: 1500,
+          title: 'Success!',
+          content: `File has been successfully uploaded`,
+          className: "bg-success text-light"
+        });
+      }, err => {
+        this.toastService.add({
+          delay: 1500,
+          title: 'Error!',
+          content: `Upload file error: ${err.message}`,
+          className: "bg-danger text-light"
+        });
+      });
+    }
+    else
+      this.eventRequest();
+  }
+
+  eventRequest() {
     let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 
@@ -154,8 +178,6 @@ export class EventFormComponent implements OnInit {
     httpMethod
       .subscribe(event => {
         this.successfullySavedEvent = true;
-        if(this.attachedFile !== null && this.attachedFile !== undefined)
-          this.uploadFile(event.id);
         setTimeout(() => { this.successfullySavedEvent = false; this.activeModal.close() }, 1500);
       },
         error => {
@@ -169,23 +191,5 @@ export class EventFormComponent implements OnInit {
         });
 
     this.error = null;
-  }
-
-  uploadFile(eventId: number) {
-    this.fileService.uploadFile(this.attachedFile, eventId).subscribe(data => {
-      this.toastService.add({
-        delay: 5000,
-        title: 'Success!',
-        content: `File has been successfully uploaded`,
-        className: "bg-success text-light"
-      });
-    }, err => {
-      this.toastService.add({
-        delay: 5000,
-        title: 'Error!',
-        content: `Upload file error: ${err.message}`,
-        className: "bg-danger text-light"
-      });
-    });
   }
 }

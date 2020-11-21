@@ -11,18 +11,16 @@ using WebCalendar.Data.Repositories.Interfaces;
 
 namespace WebCalendar.Business.Domains
 {
-  public class EventFileDomain : IEventFileDomain
+  public class FileDomain : IFileDomain
   {
-    private readonly IEventFileRepository _efRepository;
-    private readonly IEventRepository _eventRepository;
+    private readonly IFileRepository _fileRepository;
     private readonly IMapper _mapper;
     private readonly string STORAGE_PATH = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).ToString(), "EventFilesStorage\\");
     private const int MAX_FILE_SIZE = 10485760;
 
-    public EventFileDomain(IEventFileRepository fileRepository, IEventRepository eventRepository, IMapper mapper)
+    public FileDomain(IFileRepository fileRepository, IMapper mapper)
     {
-      _efRepository = fileRepository;
-      _eventRepository = eventRepository;
+      _fileRepository = fileRepository;
       _mapper = mapper;
       
       if (!Directory.Exists(STORAGE_PATH))
@@ -31,31 +29,24 @@ namespace WebCalendar.Business.Domains
       }
     }
  
-    public EventFileViewModel GetEventFile(int eventId) =>
-      _mapper.Map<EventFile, EventFileViewModel>(_efRepository.GetEventFile(eventId));
+    public FileViewModel GetEventFile(int eventId) =>
+      _mapper.Map<UserFile, FileViewModel>(_fileRepository.GetEventFile(eventId));
 
-    public void DeleteEventFile(int eventId)
+    public void DeleteFile(int fileId)
     {
-      if (_eventRepository.GetEvent(eventId) == null)
-        throw new NotFoundException("Event not found");
-
-      var eventFile = GetEventFile(eventId);
-      if (eventFile == null)
+      var userFile = _fileRepository.GetFile(fileId);
+      if (userFile == null)
         return;
 
-      if(File.Exists(eventFile.Path))
-        File.Delete(eventFile.Path);
+      if(File.Exists(userFile.Path))
+        File.Delete(userFile.Path);
+
+      _fileRepository.DeleteFile(userFile);
     }
 
 
-    public int AddFile(IFormFile file, int eventId)
+    public int AddFile(IFormFile file)
     {
-      if (_eventRepository.GetEvent(eventId) == null)
-        throw new NotFoundException("Event not found");
-
-      if (GetEventFile(eventId) != null)
-        throw new ForbiddenException("This event already has an attached file");
-
       if (file.Length == 0 || file.Length > MAX_FILE_SIZE)
         throw new FileSizeException("Incorrect file size");
 
@@ -66,7 +57,7 @@ namespace WebCalendar.Business.Domains
 
       SaveFileToLocalStorage(file, fullPath);
 
-      var evFile = new EventFile
+      var userFile = new UserFile
       {
         Id = 0,
         Name = fileName,
@@ -74,11 +65,10 @@ namespace WebCalendar.Business.Domains
         Path = fullPath,
         Size = file.Length,
         UploadDate = DateTime.Now,
-        Type = file.ContentType,
-        EventId = eventId
+        Type = file.ContentType
       };
 
-      return _efRepository.AddEventFile(evFile);
+      return _fileRepository.AddFile(userFile);
     }
 
     private void SaveFileToLocalStorage(IFormFile file, string fullPath)

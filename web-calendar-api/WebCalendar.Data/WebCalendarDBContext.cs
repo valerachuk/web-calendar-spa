@@ -110,6 +110,11 @@ namespace WebCalendar.Data
         .HasForeignKey(calendarEvent => calendarEvent.CalendarId)
         .IsRequired();
 
+      eventModelBuilder
+        .HasOne(ev => ev.File)
+        .WithOne(f => f.Event)
+        .HasForeignKey<Event>(ev => ev.FileId);
+
       var logModelBuilder = modelBuilder.Entity<Log>();
 
       logModelBuilder
@@ -124,34 +129,28 @@ namespace WebCalendar.Data
         .Property(log => log.DateTime)
         .IsRequired();
 
-      var eventFileBuilder = modelBuilder.Entity<EventFile>();
+      var fileBuilder = modelBuilder.Entity<UserFile>();
 
-      eventFileBuilder
+      fileBuilder
         .Property(ef => ef.Path)
         .IsRequired();
 
-      eventFileBuilder
+      fileBuilder
         .Property(ef => ef.Size)
         .IsRequired();
 
-      eventFileBuilder
+      fileBuilder
         .Property(ef => ef.Name)
         .IsRequired();
 
-      eventFileBuilder
+      fileBuilder
         .Property(ef => ef.UploadDate)
-        .IsRequired();
-
-      eventFileBuilder
-        .HasOne(ef => ef.Event)
-        .WithOne(calendarEvent => calendarEvent.EventFile)
-        .HasForeignKey<EventFile>(ef => ef.EventId)
         .IsRequired();
     }
 
     public DbSet<User> Users { get; set; }
     public DbSet<Calendar> Calendars { get; set; }
     public DbSet<Event> Events { get; set; }
-    public DbSet<EventFile> EventFile { get; set; }
+    public DbSet<UserFile> EventFile { get; set; }
   }
 }

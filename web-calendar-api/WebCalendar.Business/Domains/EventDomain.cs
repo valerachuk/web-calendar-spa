@@ -15,14 +15,14 @@ namespace WebCalendar.Business.Domains
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
     private readonly INotificationSenderDomain _notificationSender;
-    private readonly IEventFileDomain _eventFileDomain;
+    private readonly IFileDomain _fileDomain;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender, IEventFileDomain eventFileDomain)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender, IFileDomain fileDomain)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
       _notificationSender = notificationSender;
-      _eventFileDomain = eventFileDomain;
+      _fileDomain = fileDomain;
     }
 
     public EventViewModel GetEvent(int id)
@@ -66,6 +66,7 @@ namespace WebCalendar.Business.Domains
       var generatedEvents = new List<Event>();
       int eventRepetitionsNumber = 365;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
+      calendarEvent.FileId = null;
 
       // Create events in one series for a selected time interval for the year ahead
       for (int i = eventFrequency; i < eventRepetitionsNumber; i += eventFrequency)
@@ -140,8 +141,9 @@ namespace WebCalendar.Business.Domains
       CheckRightsToModify(id, userId);
 
       _notificationSender.NotifyEventDeleted(id, false);
-      _eventFileDomain.DeleteEventFile(id);
       var @event = _evRepository.DeleteCalendarEvent(id);
+      if(@event.FileId != null)
+        _fileDomain.DeleteFile((int)@event.FileId);
       _notificationSender.CancelScheduledNotification(@event);
     }
 

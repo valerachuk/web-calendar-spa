@@ -10,16 +10,16 @@ namespace WebCalendar.Api.Controllers
   [ApiController]
   public class FileController : ControllerBase
   {
-    private readonly IEventFileDomain _efDomain;
-    public FileController(IEventFileDomain fileDomain)
+    private readonly IFileDomain _fileDomain;
+    public FileController(IFileDomain fileDomain)
     {
-      _efDomain = fileDomain;
+      _fileDomain = fileDomain;
     }
 
     [HttpGet("{eventId}")]
     public IActionResult GetEventFile(int eventId)
     {
-      var fileView = _efDomain.GetEventFile(eventId);
+      var fileView = _fileDomain.GetEventFile(eventId);
       if (fileView == null)
         throw new NotFoundException("Event file not found");
 
@@ -31,10 +31,9 @@ namespace WebCalendar.Api.Controllers
 		[HttpPost]
 		public IActionResult UploadFile(IFormCollection form)
     {
-      var eventId = int.Parse(form["eventId"]);
-
-      if (_efDomain.AddFile(form.Files[0], eventId) > 0)
-			  return Ok();
+      var fileId = _fileDomain.AddFile(form.Files[0]);
+      if (fileId > 0)
+			  return Ok(fileId);
 
       return BadRequest();
 		}
