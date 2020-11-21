@@ -6,7 +6,7 @@ namespace WebCalendar.Business.Domains.Interfaces
 {
   public interface ICalendarItemDomain
   {
-    IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTme, int[] calendarsId);
+    IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTme, int[] calendarsId, int userId);
     void UpdateCalendarsItem(CalendarItemViewModel calendarItem);
   }
 }

@@ -123,10 +123,28 @@ namespace WebCalendar.Data
       logModelBuilder
         .Property(log => log.DateTime)
         .IsRequired();
+
+      var eventGuestsModelBuilder = modelBuilder
+        .Entity<EventGuests>()
+        .HasKey(eg => new {
+        eg.UserId,
+        eg.EventId
+      });
+
+      modelBuilder.Entity<EventGuests>()
+      .HasOne<Event>(ev => ev.Event)
+      .WithMany(s => s.Guests)
+      .HasForeignKey(sc => sc.EventId);
+
+      modelBuilder.Entity<EventGuests>()
+        .HasOne<User>(sc => sc.User)
+        .WithMany(s => s.SharedEvents)
+        .HasForeignKey(sc => sc.UserId);
     }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Calendar> Calendars { get; set; }
-    public DbSet<Event> Events { get; set; }
-  }
+  public DbSet<User> Users { get; set; }
+  public DbSet<Calendar> Calendars { get; set; }
+  public DbSet<Event> Events { get; set; }
+  public DbSet<EventGuests> EventGuests { get; set; }
+}
 }

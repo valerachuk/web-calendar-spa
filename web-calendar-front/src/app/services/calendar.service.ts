@@ -17,6 +17,10 @@ export class CalendarService {
     return this.httpClient.get<Calendar[]>(this.apiUrl + id);
   }
 
+  getCalendar(id: number): Observable<Calendar> {
+    return this.httpClient.get<Calendar>(this.apiUrl + `GetSingle?id=${id}`);
+  }
+
   addCalendar(calendar: Calendar): Observable<Calendar> {
     return this.httpClient.post<Calendar>(this.apiUrl, calendar);
   }

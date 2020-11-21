@@ -10,5 +10,7 @@ namespace WebCalendar.Business.Domains.Interfaces
     void UpdateCalendarEventSeries(EventViewModel calendarItem, int userId);
     void DeleteCalendarEvent(int id, int userId);
     void DeleteCalendarEventSeries(int id, int userId);
+    void UnsubscribeSharedEvent(int id, int guestId);
+    void UnsubscribeSharedEventSeries(int id, int guestId);
   }
 }

@@ -19,6 +19,8 @@ namespace WebCalendar.Data.Repositories.Interfaces
     void UpdateEvent(Event calendarEvent);
     Event DeleteCalendarEvent(int calendarEventId);
     IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId);
+    void UnsubscribeSharedEvent(int id, int guestId);
+    void UnsubscribeSharedEventSeries(int id, int guestId);
     EventNotificationDTO GetEventNotificationInfo(int id);
   }
 }

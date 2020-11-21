@@ -6,7 +6,7 @@
 </div>
 <div class="modal-body">
   <!-- Repeatable Event -->
-  <div *ngIf="item.meta == repeatableEvent">
+  <div *ngIf="item.meta == repeatableEvent || item.meta == sharedRepeatableEvent">
     <div class="form-check">
       <input class="form-check-input" type="radio" name="radio" value="false" 
       (change)="changeCheck()">
@@ -24,7 +24,7 @@
     </div>
   </div>
   <!-- The other item type -->
-  <div class="form-check" *ngIf="item.meta != repeatableEvent">
+  <div class="form-check" *ngIf="item.meta != repeatableEvent && item.meta != sharedRepeatableEvent">
     <p>Are you sure you want to delete the item?</p>
   </div>
 </div>

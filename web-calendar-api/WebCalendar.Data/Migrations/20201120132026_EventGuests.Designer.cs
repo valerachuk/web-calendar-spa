@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201120132026_EventGuests")]
+    partial class EventGuests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,21 +94,6 @@ namespace WebCalendar.Data.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventGuests", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "EventId");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventGuests");
-                });
-
             modelBuilder.Entity("WebCalendar.Data.Entities.Log", b =>
                 {
                     b.Property<int>("Id")
@@ -141,6 +128,9 @@ namespace WebCalendar.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -166,6 +156,8 @@ namespace WebCalendar.Data.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("Users");
 
@@ -220,19 +212,11 @@ namespace WebCalendar.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventGuests", b =>
+            modelBuilder.Entity("WebCalendar.Data.Entities.User", b =>
                 {
-                    b.HasOne("WebCalendar.Data.Entities.Event", "Event")
+                    b.HasOne("WebCalendar.Data.Entities.Event", null)
                         .WithMany("Guests")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCalendar.Data.Entities.User", "User")
-                        .WithMany("SharedEvents")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EventId");
                 });
 #pragma warning restore 612, 618
         }

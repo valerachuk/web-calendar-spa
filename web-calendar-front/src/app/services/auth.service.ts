@@ -82,6 +82,10 @@ export class AuthService {
     );
   }
 
+  public getUsersExceptCurrent(): Observable<UserInfo[]> {
+    return this.httpClient.get<UserInfo[]>(`${this.apiUrl}/auth/GetAllUsers`);
+  }
+
   public get isAuthenticated(): boolean {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     return token && !this.jwtHelper.isTokenExpired(token);

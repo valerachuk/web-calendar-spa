@@ -35,13 +35,13 @@ namespace WebCalendar.Business.Domains
     public IEnumerable<CalendarViewModel> GetUserCalendars(int id) =>
       _mapper.Map<IEnumerable<Calendar>, IEnumerable<CalendarViewModel>>(_caRepository.GetUserCalendars(id));
 
-    public Calendar GetCalendar(int id)
+    public CalendarViewModel GetCalendar(int id)
     {
       var calendar = _caRepository.GetCalendar(id);
       if (calendar == null)
         throw new NotFoundException("Calendar not found");
 
-      return calendar;
+      return _mapper.Map<Calendar, CalendarViewModel>(calendar);
     }
 
     public int AddCalendar(CalendarViewModel calendar, int userId)
@@ -57,6 +57,11 @@ namespace WebCalendar.Business.Domains
       if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
+      if(id == _caRepository.GetDefaultCalendar().Id)
+      {
+        throw new ForbiddenException("You cannot delete 'Default' calendar");
+      }
+
       _notificationSender.CancelScheduledNotification(_eventRepository.GetCalendarEvents(id).ToArray());
 
       _logger.Info($"Delete calendar {id}");
@@ -67,6 +72,11 @@ namespace WebCalendar.Business.Domains
     {
       if (GetCalendar(calendarView.Id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
+
+      if (calendarView.Id == _caRepository.GetDefaultCalendar().Id)
+      {
+        throw new ForbiddenException("You cannot edit 'Default' calendar");
+      }
 
       return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
     }

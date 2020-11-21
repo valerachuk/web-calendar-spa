@@ -36,4 +36,12 @@ export class CalendarEventService {
   deleteEventSeries(id: number): Observable<string> {
     return this.httpClient.delete<string>(this.apiUrl + `/DeleteSeries?id=${id}`);
   }
+
+  unsubscribeEvent(id: number): Observable<string> {
+    return this.httpClient.delete<string>(this.apiUrl + `/Unsubscribe?id=${id}`);
+  }
+
+  unsubscribeEventSeries(id: number): Observable<string> {
+    return this.httpClient.delete<string>(this.apiUrl + `/UnsubscribeSeries?id=${id}`);
+  }
 }

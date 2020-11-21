@@ -22,10 +22,15 @@ namespace WebCalendar.Business.Domains
       _mapper = mapper;
       _notificationSender = notificationSender;
     }
-    public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId)
+    public IEnumerable<CalendarItemViewModel> GetCalendarsItemsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarsId, int userId)
     {
-      IEnumerable<CalendarItemViewModel> сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable<CalendarItemViewModel>>(
-        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId));
+      // get events
+      List<CalendarItemViewModel> сalendarItems = _mapper.Map<IEnumerable<Event>, IEnumerable<CalendarItemViewModel>>(
+        _itRepository.GetCalendarsEventsByTimeInterval(startDateTime, endDateTime, calendarsId)).ToList();
+
+      // get shared events
+      сalendarItems.AddRange(_mapper.Map<IEnumerable<Event>, IEnumerable<CalendarItemViewModel>>(
+        _itRepository.GetSharedCalendarEventsByTimeInterval(startDateTime, endDateTime, calendarsId, userId)));
 
       return сalendarItems;
     }

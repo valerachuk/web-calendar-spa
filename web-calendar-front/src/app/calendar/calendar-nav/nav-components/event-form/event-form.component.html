@@ -131,10 +131,17 @@
         </select>
       </div>
     </div>
+    <div class="form-row">
+      <div class="col">
+        <label>Guests</label>
+        <div class="d-flex">
+          <ng-select [items]="users" bindLabel="email"  placeholder="Search user by email"
+            [(ngModel)]="selectedUsers" [multiple]="true" class="w-100" formControlName="eventGuests">
+          </ng-select>
+        </div>
+      </div>
+    </div>
   </form>
-  <div *ngIf="successfullySavedEvent" class="alert alert-success mb-0">
-    Successfully saved!
-  </div>
   <div *ngIf="error !== null" class="alert alert-danger mb-0">
     {{error}}
   </div>

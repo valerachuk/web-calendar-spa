@@ -1,3 +1,4 @@
+import { UserInfo } from '../interfaces/user-info.interface';
 import { NotificationTime } from '../enums/notification-time.enum';
 import { Reiteration } from '../enums/reiteration.enum';
 
@@ -10,4 +11,5 @@ export interface CalendarEvent {
   endDateTime: string;
   notificationTime: NotificationTime | null;
   reiteration: Reiteration | null;
+  guests: UserInfo[] | null;
 }

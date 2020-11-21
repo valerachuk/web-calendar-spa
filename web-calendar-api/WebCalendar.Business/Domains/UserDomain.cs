@@ -100,6 +100,11 @@ namespace WebCalendar.Business.Domains
       return _mapper.Map<User, UserViewModel>(user);
     }
 
+    public IEnumerable<UserViewModel> GetAllUsersExceptCurrent(int id)
+    {
+      return _mapper.Map<IEnumerable<User>, IEnumerable<UserViewModel>>(_userRepository.GetUsersExceptCurrent(id));
+    }
+
     public bool EditUser(UserViewModel userView, int authedUserId)
     {
       if (userView.Id != authedUserId)

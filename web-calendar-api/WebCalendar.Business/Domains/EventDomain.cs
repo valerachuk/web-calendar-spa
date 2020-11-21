@@ -143,6 +143,25 @@ namespace WebCalendar.Business.Domains
       _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
     }
 
+    public void UnsubscribeSharedEvent(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEvent(id, guestId);
+    }
+    public void UnsubscribeSharedEventSeries(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEventSeries(id, guestId);
+    }
+
     private void CheckRightsToModify(int id, int userId)
     {
       var currentEvent = _evRepository.GetEventInfo(id);

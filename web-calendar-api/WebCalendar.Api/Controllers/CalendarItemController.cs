@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
 using WebCalendar.Business.ViewModels;
 
@@ -19,7 +20,7 @@ namespace WebCalendar.Api.Controllers
     [HttpGet]
     public IActionResult GetCalendarsItems([FromQuery] CalendarItemFilterViewModel filter)
     {
-      var items = _itDomain.GetCalendarsItemsByTimeInterval(filter.Start, filter.End, filter.Id);
+      var items = _itDomain.GetCalendarsItemsByTimeInterval(filter.Start, filter.End, filter.Id, User.GetId());
       return Ok(items);
     }
 

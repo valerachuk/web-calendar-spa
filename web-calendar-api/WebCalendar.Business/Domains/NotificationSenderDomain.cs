@@ -117,6 +117,10 @@ namespace WebCalendar.Business.Domains
       ";
 
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        SendEmail(guest.User.Email, notificationMessage);
+      }
     }
 
     public void NotifyEventEdited(int eventId)
@@ -132,6 +136,10 @@ namespace WebCalendar.Business.Domains
       ";
 
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        SendEmail(guest.User.Email, notificationMessage);
+      }
     }
 
     public void NotifyEventStarted(int eventId)
@@ -147,6 +155,10 @@ namespace WebCalendar.Business.Domains
       ";
 
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        SendEmail(guest.User.Email, notificationMessage);
+      }
     }
 
     public void NotifyEventDeleted(int eventId, bool isSeries)
@@ -163,6 +175,10 @@ namespace WebCalendar.Business.Domains
       ";
 
       SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        SendEmail(guest.User.Email, notificationMessage);
+      }
     }
 
   }

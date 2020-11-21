@@ -17,6 +17,14 @@ namespace WebCalendar.Api.Controllers
       _userDomain = userDomain;
     }
 
+    [HttpGet]
+    [Authorize]
+    [Route("GetAllUsers")]
+    public IActionResult GetAllUsersExceptCurrent()
+    {
+      return Ok(_userDomain.GetAllUsersExceptCurrent(User.GetId()));
+    }
+
     [HttpGet("id")]
     [Authorize]
     public IActionResult GetId()
