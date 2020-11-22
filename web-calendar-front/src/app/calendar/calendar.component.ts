@@ -127,7 +127,7 @@ export class CalendarComponent implements OnInit {
 
   openEventModal(event: CalendarEvent) {
     if (event.meta === ItemType.RepeatableEvent || event.meta as ItemType === ItemType.Event) {
-      let modalRef = this.modalService.open(EventFormComponent, { centered: true })
+      let modalRef = this.modalService.open(EventFormComponent, { centered: true, size: 'lg' })
       modalRef.componentInstance.getcalendarEvent(event.id);
       modalRef.result
         .then(_ => {

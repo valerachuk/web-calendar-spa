@@ -9,6 +9,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
 import { ToastGlobalService } from 'src/app/services/toast-global.service';
+import { FileAttachService } from 'src/app/services/file-attach.service';
 import { EditEventModalComponent } from '../edit-event-modal/edit-event-modal.component';
 
 @Component({
@@ -24,6 +25,7 @@ export class EventFormComponent implements OnInit {
   endDate: NgbDateStruct;
   startTime: NgbTimeStruct;
   endTime: NgbTimeStruct;
+  attachedFile: File = null;
 
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
@@ -52,6 +54,7 @@ export class EventFormComponent implements OnInit {
     private authService: AuthService,
     private eventService: CalendarEventService,
     private modalService: NgbModal,
+    private fileService: FileAttachService,
     private toastService: ToastGlobalService
   ) {
   }
@@ -126,6 +129,30 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
+    if(this.attachedFile !== null && this.attachedFile !== undefined) {
+      this.fileService.uploadFile(this.attachedFile).subscribe(data => {
+        this.calendarEvent.fileId = data;
+        this.eventRequest();
+        this.toastService.add({
+          delay: 1500,
+          title: 'Success!',
+          content: `File has been successfully uploaded`,
+          className: "bg-success text-light"
+        });
+      }, err => {
+        this.toastService.add({
+          delay: 1500,
+          title: 'Error!',
+          content: `Upload file error: ${err.message}`,
+          className: "bg-danger text-light"
+        });
+      });
+    }
+    else
+      this.eventRequest();
+  }
+
+  eventRequest() {
     let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 

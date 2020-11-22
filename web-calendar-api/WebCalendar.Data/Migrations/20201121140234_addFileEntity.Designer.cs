@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebCalendar.Data;
 
 namespace WebCalendar.Data.Migrations
 {
     [DbContext(typeof(WebCalendarDbContext))]
-    partial class WebCalendarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201121140234_addFileEntity")]
+    partial class addFileEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,21 +99,6 @@ namespace WebCalendar.Data.Migrations
                         .HasFilter("[FileId] IS NOT NULL");
 
                     b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventGuests", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "EventId");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventGuests");
                 });
 
             modelBuilder.Entity("WebCalendar.Data.Entities.Log", b =>
@@ -261,21 +248,6 @@ namespace WebCalendar.Data.Migrations
                     b.HasOne("WebCalendar.Data.Entities.UserFile", "File")
                         .WithOne("Event")
                         .HasForeignKey("WebCalendar.Data.Entities.Event", "FileId");
-                });
-
-            modelBuilder.Entity("WebCalendar.Data.Entities.EventGuests", b =>
-                {
-                    b.HasOne("WebCalendar.Data.Entities.Event", "Event")
-                        .WithMany("Guests")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebCalendar.Data.Entities.User", "User")
-                        .WithMany("SharedEvents")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

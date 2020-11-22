@@ -42,7 +42,7 @@ export class CalendarNavComponent implements OnInit {
   }
 
   openEventModal() {
-    this.modalService.open(EventFormComponent, { centered: true }).result
+    this.modalService.open(EventFormComponent, { centered: true, size: 'lg' }).result
       .then(closeData => {
         this.updateCalendarItems();
       }, () => { });

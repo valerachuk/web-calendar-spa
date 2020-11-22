@@ -12,4 +12,5 @@ export interface CalendarEvent {
   notificationTime: NotificationTime | null;
   reiteration: Reiteration | null;
   guests: UserInfo[] | null;
+  fileId?:number;
 }

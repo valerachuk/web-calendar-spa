@@ -21,14 +21,13 @@ namespace WebCalendar.Data.Repositories
       return _context.Calendars.Where(calendar => calendar.UserId == userId).ToList();
     }
 
-    public Calendar GetCalendar(int id) => _context.Calendars.Find(id);
+    public Calendar GetCalendar(int id) => _context.Calendars.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
     public Calendar GetDefaultCalendar()
     {
-      var defaultCalendars = _context.Calendars.Where(c => c.Name == "Default");
+      var defaultCalendars = _context.Calendars.AsNoTracking().Where(c => c.Name == "Default");
       int mainDefaultCalendarId = defaultCalendars.Min(c => c.Id);
       var defaultCalendar = _context.Calendars.Find(mainDefaultCalendarId);
-      _context.Entry(defaultCalendar).State = EntityState.Detached;
       return defaultCalendar;
     }
 
