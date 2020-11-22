@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WebCalendar.Business.DTO;
 using WebCalendar.Business.ViewModels;
 
 namespace WebCalendar.Business.Domains.Interfaces
@@ -9,6 +10,6 @@ namespace WebCalendar.Business.Domains.Interfaces
     int AddCalendar(CalendarViewModel calendar, int userId);
     bool DeleteCalendar(int id, int userId);
     bool EditCalendar(CalendarViewModel calendarView, int userId);
-    (string, string) CreateICS(int calendarId, int userId); // (icsContent, calendarName)
+    CalendarICSDTO CreateICS(int calendarId, int userId);
   }
 }

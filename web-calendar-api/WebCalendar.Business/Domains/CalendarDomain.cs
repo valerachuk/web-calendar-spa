@@ -7,6 +7,7 @@ using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
 using NLog;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.DTO;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
@@ -75,7 +76,7 @@ namespace WebCalendar.Business.Domains
       return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
     }
 
-    public (string, string) CreateICS(int calendarId, int userId)
+    public CalendarICSDTO CreateICS(int calendarId, int userId)
     {
       var calendar = _caRepository.GetCalendarWithEvents(calendarId);
 
@@ -104,7 +105,11 @@ namespace WebCalendar.Business.Domains
         return icsEvent;
       }));
 
-      return (new CalendarSerializer(icsCalendar).SerializeToString(), calendar.Name);
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = calendar.Name
+      };
     }
   }
 }
