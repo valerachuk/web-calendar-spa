@@ -4,6 +4,7 @@ import { CalendarService } from 'src/app/services/calendar.service';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserInfo } from '../interfaces/user-info.interface';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-user-page',
@@ -83,7 +84,14 @@ export class UserPageComponent implements OnInit {
     });
   }
 
-  exportCalendar() {
-    console.log(this.selectedCalendars);
+  exportCalendar(): void {
+    this.selectedCalendars
+      .map(calendar => calendar.id)
+      .forEach(id => this.calendarService.downloadCalendarIcs(id).subscribe(response => {
+        const uriEncodedFileName = response.headers.get('content-disposition').match(/filename\*=UTF-8''(.*?)$/)[1];
+        const fileName = decodeURI(uriEncodedFileName);
+        const file = new File([response.body], fileName, { type: response.body.type });
+        saveAs(file);
+      }));
   }
 }
