@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WebCalendar.Constants.Enums;
 
 namespace WebCalendar.Data.Entities
@@ -18,5 +19,11 @@ namespace WebCalendar.Data.Entities
     public string NotificationScheduleJobId { get; set; }
     public int? FileId { get; set; }
     public UserFile File { get; set; }
+    public List<EventGuests> Guests { get; set; }
+
+    public Event()
+    {
+      Guests = new List<EventGuests>();
+    }
   }
 }

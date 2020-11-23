@@ -41,7 +41,7 @@
       <table class="table table-fixed">
         <tbody>
           <tr>
-            <td *ngFor="let calendar of calendars" class="d-flex align-items-center justify-content-between"
+            <td *ngFor="let calendar of calendars; let i = index" class="d-flex align-items-center justify-content-between"
               ngbPopover="{{calendar.description}}" [openDelay]="100" [closeDelay]="200"
               triggers="mouseenter:mouseleave" placement="right">
               <div class="form-check form-check-inline">
@@ -50,10 +50,10 @@
                 <label class="form-check-label" for="inlineCheckbox{{calendar.id}}">{{calendar.name}}</label>
               </div>
               <div class="btn-group">
-                <button (click)="openEditModal(calendar)" class="btn">
+                <button *ngIf="i !== 0" (click)="openEditModal(calendar)" class="btn">
                   <fa-icon [icon]="faPencil" class="text-warning"></fa-icon>
                 </button>
-                <button (click)="openDeleteModal(calendar.id)" class="btn">
+                <button *ngIf="i !== 0" (click)="openDeleteModal(calendar.id)" class="btn">
                   <fa-icon [icon]="faTrash" class="text-danger"></fa-icon>
                 </button>
               </div>

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using WebCalendar.Data.Entities;
 
 namespace WebCalendar.Data.DTO
 {
@@ -11,5 +13,6 @@ namespace WebCalendar.Data.DTO
     public string UserFirstName { get; set; }
     public DateTime StartDateTime { get; set; }
     public bool IsSeries { get; set; }
+    public List<EventGuests> Guests { get; set; }
   }
 }

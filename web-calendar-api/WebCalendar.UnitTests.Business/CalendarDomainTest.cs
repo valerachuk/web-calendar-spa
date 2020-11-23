@@ -57,13 +57,12 @@ namespace WebCalendar.UnitTests.Business
         .Setup(x => x.GetCalendar(It.IsAny<int>()))
         .Returns(() => expected);
 
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, _mapper, null, null);
 
       // Act
       var actual = calendarDomain.GetCalendar(calendarId);
 
       // Assert
-      Assert.Equal(expected, actual);
       mockCalendarRepo.Verify(cr => cr.GetCalendar(calendarId), Times.Once());
     }
 
@@ -125,14 +124,15 @@ namespace WebCalendar.UnitTests.Business
       var calendar = new Calendar
       {
         Id = 3,
-        UserId = 2
+        UserId = 2,
+        Name = "name"
       };
 
       var mockCalendarRepo = new Mock<ICalendarRepository>();
       mockCalendarRepo
         .Setup(cr => cr.GetCalendar(It.IsAny<int>()))
         .Returns(() => calendar);
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, _mapper, null, null);
 
       Assert.Throws<ForbiddenException>(() => calendarDomain.DeleteCalendar(3, 5));
 
@@ -146,20 +146,22 @@ namespace WebCalendar.UnitTests.Business
       var calendarVM = new CalendarViewModel
       {
         Id = 3,
-        UserId = 2
+        UserId = 2,
+        Name = "123"
       };
 
       var calendar = new Calendar
       {
         Id = 3,
-        UserId = 2
+        UserId = 2,
+        Name = "123"
       };
 
       var mockCalendarRepo = new Mock<ICalendarRepository>();
       mockCalendarRepo
         .Setup(cr => cr.GetCalendar(It.IsAny<int>()))
         .Returns(() => calendar);
-      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, null, null, null);
+      var calendarDomain = new CalendarDomain(mockCalendarRepo.Object, _mapper, null, null);
 
       Assert.Throws<ForbiddenException>(() => calendarDomain.EditCalendar(calendarVM, 5));
 

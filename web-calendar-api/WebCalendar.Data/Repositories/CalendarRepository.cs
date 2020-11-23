@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using WebCalendar.Data.Entities;
 using WebCalendar.Data.Repositories.Interfaces;
 
@@ -15,12 +15,21 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
+
     public IEnumerable<Calendar> GetUserCalendars(int userId)
     {
       return _context.Calendars.Where(calendar => calendar.UserId == userId).ToList();
     }
 
-    public Calendar GetCalendar(int id) => _context.Calendars.Find(id);
+    public Calendar GetCalendar(int id) => _context.Calendars.AsNoTracking().FirstOrDefault(x => x.Id == id);
+
+    public Calendar GetDefaultCalendar()
+    {
+      var defaultCalendars = _context.Calendars.AsNoTracking().Where(c => c.Name == "Default");
+      int mainDefaultCalendarId = defaultCalendars.Min(c => c.Id);
+      var defaultCalendar = _context.Calendars.Find(mainDefaultCalendarId);
+      return defaultCalendar;
+    }
 
     public Calendar GetCalendarWithEvents(int id)
       => _context.Calendars.Include(c => c.Events).FirstOrDefault(c => c.Id == id);

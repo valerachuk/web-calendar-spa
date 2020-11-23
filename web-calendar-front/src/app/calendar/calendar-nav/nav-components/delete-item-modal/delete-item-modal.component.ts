@@ -14,6 +14,7 @@ export class DeleteItemModalComponent implements OnInit {
   @Input() item: CalendarEvent;
   isEventRepeatable = true;
   repeatableEvent = ItemType.RepeatableEvent;
+  sharedRepeatableEvent = ItemType.SharedRepeatableEvent;
   error = "";
   public btnDisabled = false;
 
@@ -47,6 +48,26 @@ export class DeleteItemModalComponent implements OnInit {
     );
   }
 
+  unsubscribeEvent() {
+    this.eventService.unsubscribeEvent(+this.item.id).subscribe(id => {
+      this.activeModal.close(id)
+    },
+      err => {
+        this.error = err;
+      }
+    );
+  }
+
+  unsubscribeEventSeries() {
+    this.eventService.unsubscribeEventSeries(+this.item.id).subscribe(id => {
+      this.activeModal.close(id)
+    },
+      err => {
+        this.error = err;
+      }
+    );
+  }
+
   deleteCalendarItem() {
     this.btnDisabled = true;
     switch (this.item.meta) {
@@ -58,6 +79,16 @@ export class DeleteItemModalComponent implements OnInit {
           this.deleteEventSeries();
         } else {
           this.deleteSingleEvent();
+        }
+        break;
+      case ItemType.SharedEvent:
+        this.unsubscribeEvent();
+        break;
+      case ItemType.SharedRepeatableEvent:
+        if (this.isEventRepeatable) {
+          this.unsubscribeEvent();
+        } else {
+          this.unsubscribeEventSeries();
         }
         break;
       case ItemType.Task:

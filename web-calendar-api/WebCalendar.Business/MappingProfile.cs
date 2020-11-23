@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using System.Linq;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
 
@@ -12,12 +12,36 @@ namespace WebCalendar.Business
       CreateMap<User, UserViewModel>().ReverseMap();
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
-      CreateMap<Event, EventViewModel>().ReverseMap();
+
+      CreateMap<Event, EventViewModel>()
+        .ForMember(e => e.Guests, opt => opt.MapFrom(s => s.Guests.Select(g => g.User)));
+
+      CreateMap<EventGuests, UserViewModel>()
+              .ForMember(e => e.Id, opt => opt.MapFrom(g => g.UserId));
+
+      CreateMap<EventViewModel, Event>()
+            .AfterMap((evm, e) =>
+            {
+              foreach (var guest in e.Guests)
+              {
+                guest.EventId = evm.Id;
+              }
+            });
+
+      CreateMap<UserViewModel, EventGuests>()
+            .ForMember(g => g.UserId, opt => opt.MapFrom(uvm => uvm.Id));
+
       CreateMap<UserFile, FileViewModel>().ReverseMap();
       CreateMap<Event, CalendarItemViewModel>().BeforeMap((ev, it) =>
-      it.MetaType = ev.Reiteration == null ? 
-      Constants.Enums.CalendarItemType.Event : 
-      Constants.Enums.CalendarItemType.RepeatableEvent
+        it.MetaType = 
+        ev.Guests.Count == 0 ?
+          (ev.Reiteration == null ?
+          Constants.Enums.CalendarItemType.Event :
+          Constants.Enums.CalendarItemType.RepeatableEvent) 
+          :
+          (ev.Reiteration == null ?
+          Constants.Enums.CalendarItemType.SharedEvent :
+          Constants.Enums.CalendarItemType.SharedRepeatableEvent)
       );
     }
   }

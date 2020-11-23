@@ -21,7 +21,8 @@ namespace WebCalendar.Api.Controllers
     [HttpGet]
     public IActionResult GetEvent(int id)
     {
-      return Ok(_evDomain.GetEvent(id));
+      var ev = _evDomain.GetEvent(id);
+      return Ok(ev);
     }
 
     [HttpPost]
@@ -73,6 +74,22 @@ namespace WebCalendar.Api.Controllers
     public IActionResult DeleteEventSeries([FromQuery] int id)
     {
       _evDomain.DeleteCalendarEventSeries(id, User.GetId());
+      return Ok();
+    }
+
+    [HttpDelete]
+    [Route("Unsubscribe")]
+    public IActionResult UnsubscribeSharedEvent([FromQuery] int id)
+    {
+      _evDomain.UnsubscribeSharedEvent(id, User.GetId());
+      return Ok();
+    }
+
+    [HttpDelete]
+    [Route("UnsubscribeSeries")]
+    public IActionResult UnsubscribeSharedEventSeries([FromQuery] int id)
+    {
+      _evDomain.UnsubscribeSharedEventSeries(id, User.GetId());
       return Ok();
     }
 

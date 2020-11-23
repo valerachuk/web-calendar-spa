@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using WebCalendar.Constants.Enums;
 
@@ -20,6 +21,7 @@ namespace WebCalendar.Business.ViewModels
     public string Venue { get; set; }
     public NotificationTime? NotificationTime { get; set; }
     public Reiteration? Reiteration { get; set; }
+    public List<UserViewModel> Guests { get; set; }
     public int? FileId { get; set; }
   }
 }

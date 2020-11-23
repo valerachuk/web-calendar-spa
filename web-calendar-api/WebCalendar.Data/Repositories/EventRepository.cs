@@ -16,35 +16,67 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
-    public Event GetEvent(int id)
+    public Event GetWholeEvent(int id)
     {
-      var @event =_context.Events.Find(id);
+      Event @event =
+       _context.Events
+         .Include(ev => ev.Guests)
+         .ThenInclude(eventGuests => eventGuests.User)
+         .AsNoTracking()
+         .Where(ev => ev.Id == id)
+         .FirstOrDefault();
+
       if (@event == null)
       {
         return null;
       }
-      _context.Entry(@event).State = EntityState.Detached;
+      return @event;
+    }
+
+    public Event GetEvent(int id)
+    {
+      Event @event =
+       _context.Events
+         .AsNoTracking()
+         .Where(ev => ev.Id == id)
+         .FirstOrDefault();
+
+      if (@event == null)
+      {
+        return null;
+      }
       return @event;
     }
 
     public IEnumerable<Event> GetCalendarEvents(int calendarId)
-      => _context.Events.Where(evt => evt.CalendarId == calendarId).ToArray();
+      => _context.Events.AsNoTracking().Where(evt => evt.CalendarId == calendarId).ToArray();
 
     public Event GetMainEvent(int id)
     {
-      var seriesEvent = _context.Events.Find(id);
+      var seriesEvent = _context.Events
+        .Include(ev => ev.Guests)
+        .ThenInclude(eventGuests => eventGuests.User)
+        .AsNoTracking()
+        .FirstOrDefault(e => e.Id == id);
 
       // find min event id in series for getting main event of the series
       var mainSeriesEvent = _context.Events.Where(ev => ev.SeriesId == seriesEvent.SeriesId);
       int mainEventId = mainSeriesEvent.Min(ev => ev.Id);
-      return _context.Events.Find(mainEventId);
+      return _context.Events
+        .Include(ev => ev.Guests)
+        .ThenInclude(eventGuests => eventGuests.User)
+        .AsNoTracking()
+        .FirstOrDefault(x => x.Id == mainEventId);
     }
 
     public IEnumerable<Event> GetSeries(int seriesId)
-      => _context.Events.Where(evt => evt.SeriesId == seriesId).ToArray();
+      => _context.Events.AsNoTracking().Where(evt => evt.SeriesId == seriesId).ToArray();
 
     public EventNotificationDTO GetEventNotificationInfo(int id) =>
       _context.Events
+      .Include(ev => ev.Guests)
+      .ThenInclude(eventGuests => eventGuests.User)
+      .AsNoTracking()
         .Where(evt => evt.Id == id)
         .Select(evt => new EventNotificationDTO
         {
@@ -54,19 +86,26 @@ namespace WebCalendar.Data.Repositories
           UserFirstName = evt.Calendar.User.FirstName,
           UserWantsReceiveEmailNotifications = evt.Calendar.User.ReceiveEmailNotifications,
           IsSeries = evt.Reiteration != null,
-          UserEmail = evt.Calendar.User.Email
+          UserEmail = evt.Calendar.User.Email,
+          Guests = evt.Guests
         })
         .FirstOrDefault();
 
-    public UserEventDTO GetEventInfo(int id) =>
-     _context.Events
-       .Where(evt => evt.Id == id)
-       .Select(evt => new UserEventDTO
-       {
-         Reiteration = evt.Reiteration,
-         UserId = evt.Calendar.UserId
-       })
-       .FirstOrDefault();
+    public UserEventDTO GetEventInfo(int id)
+    {
+      UserEventDTO @event = _context.Events
+        .AsNoTracking()
+        .Where(evt => evt.Id == id)
+        .Select(evt => new UserEventDTO
+        {
+          Reiteration = evt.Reiteration,
+          UserId = evt.Calendar.UserId
+        })
+        .FirstOrDefault();
+      if (@event == null)
+        return null;
+      return @event;
+    }
 
     public void AddSeriesOfCalendarEvents(IEnumerable<Event> calendarEvents)
     {
@@ -89,6 +128,7 @@ namespace WebCalendar.Data.Repositories
       {
         return null;
       }
+      _context.EventGuests.RemoveRange(currentEvent.Guests);
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
       return currentEvent;
@@ -97,26 +137,83 @@ namespace WebCalendar.Data.Repositories
     public IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId)
     {
       Event currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+      {
+        return null;
+      }
       var eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToArray();
+      _context.EventGuests.RemoveRange(currentEvent.Guests);
       _context.Events.RemoveRange(eventSeries);
       _context.SaveChanges();
       return eventSeries;
     }
 
+    private void UpdateGuests(Event calendarEvent)
+    {
+      var oldEventGuests = _context.EventGuests.Where(x => x.EventId == calendarEvent.Id).ToList();
+      _context.EventGuests.RemoveRange(oldEventGuests);
+      _context.SaveChanges();
+      _context.EventGuests.AddRange(calendarEvent.Guests);
+    }
+
     public Event UpdateCalendarEvent(Event calendarEvent)
     {
+      calendarEvent.SeriesId = _context.Events.AsNoTracking().FirstOrDefault(e => e.Id == calendarEvent.Id).SeriesId;
+      UpdateGuests(calendarEvent);
       _context.Events.Update(calendarEvent);
       _context.SaveChanges();
       return calendarEvent;
     }
 
+    private List<Event> GetEventSeries(Event calendarEvent)
+    {
+      var currentEvent = _context.Events.FirstOrDefault(x => x.Id == calendarEvent.Id);
+      return _context.Events
+        .Include(ev => ev.Guests)
+        .Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
+    }
+
+    private void UpdateGuestsInEventSeries(Event updatedEvent, Event newEvent)
+    {
+      // get old guest list, expect guests who weren't changed
+      var oldEventGuests = _context.EventGuests
+        .Where(x => x.EventId == updatedEvent.Id &&
+          !newEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
+        .ToList();
+
+      if (oldEventGuests.Count > 0)
+      {
+        //remove deleted guests from list
+        updatedEvent.Guests = updatedEvent.Guests.Except(oldEventGuests).ToList();
+        _context.EventGuests.RemoveRange(oldEventGuests);
+        _context.SaveChanges();
+      }
+
+      var newEventGuests = newEvent.Guests
+          .Where(x => !updatedEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
+          .ToList();
+
+      if (newEventGuests.Count > 0)
+      {
+        // set only new guests in list
+        updatedEvent.Guests.AddRange(newEventGuests);
+        _context.EventGuests.AddRange(newEventGuests);
+        _context.SaveChanges();
+      }
+    }
+
     public IEnumerable<Event> UpdateCalendarEventSeries(Event calendarEvent)
     {
-      var currentEvent = _context.Events.Find(calendarEvent.Id);
-      var currentEventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
+      List<Event> currentEventSeries = GetEventSeries(calendarEvent);
+
+      // update each event in the series
       foreach (var item in currentEventSeries)
       {
-        item.Calendar = calendarEvent.Calendar;
+        calendarEvent.SeriesId = item.SeriesId;
+        calendarEvent.Id = item.Id;
+
+        UpdateGuestsInEventSeries(item, calendarEvent);
+
         item.CalendarId = calendarEvent.CalendarId;
         item.Name = calendarEvent.Name;
         item.Venue = calendarEvent.Venue;
@@ -125,9 +222,41 @@ namespace WebCalendar.Data.Repositories
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         item.EndDateTime = item.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+        _context.SaveChanges();
+      }
+     
+      return currentEventSeries;
+    }
+
+    public void UnsubscribeSharedEvent(int id, int guestId)
+    {
+      var currentEvent = _context.Events.Find(id);
+      currentEvent.Guests.Remove(_context.EventGuests.Where(eg => eg.UserId == guestId && eg.EventId == id).FirstOrDefault());
+      var oldEventGuests = _context.EventGuests.Where(x => x.UserId == guestId);
+      _context.EventGuests.RemoveRange(oldEventGuests);
+      _context.Events.Update(currentEvent);
+      _context.SaveChanges();
+    }
+
+    public void UnsubscribeSharedEventSeries(int id, int guestId)
+    {
+      var currentEvent = _context.Events.Find(id);
+      var currentEventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
+      foreach (var item in currentEventSeries)
+      {
+        item.Guests.Remove(_context.EventGuests.Where(eg => eg.UserId == guestId && eg.EventId == id).FirstOrDefault());
+        var oldEventGuests = _context.EventGuests.Where(x => x.UserId == guestId);
+        _context.EventGuests.RemoveRange(oldEventGuests);
+        _context.Events.Update(currentEvent);
       }
       _context.SaveChanges();
-      return currentEventSeries;
+    }
+
+    public void UpdateEventStartedNotification(Event @event)
+    {
+      var oldEvent = _context.Events.AsNoTracking().FirstOrDefault(x => x.Id == @event.Id);
+      oldEvent.NotificationScheduleJobId = @event.NotificationScheduleJobId;
+      _context.SaveChanges();
     }
   }
 }

@@ -19,6 +19,10 @@ namespace WebCalendar.Api.Controllers
       _caDomain = calendarDomain;
     }
 
+    [HttpGet]
+    [Route("GetSingle")]
+    public IActionResult GetCalendar([FromQuery] int id) => Ok(_caDomain.GetCalendar(id));
+
     [HttpGet("{id}")]
     public IActionResult GetUserCalendars(int id) => Ok(_caDomain.GetUserCalendars(id));
 

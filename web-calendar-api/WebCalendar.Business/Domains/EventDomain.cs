@@ -27,7 +27,7 @@ namespace WebCalendar.Business.Domains
 
     public EventViewModel GetEvent(int id)
     {
-      var currentEvent = _evRepository.GetEvent(id);
+      var currentEvent = _evRepository.GetWholeEvent(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
@@ -37,7 +37,8 @@ namespace WebCalendar.Business.Domains
 
     public int AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
     {
-      var @event = _evRepository.AddCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      int id = _evRepository.AddCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent)).Id;
+      var @event = _evRepository.GetEvent(id);
       if (isUpdated)
         _notificationSender.ScheduleEventEditedNotification(@event.Id);
       else
@@ -92,6 +93,7 @@ namespace WebCalendar.Business.Domains
         _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
         _notificationSender.ScheduleEventEditedNotification(oldEvent.Id);
 
+       oldEvent = _evRepository.GetEvent(calendarEvent.Id);
         if (oldEvent.NotificationTime != null)
           _notificationSender.ScheduleEventStartedNotification(oldEvent.Id);
       }
@@ -154,6 +156,25 @@ namespace WebCalendar.Business.Domains
       _notificationSender.NotifyEventDeleted(id, true);
       var eventSeries = _evRepository.DeleteCalendarEventSeries(id);
       _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
+    }
+
+    public void UnsubscribeSharedEvent(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEvent(id, guestId);
+    }
+    public void UnsubscribeSharedEventSeries(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEventSeries(id, guestId);
     }
 
     private void CheckRightsToModify(int id, int userId)

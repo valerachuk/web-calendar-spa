@@ -370,7 +370,7 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
 
       // Act and Assert
-      Assert.Throws<InvalidOperationException>(() => eventRepository.UpdateCalendarEvent(@event));
+      Assert.Throws<NullReferenceException>(() => eventRepository.UpdateCalendarEvent(@event));
     }
 
     [Fact]
