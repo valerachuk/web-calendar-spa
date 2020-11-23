@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
@@ -59,5 +60,11 @@ namespace WebCalendar.Api.Controllers
       return BadRequest();
     }
 
+    [HttpGet("calendar-ics/{calendarId}")]
+    public IActionResult GetCalendarICS([FromRoute] int calendarId)
+    {
+      var calendarIcs = _caDomain.CreateICS(calendarId, User.GetId());
+      return File(Encoding.UTF8.GetBytes(calendarIcs.ICSContent), "text/calendar", $"{calendarIcs.CalendarName}.ics");
+    }
   }
 }

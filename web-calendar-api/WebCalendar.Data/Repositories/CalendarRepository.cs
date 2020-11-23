@@ -31,6 +31,9 @@ namespace WebCalendar.Data.Repositories
       return defaultCalendar;
     }
 
+    public Calendar GetCalendarWithEvents(int id)
+      => _context.Calendars.Include(c => c.Events).FirstOrDefault(c => c.Id == id);
+
     public int AddCalendar(Calendar calendar)
     {
       _context.Calendars.Add(calendar);

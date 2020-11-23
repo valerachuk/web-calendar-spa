@@ -49,6 +49,7 @@ namespace WebCalendar.Api
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()
+            .WithExposedHeaders("Content-Disposition")
             .WithOrigins(frontOptions.AddressFront);
         });
       });
