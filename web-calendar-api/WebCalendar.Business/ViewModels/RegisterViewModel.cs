@@ -15,6 +15,8 @@ namespace WebCalendar.Business.ViewModels
     public string Email { get; set; }
     
     [Required]
+    [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$", 
+      ErrorMessage = "Password must contain at least one number and be 8 characters long")]
     public string Password { get; set; }
   }
 }

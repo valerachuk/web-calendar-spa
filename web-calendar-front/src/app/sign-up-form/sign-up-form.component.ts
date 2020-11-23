@@ -14,7 +14,7 @@ export class SignUpFormComponent {
     firstName: new FormControl(null, Validators.required),
     lastName: new FormControl(null, Validators.required),
     email: new FormControl(null, [Validators.required, Validators.email]),
-    password: new FormControl(null, Validators.required)
+    password: new FormControl(null, [Validators.required, Validators.pattern("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")])
   });
 
   public isEmailExsists = false;
@@ -38,11 +38,13 @@ export class SignUpFormComponent {
           this.router.navigate(['']);
         },
         error => {
-          if (error.status === 409) {
+          if (error.status === 409)
             this.isEmailExsists = true;
-            this.form.enable();
-          }
+          else if(error.status === 400 && error.error.errors.Password)
+            this.form.get('password').setErrors({ pattern: true });
         }
+      ).add(
+        this.form.enable()
       );
   }
 }

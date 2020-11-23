@@ -36,6 +36,8 @@
             [class.is-invalid]="form.get('password').invalid && form.get('password').touched">
           <small class="form-text text-danger"
             *ngIf="form.getError('required', 'password') && form.get('password').touched">Password required</small>
+          <small class="form-text text-danger"
+            *ngIf="form.getError('pattern', 'password') && form.get('password').touched">Password must contain at least one number and be 8 characters long</small>
         </div>
         
         <div class="d-flex justify-content-between">
