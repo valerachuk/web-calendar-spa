@@ -128,6 +128,7 @@ namespace WebCalendar.Data.Repositories
       {
         return null;
       }
+      _context.EventGuests.RemoveRange(currentEvent.Guests);
       _context.Events.Remove(currentEvent);
       _context.SaveChanges();
       return currentEvent;
@@ -136,7 +137,12 @@ namespace WebCalendar.Data.Repositories
     public IEnumerable<Event> DeleteCalendarEventSeries(int calendarEventId)
     {
       Event currentEvent = _context.Events.Find(calendarEventId);
+      if (currentEvent == null)
+      {
+        return null;
+      }
       var eventSeries = _context.Events.Where(ev => ev.SeriesId == currentEvent.SeriesId).ToArray();
+      _context.EventGuests.RemoveRange(currentEvent.Guests);
       _context.Events.RemoveRange(eventSeries);
       _context.SaveChanges();
       return eventSeries;
@@ -178,7 +184,7 @@ namespace WebCalendar.Data.Repositories
       if (oldEventGuests.Count > 0)
       {
         //remove deleted guests from list
-        updatedEvent.Guests.Except(oldEventGuests);
+        updatedEvent.Guests = updatedEvent.Guests.Except(oldEventGuests).ToList();
         _context.EventGuests.RemoveRange(oldEventGuests);
         _context.SaveChanges();
       }
@@ -204,7 +210,6 @@ namespace WebCalendar.Data.Repositories
       foreach (var item in currentEventSeries)
       {
         calendarEvent.SeriesId = item.SeriesId;
-       // calendarEvent.Guests.ForEach(x => x.EventId = item.Id);
         calendarEvent.Id = item.Id;
 
         UpdateGuestsInEventSeries(item, calendarEvent);

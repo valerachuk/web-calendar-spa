@@ -50,10 +50,10 @@
                 <label class="form-check-label" for="inlineCheckbox{{calendar.id}}">{{calendar.name}}</label>
               </div>
               <div class="btn-group">
-                <button *ngIf="!(i === 0 && calendar.name === 'Default calendar')" (click)="openEditModal(calendar)" class="btn">
+                <button *ngIf="i !== 0" (click)="openEditModal(calendar)" class="btn">
                   <fa-icon [icon]="faPencil" class="text-warning"></fa-icon>
                 </button>
-                <button *ngIf="!(i === 0 && calendar.name === 'Default calendar')" (click)="openDeleteModal(calendar.id)" class="btn">
+                <button *ngIf="i !== 0" (click)="openDeleteModal(calendar.id)" class="btn">
                   <fa-icon [icon]="faTrash" class="text-danger"></fa-icon>
                 </button>
               </div>

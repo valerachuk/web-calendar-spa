@@ -158,13 +158,8 @@ export class EventFormComponent implements OnInit {
     let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 
-    
-
-    let isSameDate = moment.utc(start).isSame(moment.utc(this.calendarEvent.startDateTime))
-      && moment.utc(end).isSame(moment.utc(this.calendarEvent.endDateTime));
-
-    console.log(moment.utc(start));
-    console.log(moment.utc(this.calendarEvent.startDateTime));
+    let isSameDate = moment.utc(start).startOf('day').isSame(moment.utc(this.calendarEvent.startDateTime).startOf('day'))
+      && moment.utc(end).startOf('day').isSame(moment.utc(this.calendarEvent.endDateTime).startOf('day'));
 
     this.calendarEvent.startDateTime = start;
     this.calendarEvent.endDateTime = end;
