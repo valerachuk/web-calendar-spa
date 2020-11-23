@@ -121,7 +121,9 @@ export class EventFormComponent implements OnInit {
       date.month - 1,
       date.day,
       time.hour,
-      time.minute - (new Date()).getTimezoneOffset()).toJSON();
+      time.minute 
+      - (new Date()).getTimezoneOffset()
+      ).toJSON();
   }
 
   submitEvent() {
@@ -156,9 +158,13 @@ export class EventFormComponent implements OnInit {
     let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 
-    let isSameDate =
-      moment(new Date(start).toDateString()).isSame(new Date(this.calendarEvent.startDateTime).toDateString())
-      && moment(new Date(end).toDateString()).isSame(new Date(this.calendarEvent.endDateTime).toDateString())
+    
+
+    let isSameDate = moment.utc(start).isSame(moment.utc(this.calendarEvent.startDateTime))
+      && moment.utc(end).isSame(moment.utc(this.calendarEvent.endDateTime));
+
+    console.log(moment.utc(start));
+    console.log(moment.utc(this.calendarEvent.startDateTime));
 
     this.calendarEvent.startDateTime = start;
     this.calendarEvent.endDateTime = end;

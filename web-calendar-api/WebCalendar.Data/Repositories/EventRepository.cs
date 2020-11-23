@@ -16,7 +16,7 @@ namespace WebCalendar.Data.Repositories
       _context = context;
     }
 
-    public Event GetEvent(int id)
+    public Event GetWholeEvent(int id)
     {
       Event @event =
        _context.Events
@@ -33,17 +33,40 @@ namespace WebCalendar.Data.Repositories
       return @event;
     }
 
+    public Event GetEvent(int id)
+    {
+      Event @event =
+       _context.Events
+         .AsNoTracking()
+         .Where(ev => ev.Id == id)
+         .FirstOrDefault();
+
+      if (@event == null)
+      {
+        return null;
+      }
+      return @event;
+    }
+
     public IEnumerable<Event> GetCalendarEvents(int calendarId)
       => _context.Events.AsNoTracking().Where(evt => evt.CalendarId == calendarId).ToArray();
 
     public Event GetMainEvent(int id)
     {
-      var seriesEvent = _context.Events.AsNoTracking().FirstOrDefault(e => e.Id == id);
+      var seriesEvent = _context.Events
+        .Include(ev => ev.Guests)
+        .ThenInclude(eventGuests => eventGuests.User)
+        .AsNoTracking()
+        .FirstOrDefault(e => e.Id == id);
 
       // find min event id in series for getting main event of the series
       var mainSeriesEvent = _context.Events.Where(ev => ev.SeriesId == seriesEvent.SeriesId);
       int mainEventId = mainSeriesEvent.Min(ev => ev.Id);
-      return _context.Events.FirstOrDefault(x => x.Id == mainEventId);
+      return _context.Events
+        .Include(ev => ev.Guests)
+        .ThenInclude(eventGuests => eventGuests.User)
+        .AsNoTracking()
+        .FirstOrDefault(x => x.Id == mainEventId);
     }
 
     public IEnumerable<Event> GetSeries(int seriesId)
@@ -51,6 +74,8 @@ namespace WebCalendar.Data.Repositories
 
     public EventNotificationDTO GetEventNotificationInfo(int id) =>
       _context.Events
+      .Include(ev => ev.Guests)
+      .ThenInclude(eventGuests => eventGuests.User)
       .AsNoTracking()
         .Where(evt => evt.Id == id)
         .Select(evt => new EventNotificationDTO
@@ -119,7 +144,7 @@ namespace WebCalendar.Data.Repositories
 
     private void UpdateGuests(Event calendarEvent)
     {
-      var oldEventGuests = _context.EventGuests.AsNoTracking().Where(x => x.EventId == calendarEvent.Id).ToList();
+      var oldEventGuests = _context.EventGuests.Where(x => x.EventId == calendarEvent.Id).ToList();
       _context.EventGuests.RemoveRange(oldEventGuests);
       _context.SaveChanges();
       _context.EventGuests.AddRange(calendarEvent.Guests);
@@ -128,11 +153,8 @@ namespace WebCalendar.Data.Repositories
     public Event UpdateCalendarEvent(Event calendarEvent)
     {
       calendarEvent.SeriesId = _context.Events.AsNoTracking().FirstOrDefault(e => e.Id == calendarEvent.Id).SeriesId;
-
-      var ev = _context.Events.Find(calendarEvent.Id);
-      _context.Events.Update(calendarEvent);
-
       UpdateGuests(calendarEvent);
+      _context.Events.Update(calendarEvent);
       _context.SaveChanges();
       return calendarEvent;
     }
@@ -141,9 +163,7 @@ namespace WebCalendar.Data.Repositories
     {
       var currentEvent = _context.Events.FirstOrDefault(x => x.Id == calendarEvent.Id);
       return _context.Events
-        .AsTracking()
         .Include(ev => ev.Guests)
-        .ThenInclude(eventGuests => eventGuests.User)
         .Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
     }
 
@@ -152,9 +172,7 @@ namespace WebCalendar.Data.Repositories
       // get old guest list, expect guests who weren't changed
       var oldEventGuests = _context.EventGuests
         .Where(x => x.EventId == updatedEvent.Id &&
-          !newEvent.Guests
-          .Select(g => g.UserId)
-          .Contains(x.UserId))
+          !newEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
         .ToList();
 
       if (oldEventGuests.Count > 0)
@@ -166,8 +184,7 @@ namespace WebCalendar.Data.Repositories
       }
 
       var newEventGuests = newEvent.Guests
-          .Where(x => !updatedEvent.Guests.Select(g => g.UserId)
-          .Contains(x.UserId))
+          .Where(x => !updatedEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
           .ToList();
 
       if (newEventGuests.Count > 0)
@@ -187,7 +204,8 @@ namespace WebCalendar.Data.Repositories
       foreach (var item in currentEventSeries)
       {
         calendarEvent.SeriesId = item.SeriesId;
-        calendarEvent.Guests.ForEach(x => x.EventId = item.Id);
+       // calendarEvent.Guests.ForEach(x => x.EventId = item.Id);
+        calendarEvent.Id = item.Id;
 
         UpdateGuestsInEventSeries(item, calendarEvent);
 
@@ -199,8 +217,9 @@ namespace WebCalendar.Data.Repositories
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         item.EndDateTime = item.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+        _context.SaveChanges();
       }
-      _context.SaveChanges();
+     
       return currentEventSeries;
     }
 
@@ -225,6 +244,13 @@ namespace WebCalendar.Data.Repositories
         _context.EventGuests.RemoveRange(oldEventGuests);
         _context.Events.Update(currentEvent);
       }
+      _context.SaveChanges();
+    }
+
+    public void UpdateEventStartedNotification(Event @event)
+    {
+      var oldEvent = _context.Events.AsNoTracking().FirstOrDefault(x => x.Id == @event.Id);
+      oldEvent.NotificationScheduleJobId = @event.NotificationScheduleJobId;
       _context.SaveChanges();
     }
   }

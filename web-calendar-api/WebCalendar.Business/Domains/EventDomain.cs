@@ -27,7 +27,7 @@ namespace WebCalendar.Business.Domains
 
     public EventViewModel GetEvent(int id)
     {
-      var currentEvent = _evRepository.GetEvent(id);
+      var currentEvent = _evRepository.GetWholeEvent(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");

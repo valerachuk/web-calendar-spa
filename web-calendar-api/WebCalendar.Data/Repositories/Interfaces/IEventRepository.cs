@@ -7,6 +7,7 @@ namespace WebCalendar.Data.Repositories.Interfaces
 {
   public interface IEventRepository
   {
+    Event GetWholeEvent(int id);
     Event GetEvent(int id);
     IEnumerable<Event> GetCalendarEvents(int calendarId);
     Event GetMainEvent(int id);
@@ -21,5 +22,6 @@ namespace WebCalendar.Data.Repositories.Interfaces
     void UnsubscribeSharedEvent(int id, int guestId);
     void UnsubscribeSharedEventSeries(int id, int guestId);
     EventNotificationDTO GetEventNotificationInfo(int id);
-  }
+    void UpdateEventStartedNotification(Event @event);
+    }
 }
