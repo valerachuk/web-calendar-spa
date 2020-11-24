@@ -2,7 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.DTO;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
@@ -189,5 +193,93 @@ namespace WebCalendar.Business.Domains
         throw new ForbiddenException("Not event owner");
       }
     }
+
+    private void CheckRightsToExport(int id, int userId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+
+      if (userId != currentEvent.UserId && _evRepository.GetWholeEvent(id).Guests.All(guest => guest.UserId != userId))
+      {
+        throw new ForbiddenException("No access");
+      }
+    }
+
+    public CalendarICSDTO CreateEventICS(int eventId, int userId)
+    {
+      CheckRightsToExport(eventId, userId);
+
+      var @event = _evRepository.GetEvent(eventId);
+
+      var icsEvent = new CalendarEvent
+      {
+        Summary = @event.Name,
+        Location = @event.Venue,
+        Start = new CalDateTime(@event.StartDateTime),
+        End = new CalDateTime(@event.EndDateTime)
+      };
+
+      if (@event.NotificationTime != null)
+      {
+        icsEvent.Alarms.Add(new Alarm
+        {
+          Trigger = new Trigger(TimeSpan.FromMinutes(-(int)@event.NotificationTime))
+        });
+      }
+
+      var icsCalendar = new Ical.Net.Calendar
+      {
+        Events = { icsEvent }
+      };
+
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = @event.Name
+      };
+    }
+
+    public CalendarICSDTO CreateEventSeriesICS(int eventId, int userId)
+    {
+      CheckRightsToExport(eventId, userId);
+
+      var @event = _evRepository.GetEvent(eventId);
+      if (@event.SeriesId == null)
+        throw new NotFoundException("Not event series");
+
+      var eventSeries = _evRepository.GetSeries(@event.SeriesId.Value);
+
+      var icsCalendar = new Ical.Net.Calendar();
+      icsCalendar.Events.AddRange(eventSeries.Select(evt =>
+      {
+        var icsEvent = new CalendarEvent
+        {
+          Summary = evt.Name,
+          Location = evt.Venue,
+          Start = new CalDateTime(evt.StartDateTime),
+          End = new CalDateTime(evt.EndDateTime)
+        };
+
+        if (evt.NotificationTime != null)
+        {
+          icsEvent.Alarms.Add(new Alarm
+          {
+            Trigger = new Trigger(TimeSpan.FromMinutes(-(int)evt.NotificationTime))
+          });
+        }
+
+        return icsEvent;
+      }));
+
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = @event.Name
+      };
+    }
+
   }
 }

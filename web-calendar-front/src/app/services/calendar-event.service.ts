@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { CalendarEvent } from '../interfaces/event.interface';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -43,5 +43,19 @@ export class CalendarEventService {
 
   unsubscribeEventSeries(id: number): Observable<string> {
     return this.httpClient.delete<string>(this.apiUrl + `/UnsubscribeSeries?id=${id}`);
+  }
+
+  downloadEventIcs(eventId: number): Observable<HttpResponse<Blob>> {
+    return this.httpClient.get(`${this.apiUrl}/event-ics/${eventId}`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  downloadEventSeriesIcs(eventId: number): Observable<HttpResponse<Blob>> {
+    return this.httpClient.get(`${this.apiUrl}/event-series-ics/${eventId}`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
   }
 }
