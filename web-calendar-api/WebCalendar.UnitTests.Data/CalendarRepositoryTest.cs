@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using WebCalendar.Data;
 using WebCalendar.Data.Entities;
@@ -76,7 +77,7 @@ namespace WebCalendar.UnitTests.Data
         Description = "Description 1",
         User = null,
         UserId = 1,
-        Events = null
+        Events = new System.Collections.Generic.List<Event>()
       };
       var calendar2 = new Calendar
       {
@@ -85,16 +86,16 @@ namespace WebCalendar.UnitTests.Data
         Description = "Description 2",
         User = null,
         UserId = 1,
-        Events = null
+        Events = new System.Collections.Generic.List<Event>()
       };
 
       _context.AddRange(calendar1, calendar2);
       _context.SaveChanges();
       var calendarRepo = new CalendarRepository(_context);
 
-      var actual = calendarRepo.GetCalendar(1);
+      var actual = JsonConvert.SerializeObject(calendarRepo.GetCalendar(1));
 
-      Assert.Equal(calendar1, actual);
+      Assert.Equal(JsonConvert.SerializeObject(calendar1), actual);
     }
 
     [Fact]
