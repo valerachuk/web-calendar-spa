@@ -6,18 +6,9 @@
           <fa-icon [icon]="faCog"></fa-icon>
         </button></sup>
     </div>
-    <div class="dropdown dropright d-flex align-items-center justify-content-center align-self-center p-4">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCalendarItems" data-toggle="dropdown"
-        aria-haspopup="true" aria-expanded="false">
-        <fa-icon [icon]="faPlus"></fa-icon>
-        Create item
+      <button class="btn btn-primary mx-auto d-block" (click)="openEventModal()">
+        Create event
       </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownCalendarItems">
-        <button class="btn btn-primary dropdown-item" type="button" (click)="openEventModal()">
-          Create event
-        </button>
-      </div>
-    </div>
     <div class="p-3">
       <table class="table table-fixed">
         <thead>

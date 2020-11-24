@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
@@ -91,6 +92,20 @@ namespace WebCalendar.Api.Controllers
     {
       _evDomain.UnsubscribeSharedEventSeries(id, User.GetId());
       return Ok();
+    }
+
+    [HttpGet("event-ics/{eventId}")]
+    public IActionResult GetEventICS([FromRoute] int eventId)
+    {
+      var eventIcs = _evDomain.CreateEventICS(eventId, User.GetId());
+      return File(Encoding.UTF8.GetBytes(eventIcs.ICSContent), "text/calendar", $"{eventIcs.CalendarName}.ics");
+    }
+
+    [HttpGet("event-series-ics/{eventId}")]
+    public IActionResult GetEventSeriesICS([FromRoute] int eventId)
+    {
+      var eventIcs = _evDomain.CreateEventSeriesICS(eventId, User.GetId());
+      return File(Encoding.UTF8.GetBytes(eventIcs.ICSContent), "text/calendar", $"{eventIcs.CalendarName}Series.ics");
     }
 
     string ValidateData(EventViewModel calendarEvent)
