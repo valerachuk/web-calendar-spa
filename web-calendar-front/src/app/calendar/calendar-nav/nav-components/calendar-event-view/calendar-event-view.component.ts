@@ -51,7 +51,7 @@ export class CalendarEventViewComponent implements OnInit {
     .subscribe(data => {
       this.calendar = data.name;
     });
-  }
+    }
   }
 
   export(): void {

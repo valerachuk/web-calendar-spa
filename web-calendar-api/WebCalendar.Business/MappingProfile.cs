@@ -12,6 +12,7 @@ namespace WebCalendar.Business
       CreateMap<User, UserViewModel>().ReverseMap();
       CreateMap<RegisterViewModel, User>();
       CreateMap<Calendar, CalendarViewModel>().ReverseMap();
+      CreateMap<UserFile, FileViewModel>().ReverseMap();
 
       CreateMap<Event, EventViewModel>()
         .ForMember(e => e.Guests, opt => opt.MapFrom(s => s.Guests.Select(g => g.User)));
@@ -31,7 +32,6 @@ namespace WebCalendar.Business
       CreateMap<UserViewModel, EventGuests>()
             .ForMember(g => g.UserId, opt => opt.MapFrom(uvm => uvm.Id));
 
-      CreateMap<UserFile, FileViewModel>().ReverseMap();
       CreateMap<Event, CalendarItemViewModel>().BeforeMap((ev, it) =>
         it.MetaType = 
         ev.Guests.Count == 0 ?

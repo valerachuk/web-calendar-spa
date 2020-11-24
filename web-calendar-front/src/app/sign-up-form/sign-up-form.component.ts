@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -17,6 +18,10 @@ export class SignUpFormComponent {
     password: new FormControl(null, [Validators.required, Validators.pattern("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$")])
   });
 
+  faEnvelope = faEnvelope;
+  faLock = faLock;
+  faUser = faUser;
+  
   public isEmailExsists = false;
 
   constructor(

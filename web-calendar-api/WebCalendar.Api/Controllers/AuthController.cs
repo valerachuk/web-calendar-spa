@@ -33,7 +33,7 @@ namespace WebCalendar.Api.Controllers
     }
 
     private IActionResult GenerateUserInfo(int id)
-		{
+    {
       return Ok(new
       {
         access_token = _userDomain.GenerateJWT(id)

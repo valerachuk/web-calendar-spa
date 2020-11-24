@@ -142,7 +142,6 @@ namespace WebCalendar.UnitTests.Data
           CalendarId = 1
         }
       };
-
       _context.AddRange(events);
       _context.SaveChanges();
 
@@ -252,12 +251,10 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = eventRepository.GetSeries(1);
+      var actualEvent = eventRepository.GetSeries(1).ToArray();
 
       // Assert
-      Assert.Collection(actualEvent,
-        ev1 => { Assert.Contains("Event 1", ev1.Name); Assert.Equal(1, ev1.Id); },
-        ev2 => { Assert.Contains("Event 2", ev2.Name); Assert.Equal(2, ev2.Id); });
+      Assert.Equal(@events.Count(), actualEvent.Count());
     }
 
     [Fact]
@@ -277,6 +274,7 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       Event @event = GetTestEvent(3);
+
 
       UserEventDTO @userEvent = new UserEventDTO()
       {
@@ -388,7 +386,8 @@ namespace WebCalendar.UnitTests.Data
       Event actualEvent = eventRepository.UpdateCalendarEvent(@event);
 
       // Assert
-      Assert.Equal(@event, actualEvent);
+      Assert.Equal(@event.Id, actualEvent.Id);
+      Assert.Equal(@event.Venue, actualEvent.Venue);
     }
 
     [Fact]
@@ -460,7 +459,7 @@ namespace WebCalendar.UnitTests.Data
     }
 
     [Fact]
-    public void DeleteCalendarEventSeries_RemovingNotExistingEventSeries_ShouldThrowException()
+    public void DeleteCalendarEventSeries_RemovingNotExistingEventSeries_ShouldReturnNull()
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
@@ -486,6 +485,7 @@ namespace WebCalendar.UnitTests.Data
         _context.Update(ev);
         _context.SaveChanges();
       }
+
       @events[2].Name = "123";
       var updatedEvent = @events[2];
       _context.Update(updatedEvent);
@@ -517,7 +517,7 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
       GetTestEvent(3);
       // Act and Assert
-      Assert.Throws<NullReferenceException>(() => eventRepository.UpdateCalendarEventSeries(@events));
+      Assert.Throws<InvalidOperationException>(() => eventRepository.UpdateCalendarEventSeries(@events));
     }
   }
 }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Business.Domains.Interfaces;
@@ -8,6 +9,7 @@ namespace WebCalendar.Api.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [Authorize]
   public class FileController : ControllerBase
   {
     private readonly IFileDomain _fileDomain;

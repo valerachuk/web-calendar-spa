@@ -16,7 +16,7 @@ namespace WebCalendar.Data.Repositories
 
     public UserFile GetFile(int id) => _context.EventFile.Find(id);
 
-    public UserFile GetEventFile(int eventId) => 
+    public UserFile GetEventFile(int eventId) =>
       _context.EventFile.AsNoTracking().Where(ef => ef.Event.Id == eventId).FirstOrDefault();
 
     public bool DeleteFile(UserFile file)

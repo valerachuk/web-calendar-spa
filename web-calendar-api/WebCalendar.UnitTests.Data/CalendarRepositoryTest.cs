@@ -52,7 +52,7 @@ namespace WebCalendar.UnitTests.Data
 
       var actual = calendarRepo.GetUserCalendars(1);
 
-      Assert.Collection(actual, 
+      Assert.Collection(actual,
         calendar => Assert.Contains("Calendar 1", calendar.Name));
     }
 
@@ -94,7 +94,6 @@ namespace WebCalendar.UnitTests.Data
       var calendarRepo = new CalendarRepository(_context);
 
       var actual = calendarRepo.GetCalendar(1);
-
       Assert.Equal(calendar1.Name, actual.Name);
       Assert.Equal(calendar1.Id, actual.Id);
     }

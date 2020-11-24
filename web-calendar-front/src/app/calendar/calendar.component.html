@@ -37,11 +37,11 @@
     </div>
     <br>
     <div [ngSwitch]="view">
-      <ng-template #customTitleTemplate let-event="event" >
-        <span class="font-weight-bold" (click)="eventClicked(event.id)">{{event.title}}</span>
+      <ng-template #customTitleTemplate let-event="event">
+        <span class="font-weight-bold my-custom-class" (click)="eventClicked(event.id)">{{event.title}}</span>
         <button (click)="openEventModal(event)" class="btn xs" 
         *ngIf="event.metaType !== sharedEvent && event.metaType !== sharedRepeatableEvent">
-          <fa-icon *ngIf = "event.metaType != sharedType"[icon]="faEdit" class="text-warning"></fa-icon>
+          <fa-icon [icon]="faEdit" class="text-warning"></fa-icon>
         </button>
         <button (click)="openDeleteItemModal(event)" class="btn xs">
           <fa-icon [icon]="faTrash" class="text-danger"></fa-icon>

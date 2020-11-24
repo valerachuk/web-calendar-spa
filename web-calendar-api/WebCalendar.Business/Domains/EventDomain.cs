@@ -126,16 +126,19 @@ namespace WebCalendar.Business.Domains
       {
         // find main (first) event of the series
         var mainSeriesEvent = _evRepository.GetMainEvent(calendarEvent.Id);
+
         // update main event, except dates 
         var updatedMainSeriesEvent = _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
         updatedMainSeriesEvent.StartDateTime = mainSeriesEvent.StartDateTime.Date
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         updatedMainSeriesEvent.EndDateTime = mainSeriesEvent.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+
         // delete series
         var eventSeries = _evRepository.GetSeries(mainSeriesEvent.SeriesId.GetValueOrDefault()).ToArray();
         _notificationSender.CancelScheduledNotification(eventSeries);
         _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
+
         //add new event series
         updatedMainSeriesEvent.Id = default;
         AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent), true);

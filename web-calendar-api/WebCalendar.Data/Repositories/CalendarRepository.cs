@@ -23,10 +23,10 @@ namespace WebCalendar.Data.Repositories
 
     public Calendar GetCalendar(int id) => _context.Calendars.AsNoTracking().FirstOrDefault(x => x.Id == id);
 
-    public Calendar GetDefaultCalendar()
+    public Calendar GetDefaultCalendar(int userId)
     {
-      var defaultCalendars = _context.Calendars.AsNoTracking().Where(c => c.Name == "Default");
-      int mainDefaultCalendarId = defaultCalendars.Min(c => c.Id);
+      var userCalendars = _context.Calendars.AsNoTracking().Where(c => c.UserId == userId);
+      int mainDefaultCalendarId = userCalendars.Min(c => c.Id);
       var defaultCalendar = _context.Calendars.Find(mainDefaultCalendarId);
       return defaultCalendar;
     }
