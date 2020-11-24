@@ -4,6 +4,7 @@ import { saveAs } from 'file-saver';
 import { FileAttachService } from 'src/app/services/file-attach.service';
 import { ToastGlobalService } from 'src/app/services/toast-global.service';
 import { throwError } from 'rxjs';
+import { CalendarEvent } from 'src/app/interfaces/event.interface';
 
 @Component({
   selector: 'app-file-attach',
@@ -11,7 +12,7 @@ import { throwError } from 'rxjs';
   styleUrls: ['./file-attach.component.css']
 })
 export class FileAttachComponent implements OnInit {
-  @Input() eventId: number;
+  @Input() event: CalendarEvent;
   @Input() public attachedFile: File;
   @Output() attachedFileChange = new EventEmitter<File>();
 
@@ -52,10 +53,10 @@ export class FileAttachComponent implements OnInit {
   }
 
   attachedFileInit() {
-    if(this.eventId === null || this.eventId === undefined)
+    if(this.event.id === null || this.event.id === undefined || this.event.fileId === null)
       return;
     
-    this.fileService.getEventFile(this.eventId).subscribe(response => {
+    this.fileService.getEventFile(this.event.id).subscribe(response => {
       this.downloadFile = new File([response.body], this.getFileName(response.headers), {type: response.body.type});
     }, err => {
       if(err.status === 404)

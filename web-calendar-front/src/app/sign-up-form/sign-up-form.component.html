@@ -64,6 +64,13 @@
           </div>
           <input type="password" class="form-control" id="passwordInput" [formControl]="form.get('password')"
             [class.is-invalid]="form.get('password').invalid && form.get('password').touched">
+<<<<<<< HEAD
+=======
+          <small class="form-text text-danger"
+            *ngIf="form.getError('required', 'password') && form.get('password').touched">Password required</small>
+          <small class="form-text text-danger"
+            *ngIf="form.getError('pattern', 'password') && form.get('password').touched">Password must contain at least one number, one letter and be 8 characters long</small>
+>>>>>>> 06cd5e781014b8daafd856b4e016eac5b1f69d96
         </div>
         <small class="form-text text-danger"
           *ngIf="form.getError('required', 'password') && form.get('password').touched">Password required</small>
