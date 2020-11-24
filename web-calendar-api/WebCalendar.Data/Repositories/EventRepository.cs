@@ -150,7 +150,9 @@ namespace WebCalendar.Data.Repositories
 
     private void UpdateGuests(Event calendarEvent)
     {
-      var oldEventGuests = _context.EventGuests.Where(x => x.EventId == calendarEvent.Id).ToList();
+      var oldEventGuests = _context.EventGuests
+      .Where(x => x.EventId == calendarEvent.Id).ToList();
+
       _context.EventGuests.RemoveRange(oldEventGuests);
       _context.SaveChanges();
       _context.EventGuests.AddRange(calendarEvent.Guests);
@@ -158,47 +160,59 @@ namespace WebCalendar.Data.Repositories
 
     public Event UpdateCalendarEvent(Event calendarEvent)
     {
-      calendarEvent.SeriesId = _context.Events.AsNoTracking().FirstOrDefault(e => e.Id == calendarEvent.Id).SeriesId;
+      calendarEvent.SeriesId = _context.Events
+      .AsNoTracking()
+      .FirstOrDefault(e => e.Id == calendarEvent.Id).SeriesId;
+      
       UpdateGuests(calendarEvent);
       _context.Events.Update(calendarEvent);
       _context.SaveChanges();
-      return calendarEvent;
+
+      return _context.Events
+      .Include(ev => ev.Guests)
+      .ThenInclude(eventGuests => eventGuests.User)
+      .AsNoTracking()
+      .FirstOrDefault(e => e.Id == calendarEvent.Id);
     }
 
     private List<Event> GetEventSeries(Event calendarEvent)
     {
-      var currentEvent = _context.Events.FirstOrDefault(x => x.Id == calendarEvent.Id);
+      var currentEvent = _context.Events.AsNoTracking().FirstOrDefault(x => x.Id == calendarEvent.Id);
       return _context.Events
         .Include(ev => ev.Guests)
+        .ThenInclude(eventGuests => eventGuests.User)
         .Where(ev => ev.SeriesId == currentEvent.SeriesId).ToList();
     }
 
     private void UpdateGuestsInEventSeries(Event updatedEvent, Event newEvent)
     {
-      // get old guest list, expect guests who weren't changed
-      var oldEventGuests = _context.EventGuests
-        .Where(x => x.EventId == updatedEvent.Id &&
-          !newEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
-        .ToList();
-
-      if (oldEventGuests.Count > 0)
-      {
-        //remove deleted guests from list
-        updatedEvent.Guests = updatedEvent.Guests.Except(oldEventGuests).ToList();
-        _context.EventGuests.RemoveRange(oldEventGuests);
-        _context.SaveChanges();
-      }
-
-      var newEventGuests = newEvent.Guests
-          .Where(x => !updatedEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
+      if (updatedEvent.Guests.Count > 0) {
+        // get old guest list, expect guests who weren't changed
+        var oldEventGuests = _context.EventGuests
+          .Where(x => x.EventId == updatedEvent.Id &&
+            !newEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
           .ToList();
 
-      if (newEventGuests.Count > 0)
-      {
-        // set only new guests in list
-        updatedEvent.Guests.AddRange(newEventGuests);
-        _context.EventGuests.AddRange(newEventGuests);
-        _context.SaveChanges();
+        if (oldEventGuests.Count > 0)
+        {
+          //remove deleted guests from list
+          updatedEvent.Guests = updatedEvent.Guests.Except(oldEventGuests).ToList();
+          _context.EventGuests.RemoveRange(oldEventGuests);
+          _context.SaveChanges();
+        }
+      }
+      if (newEvent.Guests.Count > 0) {
+        var newEventGuests = newEvent.Guests
+            .Where(x => !updatedEvent.Guests.Select(g => g.UserId).Contains(x.UserId))
+            .ToList();
+
+        if (newEventGuests.Count > 0)
+        {
+          // set only new guests in list
+          updatedEvent.Guests.AddRange(newEventGuests);
+          _context.EventGuests.AddRange(newEventGuests);
+          _context.SaveChanges();
+        }
       }
     }
 
@@ -210,7 +224,6 @@ namespace WebCalendar.Data.Repositories
       foreach (var item in currentEventSeries)
       {
         calendarEvent.SeriesId = item.SeriesId;
-        calendarEvent.Id = item.Id;
 
         UpdateGuestsInEventSeries(item, calendarEvent);
 
@@ -222,9 +235,8 @@ namespace WebCalendar.Data.Repositories
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         item.EndDateTime = item.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
-        _context.SaveChanges();
       }
-     
+      _context.SaveChanges();
       return currentEventSeries;
     }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, Type } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CalendarItemsService } from '../services/calendar-items.service';
 import {
   CalendarDayViewBeforeRenderEvent,
@@ -143,10 +143,7 @@ export class CalendarComponent implements OnInit {
     modalRef.result.then(() => {
       this.updateCalendarItems();
       this.closeOpenMonthViewDay();
-    })
-    .catch(() => {
-      // on modal close
-    });
+    }, () => { });
   }
 
   eventTimesChanged({

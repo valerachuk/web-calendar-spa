@@ -28,8 +28,8 @@ namespace WebCalendar.Data.Repositories
 
     public IEnumerable<Event> GetSharedCalendarEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarId, int userId)
     {
-      var defaultCalendars = _context.Calendars.Where(cal => cal.Name == "Default calendar" && cal.UserId == userId);
-      if (defaultCalendars.Count() > 0 && calendarId.Contains(defaultCalendars.Min(ev => ev.Id))) {
+      var defaultCalendarId = _context.Calendars.Where(cal => cal.UserId == userId).Min(cal => cal.Id);
+      if (defaultCalendarId > 0 && calendarId.Contains(defaultCalendarId)) {
         var sharedEventsList = _context.Events
           .Include(ev => ev.Guests)
           .ThenInclude(eventGuests => eventGuests.User)

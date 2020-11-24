@@ -51,7 +51,7 @@ namespace WebCalendar.UnitTests.Data
 
       var actual = calendarRepo.GetUserCalendars(1);
 
-      Assert.Collection(actual, 
+      Assert.Collection(actual,
         calendar => Assert.Contains("Calendar 1", calendar.Name));
     }
 
@@ -76,7 +76,7 @@ namespace WebCalendar.UnitTests.Data
         Description = "Description 1",
         User = null,
         UserId = 1,
-        Events = null
+        Events = { }
       };
       var calendar2 = new Calendar
       {
@@ -85,7 +85,7 @@ namespace WebCalendar.UnitTests.Data
         Description = "Description 2",
         User = null,
         UserId = 1,
-        Events = null
+        Events = { }
       };
 
       _context.AddRange(calendar1, calendar2);
@@ -94,7 +94,7 @@ namespace WebCalendar.UnitTests.Data
 
       var actual = calendarRepo.GetCalendar(1);
 
-      Assert.Equal(calendar1, actual);
+      Assert.Equal(calendar1.Id, actual.Id);
     }
 
     [Fact]

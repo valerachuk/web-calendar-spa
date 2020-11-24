@@ -78,7 +78,7 @@ namespace WebCalendar.Business.Domains
       var notifyTime = @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault());
       var notifyTimeUTC = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
 
-      @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender 
+      @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender
         => notificationSender.NotifyEventStarted(eventId), notifyTimeUTC);
 
       _eventRepository.UpdateEventStartedNotification(@event);
@@ -121,8 +121,12 @@ namespace WebCalendar.Business.Domains
         SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
         foreach (var guest in eventNotificationInfo.Guests)
         {
-          SendEmail(guest.User.Email, notificationMessage
-            + $@"You were invited by <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})");
+          notificationMessage = $@"
+        Hello <i>{ guest.User.FirstName },</i>
+        <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
+        <b>{ eventNotificationInfo.EventName }</b> has been created successfully in your default calendar.
+        You were invited by <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
+          SendEmail(guest.User.Email, notificationMessage);
         }
       }
     }
@@ -144,6 +148,11 @@ namespace WebCalendar.Business.Domains
         SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
         foreach (var guest in eventNotificationInfo.Guests)
         {
+          notificationMessage = $@"
+        Hello <i>{ guest.User.FirstName },</i>
+        <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
+        <b>{ eventNotificationInfo.EventName }</b> has been edited successfully in your default calendar by
+        <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
           SendEmail(guest.User.Email, notificationMessage);
         }
       }
@@ -166,10 +175,16 @@ namespace WebCalendar.Business.Domains
         SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
         foreach (var guest in eventNotificationInfo.Guests)
         {
+          notificationMessage = $@"
+        Hello <i>{ guest.User.FirstName },</i>
+        <br>Event <b>{ eventNotificationInfo.EventName }</b>
+        in calendar <b>{ eventNotificationInfo.CalendarName }</b>
+        will begin at <b>{ eventNotificationInfo.StartDateTime:g}</b>.
+        { eventNotificationInfo.UserFirstName } is looking forward to you!";
           SendEmail(guest.User.Email, notificationMessage);
         }
       }
-      }
+    }
     public void NotifyEventDeleted(int eventId, bool isSeries)
     {
       var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
@@ -188,6 +203,11 @@ namespace WebCalendar.Business.Domains
         SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
         foreach (var guest in eventNotificationInfo.Guests)
         {
+          notificationMessage = $@"
+        Hello <i>{ guest.User.FirstName },</i>
+        <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
+        <b>{ eventNotificationInfo.EventName }</b> has been deleted from your default calendar by
+        <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
           SendEmail(guest.User.Email, notificationMessage);
         }
       }

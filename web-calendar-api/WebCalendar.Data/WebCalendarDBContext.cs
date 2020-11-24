@@ -166,10 +166,10 @@ namespace WebCalendar.Data
         .Property(ef => ef.UploadDate)
           .IsRequired();
     }
-  public DbSet<User> Users { get; set; }
-  public DbSet<Calendar> Calendars { get; set; }
-  public DbSet<Event> Events { get; set; }
-  public DbSet<EventGuests> EventGuests { get; set; }
-  public DbSet<UserFile> EventFile { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Calendar> Calendars { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<EventGuests> EventGuests { get; set; }
+    public DbSet<UserFile> EventFile { get; set; }
   }
 }
