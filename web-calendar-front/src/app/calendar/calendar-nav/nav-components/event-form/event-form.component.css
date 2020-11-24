@@ -9,7 +9,3 @@ button.calendar, button.calendar:active {
   .danger-input {
     border: 1px solid red;
   }
-
-  label {
-    margin-bottom: .2rem;
-  }

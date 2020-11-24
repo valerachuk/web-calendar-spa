@@ -93,9 +93,10 @@ namespace WebCalendar.UnitTests.Data
       _context.SaveChanges();
       var calendarRepo = new CalendarRepository(_context);
 
-      var actual = JsonConvert.SerializeObject(calendarRepo.GetCalendar(1));
+      var actual = calendarRepo.GetCalendar(1);
 
-      Assert.Equal(JsonConvert.SerializeObject(calendar1), actual);
+      Assert.Equal(calendar1.Name, actual.Name);
+      Assert.Equal(calendar1.Id, actual.Id);
     }
 
     [Fact]

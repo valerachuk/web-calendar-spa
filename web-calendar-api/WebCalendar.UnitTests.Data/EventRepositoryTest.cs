@@ -143,11 +143,8 @@ namespace WebCalendar.UnitTests.Data
         }
       };
 
-      foreach (var ev in events)
-      {
-        _context.Add(ev);
-        _context.SaveChanges();
-      }
+      _context.AddRange(events);
+      _context.SaveChanges();
 
       var eventRepository = new EventRepository(_context);
 
@@ -155,9 +152,9 @@ namespace WebCalendar.UnitTests.Data
       var actualEvent = eventRepository.GetCalendarEvents(1);
 
       // Assert
-      Assert.Collection(@events, 
-        ev1 => Assert.Contains("Event 1", ev1.Name),
-        ev2 => Assert.Contains("Event 2", ev2.Name));
+      Assert.Collection(actualEvent,
+        ev1 => { Assert.Contains("Event 1", ev1.Name); Assert.Equal(1, ev1.Id); },
+        ev2 => { Assert.Contains("Event 2", ev2.Name); Assert.Equal(2, ev2.Id); });
     }
 
     [Fact]
@@ -196,20 +193,17 @@ namespace WebCalendar.UnitTests.Data
         }
       };
 
-      foreach (var ev in events)
-      {
-        _context.Add(ev);
-        _context.SaveChanges();
-      }
+      _context.AddRange(events);
+      _context.SaveChanges();
 
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = JsonConvert.SerializeObject(eventRepository.GetMainEvent(2));
-      var expectedEvents = JsonConvert.SerializeObject(@events[0]);
+      var actualEvent = eventRepository.GetMainEvent(2);
 
       // Assert
-      Assert.Equal(expectedEvents, actualEvent);
+      Assert.Equal(@events[0].Name, actualEvent.Name);
+      Assert.Equal(@events[0].Id, actualEvent.Id);
     }
 
     [Fact]
@@ -242,11 +236,8 @@ namespace WebCalendar.UnitTests.Data
         }
       };
       
-      foreach (var ev in @events)
-      {
-        _context.Add(ev);
-        _context.SaveChanges();
-      }
+      _context.AddRange(events);
+      _context.SaveChanges();
 
       var otherEventSeriesEvent = new Event
       {
@@ -261,12 +252,12 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = JsonConvert.SerializeObject(eventRepository.GetSeries(1));
-
-      var expectedEvents = JsonConvert.SerializeObject(@events);
+      var actualEvent = eventRepository.GetSeries(1);
 
       // Assert
-      Assert.Equal(expectedEvents, actualEvent);
+      Assert.Collection(actualEvent,
+        ev1 => { Assert.Contains("Event 1", ev1.Name); Assert.Equal(1, ev1.Id); },
+        ev2 => { Assert.Contains("Event 2", ev2.Name); Assert.Equal(2, ev2.Id); });
     }
 
     [Fact]
@@ -274,7 +265,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
       // Act
       var actualEvent = eventRepository.GetSeries(10);
 
@@ -309,7 +299,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
       // Act
       var actualEvent = eventRepository.GetEventInfo(123);
 
@@ -435,7 +424,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
 
       // Act and Assert
       Assert.Null(eventRepository.DeleteCalendarEvent(10));
