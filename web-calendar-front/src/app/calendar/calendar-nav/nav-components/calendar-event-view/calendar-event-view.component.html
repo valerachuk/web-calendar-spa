@@ -40,6 +40,9 @@
       [searchable]="false" [clearable]="false" [multiple]="true" disabled>
     </ng-select>
   </div>
+  <div class="form-row mb-3">
+    <app-file-attach [event]="calendarEvent"></app-file-attach>
+  </div>
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-primary" *ngIf="calendarEvent?.reiteration !== null" (click)="exportSeries()">Export series</button>

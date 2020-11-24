@@ -1,4 +1,4 @@
-import { HttpBackend, HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -8,9 +8,8 @@ import { environment } from 'src/environments/environment';
 })
 export class FileAttachService {
   private apiUrl = environment.apiUrl + "/file";
-  private httpClient: HttpClient;
-  constructor(handler: HttpBackend) {
-    this.httpClient = new HttpClient(handler);
+  
+  constructor(private httpClient: HttpClient) {
   }
 
   uploadFile(file: File): Observable<number> {

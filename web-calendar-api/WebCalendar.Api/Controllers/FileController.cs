@@ -25,7 +25,6 @@ namespace WebCalendar.Api.Controllers
       if (fileView == null)
         throw new NotFoundException("Event file not found");
 
-      Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
       FileStream stream = new FileStream(fileView.Path, FileMode.Open);
       return File(stream, fileView.Type, fileView.Name);
     }
