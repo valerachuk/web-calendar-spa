@@ -266,7 +266,7 @@ namespace WebCalendar.Data.Repositories
 
     public void UpdateEventStartedNotification(Event @event)
     {
-      var oldEvent = _context.Events.AsNoTracking().FirstOrDefault(x => x.Id == @event.Id);
+      var oldEvent = _context.Events.FirstOrDefault(x => x.Id == @event.Id);
       oldEvent.NotificationScheduleJobId = @event.NotificationScheduleJobId;
       _context.SaveChanges();
     }
