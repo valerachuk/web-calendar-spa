@@ -6,7 +6,7 @@
 </div>
 <div class="modal-body d-flex">
   <div ngbNav #nav="ngbNav" class="nav-pills col-md-2" orientation="vertical">
-    <ng-container ngbNavItem>
+    <ng-container [ngbNavItem]="1">
       <a ngbNavLink>Event info</a>
       <ng-template ngbNavContent>
         <form [formGroup]="eventForm" id="eventForm">
@@ -177,14 +177,14 @@
     <ng-container ngbNavItem>
       <a ngbNavLink>Attach file</a>
       <ng-template ngbNavContent>
-        <app-file-attach [(attachedFile)]="attachedFile" [eventId]="calendarEvent.id"></app-file-attach>
+        <app-file-attach [(attachedFile)]="attachedFile" [event]="calendarEvent"></app-file-attach>
       </ng-template>
     </ng-container>
   </div>
   <div [ngbNavOutlet]="nav" class="col-md-9 mr-4"></div>
 </div>
 <div class="modal-footer">
-  <button type="submit" (click)="submitEvent()" form="eventForm" class="btn btn-primary" [disabled]="eventForm.disabled"
+  <button type="submit" (click)="nav.select(1); submitEvent()" form="eventForm" class="btn btn-primary" [disabled]="eventForm.disabled"
     ngbAutofocus>Save</button>
   <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
 </div>

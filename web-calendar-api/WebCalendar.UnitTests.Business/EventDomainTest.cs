@@ -28,12 +28,12 @@ namespace WebCalendar.UnitTests.Business
       var mockEventRepo = new Mock<IEventRepository>();
       var eventDomain = new EventDomain(mockEventRepo.Object, null, null, null);
       mockEventRepo
-        .Setup(evrep => evrep.GetEvent(It.IsAny<int>()))
+        .Setup(evrep => evrep.GetWholeEvent(It.IsAny<int>()))
         .Returns(() => null);
 
       // Act and Assert
       Assert.Throws<NotFoundException>(() => eventDomain.GetEvent(123));
-      mockEventRepo.Verify(evrep => evrep.GetEvent(It.IsAny<int>()), Times.Once());
+      mockEventRepo.Verify(evrep => evrep.GetWholeEvent(It.IsAny<int>()), Times.Once());
     }
 
     [Fact]
