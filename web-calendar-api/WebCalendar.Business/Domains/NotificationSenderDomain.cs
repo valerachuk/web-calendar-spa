@@ -76,10 +76,10 @@ namespace WebCalendar.Business.Domains
         return;
 
       var notifyTime = @event.StartDateTime - TimeSpan.FromMinutes((int)@event.NotificationTime.GetValueOrDefault());
-      var notifyTimeUTC = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
+      var notifyTimeUtc = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
 
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender
-        => notificationSender.NotifyEventStarted(eventId), notifyTimeUTC);
+        => notificationSender.NotifyEventStarted(eventId), notifyTime);
 
       _eventRepository.UpdateEventStartedNotification(@event);
     }
@@ -107,109 +107,106 @@ namespace WebCalendar.Business.Domains
     public void NotifyEventCreated(int eventId)
     {
       var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
-      if (eventNotificationInfo != null)
-      {
-        if (eventNotificationInfo == null && !eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
-        var notificationMessage = $@"
+      if (eventNotificationInfo == null) return;
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+
+      var notificationMessage = $@"
         Hello <i>{ eventNotificationInfo.UserFirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been created successfully
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>.
       ";
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
 
-        SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
-        foreach (var guest in eventNotificationInfo.Guests)
-        {
-          notificationMessage = $@"
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        notificationMessage = $@"
         Hello <i>{ guest.User.FirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been created successfully in your default calendar.
         You were invited by <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
-          SendEmail(guest.User.Email, notificationMessage);
-        }
+        SendEmail(guest.User.Email, notificationMessage);
       }
     }
 
     public void NotifyEventEdited(int eventId)
     {
       var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
-      if (eventNotificationInfo != null)
-      {
-        if (eventNotificationInfo == null && !eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
-        var notificationMessage = $@"
+      if (eventNotificationInfo == null) return;
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+
+      var notificationMessage = $@"
         Hello <i>{ eventNotificationInfo.UserFirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been edited successfully
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>.
       ";
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
 
-        SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
-        foreach (var guest in eventNotificationInfo.Guests)
-        {
-          notificationMessage = $@"
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        notificationMessage = $@"
         Hello <i>{ guest.User.FirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been edited successfully in your default calendar by
         <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
-          SendEmail(guest.User.Email, notificationMessage);
-        }
+        SendEmail(guest.User.Email, notificationMessage);
       }
     }
 
     public void NotifyEventStarted(int eventId)
     {
       var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
-      if (eventNotificationInfo != null)
-      {
-        if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
-        var notificationMessage = $@"
+      if (eventNotificationInfo == null) return;
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+
+      var notificationMessage = $@"
         Hello <i>{ eventNotificationInfo.UserFirstName },</i>
         <br>Event <b>{ eventNotificationInfo.EventName }</b>
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>
         will begin at <b>{ eventNotificationInfo.StartDateTime:g}</b>.
       ";
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
 
-        SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
-        foreach (var guest in eventNotificationInfo.Guests)
-        {
-          notificationMessage = $@"
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        notificationMessage = $@"
         Hello <i>{ guest.User.FirstName },</i>
         <br>Event <b>{ eventNotificationInfo.EventName }</b>
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>
         will begin at <b>{ eventNotificationInfo.StartDateTime:g}</b>.
         { eventNotificationInfo.UserFirstName } is looking forward to you!";
-          SendEmail(guest.User.Email, notificationMessage);
-        }
+        SendEmail(guest.User.Email, notificationMessage);
       }
     }
+
     public void NotifyEventDeleted(int eventId, bool isSeries)
     {
       var eventNotificationInfo = _eventRepository.GetEventNotificationInfo(eventId);
-      if (eventNotificationInfo != null)
-      {
-        if (eventNotificationInfo == null && !eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
 
-        var notificationMessage = $@"
+      if (eventNotificationInfo == null) return;
+      if (!eventNotificationInfo.UserWantsReceiveEmailNotifications) return;
+
+      var notificationMessage = $@"
         Hello <i>{ eventNotificationInfo.UserFirstName },</i>
         <br>Event {(isSeries ? "series" : "")} 
         <b>{ eventNotificationInfo.EventName }</b>
         in calendar <b>{ eventNotificationInfo.CalendarName }</b>
         has been deleted.
       ";
+      SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
 
-        SendEmail(eventNotificationInfo.UserEmail, notificationMessage);
-        foreach (var guest in eventNotificationInfo.Guests)
-        {
-          notificationMessage = $@"
+      foreach (var guest in eventNotificationInfo.Guests)
+      {
+        notificationMessage = $@"
         Hello <i>{ guest.User.FirstName },</i>
         <br>Event {(eventNotificationInfo.IsSeries ? "series" : "")}
         <b>{ eventNotificationInfo.EventName }</b> has been deleted from your default calendar by
         <b>{eventNotificationInfo.UserFirstName}</b> ({eventNotificationInfo.UserEmail})";
-          SendEmail(guest.User.Email, notificationMessage);
-        }
+        SendEmail(guest.User.Email, notificationMessage);
       }
     }
   }

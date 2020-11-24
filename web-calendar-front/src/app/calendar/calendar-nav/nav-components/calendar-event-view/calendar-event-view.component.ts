@@ -4,6 +4,8 @@ import { UserInfo } from 'src/app/interfaces/user-info.interface';
 import { CalendarEvent } from 'src/app/interfaces/event.interface';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { saveAs } from 'file-saver';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-calendar-event-view',
@@ -30,6 +32,7 @@ export class CalendarEventViewComponent implements OnInit {
   }
 
   getCalendarEvent(id: number) {
+    this.eventId = id;
     this.eventService
     .getEvent(id)
     .subscribe(data => {
@@ -51,9 +54,19 @@ export class CalendarEventViewComponent implements OnInit {
     }
   }
 
-  export(){
-    // TO DO
+  export(): void {
+    this.eventService.downloadEventIcs(this.eventId).subscribe(this.downloadFileFromHttp);
   }
+
+  exportSeries(): void {
+    this.eventService.downloadEventSeriesIcs(this.eventId).subscribe(this.downloadFileFromHttp);
+  }
+
+  downloadFileFromHttp(httpResponse: HttpResponse<Blob>): void {
+    const uriEncodedFileName = httpResponse.headers.get('content-disposition').match(/filename\*=UTF-8''(.*?)$/)[1];
+    const fileName = decodeURI(uriEncodedFileName);
+    const file = new File([httpResponse.body], fileName, { type: httpResponse.body.type });
+    saveAs(file);
+  }
+
 }
-
-
