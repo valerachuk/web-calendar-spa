@@ -23,7 +23,7 @@ namespace WebCalendar.Api.Controllers
     {
       var fileView = _fileDomain.GetEventFile(eventId);
       if (fileView == null)
-        throw new NotFoundException("Event file not found");
+        return NotFound("Event file not found");
 
       FileStream stream = new FileStream(fileView.Path, FileMode.Open);
       return File(stream, fileView.Type, fileView.Name);
