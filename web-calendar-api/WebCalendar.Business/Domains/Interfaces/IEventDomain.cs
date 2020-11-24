@@ -1,4 +1,5 @@
-﻿using WebCalendar.Business.ViewModels;
+﻿using WebCalendar.Business.DTO;
+using WebCalendar.Business.ViewModels;
 
 namespace WebCalendar.Business.Domains.Interfaces
 {
@@ -12,5 +13,7 @@ namespace WebCalendar.Business.Domains.Interfaces
     void DeleteCalendarEventSeries(int id, int userId);
     void UnsubscribeSharedEvent(int id, int guestId);
     void UnsubscribeSharedEventSeries(int id, int guestId);
+    CalendarICSDTO CreateEventICS(int eventId, int userId);
+    CalendarICSDTO CreateEventSeriesICS(int eventId, int userId);
   }
 }
