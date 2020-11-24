@@ -79,7 +79,7 @@ namespace WebCalendar.Business.Domains
       var notifyTimeUtc = DateTime.SpecifyKind(notifyTime, DateTimeKind.Local);
 
       @event.NotificationScheduleJobId = _backgroundJobClient.Schedule<NotificationSenderDomain>(notificationSender
-        => notificationSender.NotifyEventStarted(eventId), notifyTime);
+        => notificationSender.NotifyEventStarted(eventId), notifyTimeUtc);
 
       _eventRepository.UpdateEventStartedNotification(@event);
     }
