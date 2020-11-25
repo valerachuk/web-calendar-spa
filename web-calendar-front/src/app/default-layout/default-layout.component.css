@@ -1,3 +1,7 @@
 .full-height {
     min-height: 100vh;
 }
+
+.bg-color {
+    background: linear-gradient(to top left, rgb(55, 149, 161), rgb(62, 106, 155));
+}

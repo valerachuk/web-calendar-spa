@@ -4,6 +4,8 @@ import { CalendarService } from 'src/app/services/calendar.service';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserInfo } from '../interfaces/user-info.interface';
+import { saveAs } from 'file-saver';
+import { ToastGlobalService } from '../services/toast-global.service';
 
 @Component({
   selector: 'app-user-page',
@@ -13,13 +15,15 @@ import { UserInfo } from '../interfaces/user-info.interface';
 export class UserPageComponent implements OnInit {
   constructor(
     public authService: AuthService,
-    private calendarService: CalendarService
+    private calendarService: CalendarService,
+    private toastService: ToastGlobalService
   ) { }
   public userForm = new FormGroup({
-    firstName: new FormControl(null, Validators.required),
-    lastName: new FormControl(null,  Validators.required),
+    firstName: new FormControl(null, [Validators.required, this.noWhitespaceValidator]),
+    lastName: new FormControl(null,  [Validators.required, this.noWhitespaceValidator]),
     notifications: new FormControl(null)
   });
+  
   firstName = this.userForm.get('firstName');
   lastName = this.userForm.get('lastName');
   notifications = this.userForm.get('notifications');
@@ -28,7 +32,6 @@ export class UserPageComponent implements OnInit {
   public selectedCalendars: Calendar[] = [];
   public calendars: Calendar[];
 
-  public savedChanges = false;
   public errors = [];
   
   ngOnInit(): void {
@@ -37,7 +40,13 @@ export class UserPageComponent implements OnInit {
     });
     this.resetForm();
   }
-  
+
+  public noWhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    return isValid ? null : { 'whitespace': true };
+  }
+
   resetForm() {
     this.firstName.setValue(this.authService.firstName);
     this.lastName.setValue(this.authService.lastName);
@@ -67,15 +76,19 @@ export class UserPageComponent implements OnInit {
       receiveEmailNotifications: this.notifications.value
     }
     this.authService.editUser(userInfo).subscribe(data => {
-      this.savedChanges = true;
-      setTimeout(()=> this.savedChanges = false, 2000);
+      this.toastService.add({
+        delay: 5000,
+        title: 'Success!',
+        content: 'User info was updated successfully',
+        className: "bg-success text-light"
+      });
     }, err => {
       if(err.status === 403)
         this.errors.push(err.error.error);
       else
         this.errors.push(err.error.title);
 
-      setTimeout(() => this.errors = [], 2000);
+      setTimeout(() => this.errors = [], 3000);
     })
     .add(()=> {
       this.resetForm();
@@ -83,7 +96,14 @@ export class UserPageComponent implements OnInit {
     });
   }
 
-  exportCalendar() {
-    console.log(this.selectedCalendars);
+  exportCalendar(): void {
+    this.selectedCalendars
+      .map(calendar => calendar.id)
+      .forEach(id => this.calendarService.downloadCalendarIcs(id).subscribe(response => {
+        const uriEncodedFileName = response.headers.get('content-disposition').match(/filename\*=UTF-8''(.*?)$/)[1];
+        const fileName = decodeURI(uriEncodedFileName);
+        const file = new File([response.body], fileName, { type: response.body.type });
+        saveAs(file);
+      }));
   }
 }

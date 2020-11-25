@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebCalendar.Api.Extensions;
 using WebCalendar.Business.Domains.Interfaces;
@@ -21,7 +22,8 @@ namespace WebCalendar.Api.Controllers
     [HttpGet]
     public IActionResult GetEvent(int id)
     {
-      return Ok(_evDomain.GetEvent(id));
+      var ev = _evDomain.GetEvent(id);
+      return Ok(ev);
     }
 
     [HttpPost]
@@ -30,7 +32,7 @@ namespace WebCalendar.Api.Controllers
       string error = ValidateData(calendarEvent);
       if (error == string.Empty)
       {
-        _evDomain.AddCalendarEvent(calendarEvent);
+        calendarEvent.Id = _evDomain.AddCalendarEvent(calendarEvent);
         return Ok(calendarEvent);
       }
       return BadRequest(error);
@@ -74,6 +76,36 @@ namespace WebCalendar.Api.Controllers
     {
       _evDomain.DeleteCalendarEventSeries(id, User.GetId());
       return Ok();
+    }
+
+    [HttpDelete]
+    [Route("Unsubscribe")]
+    public IActionResult UnsubscribeSharedEvent([FromQuery] int id)
+    {
+      _evDomain.UnsubscribeSharedEvent(id, User.GetId());
+      return Ok();
+    }
+
+    [HttpDelete]
+    [Route("UnsubscribeSeries")]
+    public IActionResult UnsubscribeSharedEventSeries([FromQuery] int id)
+    {
+      _evDomain.UnsubscribeSharedEventSeries(id, User.GetId());
+      return Ok();
+    }
+
+    [HttpGet("event-ics/{eventId}")]
+    public IActionResult GetEventICS([FromRoute] int eventId)
+    {
+      var eventIcs = _evDomain.CreateEventICS(eventId, User.GetId());
+      return File(Encoding.UTF8.GetBytes(eventIcs.ICSContent), "text/calendar", $"{eventIcs.CalendarName}.ics");
+    }
+
+    [HttpGet("event-series-ics/{eventId}")]
+    public IActionResult GetEventSeriesICS([FromRoute] int eventId)
+    {
+      var eventIcs = _evDomain.CreateEventSeriesICS(eventId, User.GetId());
+      return File(Encoding.UTF8.GetBytes(eventIcs.ICSContent), "text/calendar", $"{eventIcs.CalendarName}Series.ics");
     }
 
     string ValidateData(EventViewModel calendarEvent)

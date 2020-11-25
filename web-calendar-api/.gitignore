@@ -364,3 +364,6 @@ FodyWeavers.xsd
 # Appsettings
 *appsettings.Development.json
 *appsettings.json
+
+#File storage
+/EventFilesStorage

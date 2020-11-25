@@ -5,15 +5,15 @@
   </button>
 </div>
 <div class="modal-body">
-  <div class="form-check">
-    <label class="form-check-label">
-      <input class="form-check-input" type="radio" name="radio" value="false" (change)="changeCheck()" checked>
+  <div class="form-check m-2">
+    <input class="form-check-input" type="radio" name="radio" value="false" (change)="changeCheck()" id="radioSingle" checked>
+    <label class="form-check-label"  for="radioSingle">
       Edit one event
     </label>
   </div>
-  <div class="form-check">
-    <label class="form-check-label">
-      <input class="form-check-input" type="radio" name="radio" value="true" (change)="changeCheck()">
+  <div class="form-check m-2">
+      <input class="form-check-input" type="radio" name="radio" value="true" (change)="changeCheck()" id="radioSeries">
+    <label class="form-check-label" for="radioSeries">
       Edit event series
     </label>
   </div>

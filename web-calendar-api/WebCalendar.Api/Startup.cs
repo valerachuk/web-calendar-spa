@@ -49,6 +49,7 @@ namespace WebCalendar.Api
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()
+            .WithExposedHeaders("Content-Disposition")
             .WithOrigins(frontOptions.AddressFront);
         });
       });
@@ -100,6 +101,7 @@ namespace WebCalendar.Api
       services.AddTransient<ICalendarRepository, CalendarRepository>();
       services.AddTransient<IEventRepository, EventRepository>();
       services.AddTransient<ICalendarItemRepository, CalendarItemRepository>();
+      services.AddTransient<IFileRepository, FileRepository>();
 
       // Domains
       services.AddTransient<IUserDomain, UserDomain>();
@@ -107,6 +109,7 @@ namespace WebCalendar.Api
       services.AddTransient<IEventDomain, EventDomain>();
       services.AddTransient<ICalendarItemDomain, CalendarItemDomain>();
       services.AddTransient<INotificationSenderDomain, NotificationSenderDomain>();
+      services.AddTransient<IFileDomain, FileDomain>();
 
       // AutoMapper
       var mapConfig = new MapperConfiguration(mc => mc.AddProfile(new MappingProfile()));

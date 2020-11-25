@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using WebCalendar.Data;
 using WebCalendar.Data.DTO;
 using WebCalendar.Data.Entities;
@@ -39,13 +41,13 @@ namespace WebCalendar.UnitTests.Data
 
       var calendar = new Calendar
       {
-        Name = "myCalendar1",
+        Name =  $"myCalendar",
         User = user
       };
 
       var @event = new Event
       {
-        Name = "myEvent1_1492132193",
+        Name = $"myEvent {id}",
         StartDateTime = new DateTime(2020, 5, 6),
         Reiteration = null,
         Calendar = calendar,
@@ -125,27 +127,33 @@ namespace WebCalendar.UnitTests.Data
     public void GetCalendarEvents_GettingEvents_ShouldReturnEvents()
     {
       // Arrange
-      Event[] @events = new Event[]
+      var @events = new Event[]
       {
-        GetTestEvent(1),
-        GetTestEvent(2),
-        GetTestEvent(3)
+        new Event
+        {
+          Id = 1,
+          Name = "Event 1",
+          CalendarId = 1
+        },
+        new Event
+        {
+          Id = 2,
+          Name = "Event 2",
+          CalendarId = 1
+        }
       };
-
-      foreach (var ev in events)
-      {
-        ev.CalendarId = 1;
-        _context.Update(ev);
-        _context.SaveChanges();
-      }
+      _context.AddRange(events);
+      _context.SaveChanges();
 
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = eventRepository.GetCalendarEvents(events[0].CalendarId);
+      var actualEvent = eventRepository.GetCalendarEvents(1);
 
       // Assert
-      Assert.Equal(events, actualEvent);
+      Assert.Collection(actualEvent,
+        ev1 => { Assert.Contains("Event 1", ev1.Name); Assert.Equal(1, ev1.Id); },
+        ev2 => { Assert.Contains("Event 2", ev2.Name); Assert.Equal(2, ev2.Id); });
     }
 
     [Fact]
@@ -166,28 +174,35 @@ namespace WebCalendar.UnitTests.Data
     [Fact]
     public void GetMainEvent_GettingValidMainEvent_ShouldReturnEvent()
     {
-      // Arrange
-      Event[] @events = new Event[]
+      var @events = new Event[]
       {
-        GetTestEvent(1),
-        GetTestEvent(2),
-        GetTestEvent(3)
+        new Event
+        {
+          Id = 1,
+          Name = "Event 1",
+          CalendarId = 1,
+          SeriesId = 1
+        },
+        new Event
+        {
+          Id = 2,
+          Name = "Event 2",
+          CalendarId = 1,
+          SeriesId = 1
+        }
       };
 
-      foreach (var ev in @events)
-      {
-        ev.SeriesId = 1;
-        _context.Update(ev);
-        _context.SaveChanges();
-      }
+      _context.AddRange(events);
+      _context.SaveChanges();
 
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = eventRepository.GetMainEvent(@events[2].Id);
+      var actualEvent = eventRepository.GetMainEvent(2);
 
       // Assert
-      Assert.Equal(events[0], actualEvent);
+      Assert.Equal(@events[0].Name, actualEvent.Name);
+      Assert.Equal(@events[0].Id, actualEvent.Id);
     }
 
     [Fact]
@@ -202,29 +217,44 @@ namespace WebCalendar.UnitTests.Data
     [Fact]
     public void GetSeries_GettingValidSeries_ShouldReturnEventSeriesArray()
     {
-      // Arrange
-      Event[] @events = new Event[]
+      var @events = new Event[]
       {
-        GetTestEvent(1),
-        GetTestEvent(2),
-        GetTestEvent(3)
+        new Event
+        {
+          Id = 1,
+          Name = "Event 1",
+          CalendarId = 1,
+          SeriesId = 1
+        },
+        new Event
+        {
+          Id = 2,
+          Name = "Event 2",
+          CalendarId = 1,
+          SeriesId = 1
+        }
       };
-        GetTestEvent(4);
+      
+      _context.AddRange(events);
+      _context.SaveChanges();
 
-      foreach (var ev in @events)
+      var otherEventSeriesEvent = new Event
       {
-        ev.SeriesId = 1;
-        _context.Update(ev);
-        _context.SaveChanges();
-      }
+        Id = 3,
+        Name = "Event 3",
+        CalendarId = 2,
+        SeriesId = 2
+      };
+      _context.Add(otherEventSeriesEvent);
+      _context.SaveChanges();
 
       var eventRepository = new EventRepository(_context);
 
       // Act
-      var actualEvent = eventRepository.GetSeries(1);
+      var actualEvent = eventRepository.GetSeries(1).ToArray();
 
       // Assert
-      Assert.Equal(@events, actualEvent);
+      Assert.Equal(@events.Count(), actualEvent.Count());
     }
 
     [Fact]
@@ -232,7 +262,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
       // Act
       var actualEvent = eventRepository.GetSeries(10);
 
@@ -245,6 +274,7 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       Event @event = GetTestEvent(3);
+
 
       UserEventDTO @userEvent = new UserEventDTO()
       {
@@ -267,7 +297,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
       // Act
       var actualEvent = eventRepository.GetEventInfo(123);
 
@@ -357,7 +386,8 @@ namespace WebCalendar.UnitTests.Data
       Event actualEvent = eventRepository.UpdateCalendarEvent(@event);
 
       // Assert
-      Assert.Equal(@event, actualEvent);
+      Assert.Equal(@event.Id, actualEvent.Id);
+      Assert.Equal(@event.Venue, actualEvent.Venue);
     }
 
     [Fact]
@@ -370,7 +400,7 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
 
       // Act and Assert
-      Assert.Throws<InvalidOperationException>(() => eventRepository.UpdateCalendarEvent(@event));
+      Assert.Throws<NullReferenceException>(() => eventRepository.UpdateCalendarEvent(@event));
     }
 
     [Fact]
@@ -393,7 +423,6 @@ namespace WebCalendar.UnitTests.Data
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
 
       // Act and Assert
       Assert.Null(eventRepository.DeleteCalendarEvent(10));
@@ -418,6 +447,8 @@ namespace WebCalendar.UnitTests.Data
         _context.SaveChanges();
       }
 
+      Assert.Equal(events, _context.Events);
+
       var eventRepository = new EventRepository(_context);
 
       //Act
@@ -428,14 +459,13 @@ namespace WebCalendar.UnitTests.Data
     }
 
     [Fact]
-    public void DeleteCalendarEventSeries_RemovingNotExistingEventSeries_ShouldThrowException()
+    public void DeleteCalendarEventSeries_RemovingNotExistingEventSeries_ShouldReturnNull()
     {
       // Arrange
       var eventRepository = new EventRepository(_context);
-      Event @event = GetTestEvent(3);
 
       // Act and Assert
-      Assert.Throws<InvalidOperationException>(() => eventRepository.DeleteCalendarEventSeries(10));
+      Assert.Null(eventRepository.DeleteCalendarEventSeries(10));
     }
 
     [Fact]
@@ -455,6 +485,7 @@ namespace WebCalendar.UnitTests.Data
         _context.Update(ev);
         _context.SaveChanges();
       }
+
       @events[2].Name = "123";
       var updatedEvent = @events[2];
       _context.Update(updatedEvent);
@@ -486,7 +517,7 @@ namespace WebCalendar.UnitTests.Data
       var eventRepository = new EventRepository(_context);
       GetTestEvent(3);
       // Act and Assert
-      Assert.Throws<NullReferenceException>(() => eventRepository.UpdateCalendarEventSeries(@events));
+      Assert.Throws<InvalidOperationException>(() => eventRepository.UpdateCalendarEventSeries(@events));
     }
   }
 }

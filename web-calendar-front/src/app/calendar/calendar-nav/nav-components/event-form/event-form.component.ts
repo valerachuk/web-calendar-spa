@@ -4,9 +4,12 @@ import { NgbActiveModal, NgbDateStruct, NgbModal, NgbTimeStruct } from '@ng-boot
 import * as moment from 'moment';
 import { Calendar } from 'src/app/interfaces/calendar.interface';
 import { CalendarEvent } from 'src/app/interfaces/event.interface';
+import { UserInfo } from 'src/app/interfaces/user-info.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { CalendarEventService } from 'src/app/services/calendar-event.service';
 import { CalendarService } from 'src/app/services/calendar.service';
+import { ToastGlobalService } from 'src/app/services/toast-global.service';
+import { FileAttachService } from 'src/app/services/file-attach.service';
 import { EditEventModalComponent } from '../edit-event-modal/edit-event-modal.component';
 
 @Component({
@@ -16,19 +19,21 @@ import { EditEventModalComponent } from '../edit-event-modal/edit-event-modal.co
 })
 
 export class EventFormComponent implements OnInit {
-
-  public successfullySavedEvent = false;
   public error: string;
 
   startDate: NgbDateStruct;
   endDate: NgbDateStruct;
   startTime: NgbTimeStruct;
   endTime: NgbTimeStruct;
+  attachedFile: File = null;
 
   calendars: Calendar[];
   calendarEvent: CalendarEvent;
   title = "Create new event";
   isRepeatable = false;
+
+  users: UserInfo[] = null;
+  selectedUsers: UserInfo[] = null;
 
   eventForm = new FormGroup({
     eventName: new FormControl(null, [Validators.required, Validators.maxLength(100), this.noWhitespaceValidator]),
@@ -39,7 +44,8 @@ export class EventFormComponent implements OnInit {
     eventEndTime: new FormControl(null, Validators.required),
     eventNotificationTime: new FormControl(null),
     eventCalendar: new FormControl(null, Validators.required),
-    eventReiteration: new FormControl(null)
+    eventReiteration: new FormControl(null),
+    eventGuests: new FormControl(null)
   });
 
   constructor(
@@ -47,7 +53,9 @@ export class EventFormComponent implements OnInit {
     private calendarService: CalendarService,
     private authService: AuthService,
     private eventService: CalendarEventService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private fileService: FileAttachService,
+    private toastService: ToastGlobalService
   ) {
   }
 
@@ -60,6 +68,7 @@ export class EventFormComponent implements OnInit {
   ngOnInit() {
     this.dateTimeInit();
     this.calendarEventInit();
+    this.usersInit();
   }
 
   getcalendarEvent(id: number) {
@@ -73,6 +82,7 @@ export class EventFormComponent implements OnInit {
       this.endDate = { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
       this.endTime = { hour: date.getHours(), minute: date.getMinutes(), second: date.getSeconds() };
       this.isRepeatable = data.reiteration ? true : false;
+      this.selectedUsers = data.guests;
     });
   }
 
@@ -83,9 +93,16 @@ export class EventFormComponent implements OnInit {
     this.calendarEvent.venue = null;
     this.calendars = [];
     this.error = null;
-    this.calendarService.get(this.authService.userId).subscribe(data => {
+    this.calendarService.get(this.authService.userId)
+    .subscribe(data => {
       this.calendars = data;
     });
+  }
+
+  usersInit() {
+    this.authService
+    .getUsersExceptCurrent()
+    .subscribe(data => this.users = data);
   }
 
   dateTimeInit() {
@@ -104,7 +121,9 @@ export class EventFormComponent implements OnInit {
       date.month - 1,
       date.day,
       time.hour,
-      time.minute - (new Date()).getTimezoneOffset()).toJSON();
+      time.minute 
+      - (new Date()).getTimezoneOffset()
+      ).toJSON();
   }
 
   submitEvent() {
@@ -112,24 +131,50 @@ export class EventFormComponent implements OnInit {
       this.eventForm.markAllAsTouched();
       return;
     }
+    if(this.attachedFile !== null && this.attachedFile !== undefined) {
+      this.fileService.uploadFile(this.attachedFile).subscribe(data => {
+        this.calendarEvent.fileId = data;
+        this.eventRequest();
+        this.toastService.add({
+          delay: 1500,
+          title: 'Success!',
+          content: `File has been successfully uploaded`,
+          className: "bg-success text-light"
+        });
+      }, err => {
+        this.toastService.add({
+          delay: 1500,
+          title: 'Error!',
+          content: `Upload file error: ${err.message}`,
+          className: "bg-danger text-light"
+        });
+      });
+    }
+    else
+      this.eventRequest();
+  }
+
+  eventRequest() {
     let start = this.calendarEventDateTimeAssembly(this.startTime, this.startDate);
     let end = this.calendarEventDateTimeAssembly(this.endTime, this.endDate);
 
-    let isDateChanged =
-      moment(start).isSame(this.calendarEvent.startDateTime)
-      && moment(end).isSame(this.calendarEvent.endDateTime)
+    let isSameDate = moment.utc(start).startOf('day').isSame(moment.utc(this.calendarEvent.startDateTime).startOf('day'))
+      && moment.utc(end).startOf('day').isSame(moment.utc(this.calendarEvent.endDateTime).startOf('day'));
 
     this.calendarEvent.startDateTime = start;
     this.calendarEvent.endDateTime = end;
 
+    this.calendarEvent.guests = this.selectedUsers;
+
     this.eventForm.disable();
     let httpMethod;
+
     if (!this.calendarEvent.id) {
       httpMethod = this.eventService.addEvent(this.calendarEvent);
       this.httpRequest(httpMethod);
     } else {
       // dates have impact on event series, so if user change event date - edit only this event 
-      if (this.isRepeatable && !isDateChanged) {
+      if (this.isRepeatable && isSameDate) {
         let modalRef = this.modalService.open(EditEventModalComponent, { centered: true, size: 'sm' });
         modalRef.result.then(
           isSeriesEdit => {
@@ -137,7 +182,8 @@ export class EventFormComponent implements OnInit {
               this.eventService.updateEventSeries(this.calendarEvent) :
               this.eventService.updateEvent(this.calendarEvent);
             this.httpRequest(httpMethod);
-          });
+          },
+          ()=> this.eventForm.enable());
       } else {
         httpMethod = this.eventService.updateEvent(this.calendarEvent);
         this.httpRequest(httpMethod);
@@ -148,15 +194,19 @@ export class EventFormComponent implements OnInit {
   httpRequest(httpMethod) {
     httpMethod
       .subscribe(response => {
-        this.successfullySavedEvent = true;
-        setTimeout(() => { this.successfullySavedEvent = false; this.activeModal.close() }, 1500);
+        setTimeout(() => { this.activeModal.close() }, 1000);
+        this.toastService.add({
+          delay: 5000,
+          title: 'Success!',
+          content: 'Event was saved successfully',
+          className: "bg-success text-light"
+        });
       },
         error => {
           this.error = error.error;
           this.eventForm.enable();
         }, () => {
           this.error = null;
-          this.eventForm.reset();
           this.dateTimeInit();
           this.eventForm.enable();
         });

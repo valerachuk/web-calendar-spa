@@ -18,6 +18,7 @@ import { UserPageComponent } from './user-page/user-page.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ErrorHandlerModule } from './global-error-handler/error-handler.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 function tokenGetter(): string {
   return localStorage.getItem(ACCESS_TOKEN_KEY);
@@ -44,6 +45,7 @@ function tokenGetter(): string {
     NgSelectModule,
     ErrorHandlerModule,
     BrowserAnimationsModule,
+    FontAwesomeModule,
     JwtModule.forRoot({
       config: {
         tokenGetter,

@@ -1,50 +1,83 @@
 <div class="card mx-auto">
-    <div class="card-body">
-      <h2 class="card-title text-center">Sign Up</h2>
-      <form [formGroup]="form" (submit)="submit()" novalidate>
-  
-        <div class="form-group">
-          <label for="firstNameInput">First name</label>
+  <div class="card-body">
+    <h2 class="card-title text-center">Sign Up</h2>
+    <p class="card-title text-center text-secondary">Start using your calendar here</p>
+    <form [formGroup]="form" (submit)="submit()" novalidate>
+
+      <div class="form-group">
+        <label for="firstNameInput">First name</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <fa-icon [icon]="faUser"></fa-icon>
+            </span>
+          </div>
           <input type="text" class="form-control" id="firstNameInput" [formControl]="form.get('firstName')"
             [class.is-invalid]="form.get('firstName').invalid && form.get('firstName').touched">
-          <small class="form-text text-danger"
-            *ngIf="form.getError('required', 'firstName') && form.get('firstName').touched">First name required</small>
         </div>
-  
-        <div class="form-group">
-          <label for="lastNameInput">Last name</label>
+
+        <small class="form-text text-danger"
+          *ngIf="form.getError('required', 'firstName') && form.get('firstName').touched">First name required</small>
+      </div>
+
+      <div class="form-group">
+        <label for="lastNameInput">Last name</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <fa-icon [icon]="faUser"></fa-icon> 
+            </span>
+          </div>
           <input type="text" class="form-control" id="lastNameInput" [formControl]="form.get('lastName')"
             [class.is-invalid]="form.get('lastName').invalid && form.get('lastName').touched">
-          <small class="form-text text-danger"
-            *ngIf="form.getError('required', 'lastName') && form.get('lastName').touched">Last name required</small>
         </div>
-  
-        <div class="form-group">
-          <label for="emailInput">Email</label>
+        <small class="form-text text-danger"
+          *ngIf="form.getError('required', 'lastName') && form.get('lastName').touched">Last name required</small>
+      </div>
+
+      <div class="form-group">
+        <label for="emailInput">Email</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <fa-icon [icon]="faEnvelope"></fa-icon>
+            </span>
+          </div>
           <input type="email" class="form-control" id="emailInput" [formControl]="form.get('email')"
-            [class.is-invalid]="form.get('email').invalid && form.get('email').touched" (input)="isEmailExsists = false">
-          <small class="form-text text-danger"
-            *ngIf="form.getError('required', 'email') && form.get('email').touched">Email required</small>
-          <small class="form-text text-danger"
-            *ngIf="form.getError('email', 'email') && form.get('email').touched">Invalid email</small>
-          <small class="form-text text-danger" *ngIf="isEmailExsists">Email already exists</small>
+            [class.is-invalid]="form.get('email').invalid && form.get('email').touched"
+            (input)="isEmailExsists = false">
         </div>
-  
-        <div class="form-group">
-          <label for="passwordInput">Password</label>
+        <small class="form-text text-danger"
+          *ngIf="form.getError('required', 'email') && form.get('email').touched">Email is required</small>
+        <small class="form-text text-danger"
+          *ngIf="form.getError('email', 'email') && form.get('email').touched">Invalid email</small>
+        <small class="form-text text-danger" *ngIf="isEmailExsists">Email already exists</small>
+      </div>
+
+      <div class="form-group">
+        <label for="passwordInput">Password</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <fa-icon [icon]="faLock"></fa-icon>
+            </span>
+          </div>
           <input type="password" class="form-control" id="passwordInput" [formControl]="form.get('password')"
             [class.is-invalid]="form.get('password').invalid && form.get('password').touched">
+          </div>
           <small class="form-text text-danger"
-            *ngIf="form.getError('required', 'password') && form.get('password').touched">Password required</small>
-        </div>
+            *ngIf="form.getError('required', 'password') && form.get('password').touched">Password is required</small>
+          <small class="form-text text-danger"
+            *ngIf="form.getError('pattern', 'password') && form.get('password').touched">Password must contain at least one number, one letter and be 8 characters long</small>
         
-        <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary" type="submit" [disabled]="form.disabled">Submit</button>
-          <button type="button" class="btn btn-link" [routerLink]="['/', 'auth', 'sign-in']">Sign In</button>
-        </div>
-  
-  
-      </form>
-    </div>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary" type="submit" [disabled]="form.disabled">Create account</button>
+        <button type="button" class="btn btn-link" [routerLink]="['/', 'auth', 'sign-in']">Already have an
+          account?</button>
+      </div>
+
+    </form>
   </div>
-  
+</div>

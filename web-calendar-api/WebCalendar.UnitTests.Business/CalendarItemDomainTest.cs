@@ -41,7 +41,7 @@ namespace WebCalendar.UnitTests.Business
         .Returns(() => expected);
 
       // Act
-      var actual = itemDomain.GetCalendarsItemsByTimeInterval(start, end, id);
+      var actual = itemDomain.GetCalendarsItemsByTimeInterval(start, end, id, 123);
 
       // Assert
       mockEventRepo.Verify(item => item.GetCalendarsEventsByTimeInterval(It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int[]>()), Times.Once());

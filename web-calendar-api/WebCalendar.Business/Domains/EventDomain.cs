@@ -2,7 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.DTO;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
@@ -15,17 +19,19 @@ namespace WebCalendar.Business.Domains
     private readonly IEventRepository _evRepository;
     private readonly IMapper _mapper;
     private readonly INotificationSenderDomain _notificationSender;
+    private readonly IFileDomain _fileDomain;
 
-    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender)
+    public EventDomain(IEventRepository eventRepository, IMapper mapper, INotificationSenderDomain notificationSender, IFileDomain fileDomain)
     {
       _evRepository = eventRepository;
       _mapper = mapper;
       _notificationSender = notificationSender;
+      _fileDomain = fileDomain;
     }
 
     public EventViewModel GetEvent(int id)
     {
-      var currentEvent = _evRepository.GetEvent(id);
+      var currentEvent = _evRepository.GetWholeEvent(id);
       if (currentEvent == null)
       {
         throw new NotFoundException("Event not found");
@@ -33,9 +39,10 @@ namespace WebCalendar.Business.Domains
       return _mapper.Map<Event, EventViewModel>(currentEvent);
     }
 
-    public void AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
+    public int AddCalendarEvent(EventViewModel calendarEvent, bool isUpdated = false)
     {
-      var @event = _evRepository.AddCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
+      int id = _evRepository.AddCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent)).Id;
+      var @event = _evRepository.GetEvent(id);
       if (isUpdated)
         _notificationSender.ScheduleEventEditedNotification(@event.Id);
       else
@@ -55,6 +62,8 @@ namespace WebCalendar.Business.Domains
       {
         _notificationSender.ScheduleEventStartedNotification(@event.Id);
       }
+
+      return @event.Id;
     }
 
     private void GenerateEventsOfSeries(EventViewModel calendarEvent, int seriesId)
@@ -62,6 +71,7 @@ namespace WebCalendar.Business.Domains
       var generatedEvents = new List<Event>();
       int eventRepetitionsNumber = 365;
       int eventFrequency = calendarEvent.Reiteration != null ? (int)calendarEvent.Reiteration : 1;
+      calendarEvent.FileId = null;
 
       // Create events in one series for a selected time interval for the year ahead
       for (int i = eventFrequency; i < eventRepetitionsNumber; i += eventFrequency)
@@ -87,6 +97,7 @@ namespace WebCalendar.Business.Domains
         _evRepository.UpdateCalendarEvent(_mapper.Map(calendarEvent, oldEvent));
         _notificationSender.ScheduleEventEditedNotification(oldEvent.Id);
 
+       oldEvent = _evRepository.GetEvent(calendarEvent.Id);
         if (oldEvent.NotificationTime != null)
           _notificationSender.ScheduleEventStartedNotification(oldEvent.Id);
       }
@@ -115,16 +126,19 @@ namespace WebCalendar.Business.Domains
       {
         // find main (first) event of the series
         var mainSeriesEvent = _evRepository.GetMainEvent(calendarEvent.Id);
+
         // update main event, except dates 
         var updatedMainSeriesEvent = _evRepository.UpdateCalendarEvent(_mapper.Map<EventViewModel, Event>(calendarEvent));
         updatedMainSeriesEvent.StartDateTime = mainSeriesEvent.StartDateTime.Date
           + new TimeSpan(calendarEvent.StartDateTime.Hour, calendarEvent.StartDateTime.Minute, 0);
         updatedMainSeriesEvent.EndDateTime = mainSeriesEvent.EndDateTime.Date
           + new TimeSpan(calendarEvent.EndDateTime.Hour, calendarEvent.EndDateTime.Minute, 0);
+
         // delete series
         var eventSeries = _evRepository.GetSeries(mainSeriesEvent.SeriesId.GetValueOrDefault()).ToArray();
         _notificationSender.CancelScheduledNotification(eventSeries);
         _evRepository.DeleteCalendarEventSeries(calendarEvent.Id);
+
         //add new event series
         updatedMainSeriesEvent.Id = default;
         AddCalendarEvent(_mapper.Map<Event, EventViewModel>(updatedMainSeriesEvent), true);
@@ -137,6 +151,8 @@ namespace WebCalendar.Business.Domains
 
       _notificationSender.NotifyEventDeleted(id, false);
       var @event = _evRepository.DeleteCalendarEvent(id);
+      if(@event.FileId != null)
+        _fileDomain.DeleteFile((int)@event.FileId);
       _notificationSender.CancelScheduledNotification(@event);
     }
 
@@ -147,6 +163,25 @@ namespace WebCalendar.Business.Domains
       _notificationSender.NotifyEventDeleted(id, true);
       var eventSeries = _evRepository.DeleteCalendarEventSeries(id);
       _notificationSender.CancelScheduledNotification(eventSeries.ToArray());
+    }
+
+    public void UnsubscribeSharedEvent(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEvent(id, guestId);
+    }
+    public void UnsubscribeSharedEventSeries(int id, int guestId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+      _evRepository.UnsubscribeSharedEventSeries(id, guestId);
     }
 
     private void CheckRightsToModify(int id, int userId)
@@ -161,5 +196,93 @@ namespace WebCalendar.Business.Domains
         throw new ForbiddenException("Not event owner");
       }
     }
+
+    private void CheckRightsToExport(int id, int userId)
+    {
+      var currentEvent = _evRepository.GetEventInfo(id);
+      if (currentEvent == null)
+      {
+        throw new NotFoundException("Event not found");
+      }
+
+      if (userId != currentEvent.UserId && _evRepository.GetWholeEvent(id).Guests.All(guest => guest.UserId != userId))
+      {
+        throw new ForbiddenException("No access");
+      }
+    }
+
+    public CalendarICSDTO CreateEventICS(int eventId, int userId)
+    {
+      CheckRightsToExport(eventId, userId);
+
+      var @event = _evRepository.GetEvent(eventId);
+
+      var icsEvent = new CalendarEvent
+      {
+        Summary = @event.Name,
+        Location = @event.Venue,
+        Start = new CalDateTime(@event.StartDateTime),
+        End = new CalDateTime(@event.EndDateTime)
+      };
+
+      if (@event.NotificationTime != null)
+      {
+        icsEvent.Alarms.Add(new Alarm
+        {
+          Trigger = new Trigger(TimeSpan.FromMinutes(-(int)@event.NotificationTime))
+        });
+      }
+
+      var icsCalendar = new Ical.Net.Calendar
+      {
+        Events = { icsEvent }
+      };
+
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = @event.Name
+      };
+    }
+
+    public CalendarICSDTO CreateEventSeriesICS(int eventId, int userId)
+    {
+      CheckRightsToExport(eventId, userId);
+
+      var @event = _evRepository.GetEvent(eventId);
+      if (@event.SeriesId == null)
+        throw new NotFoundException("Not event series");
+
+      var eventSeries = _evRepository.GetSeries(@event.SeriesId.Value);
+
+      var icsCalendar = new Ical.Net.Calendar();
+      icsCalendar.Events.AddRange(eventSeries.Select(evt =>
+      {
+        var icsEvent = new CalendarEvent
+        {
+          Summary = evt.Name,
+          Location = evt.Venue,
+          Start = new CalDateTime(evt.StartDateTime),
+          End = new CalDateTime(evt.EndDateTime)
+        };
+
+        if (evt.NotificationTime != null)
+        {
+          icsEvent.Alarms.Add(new Alarm
+          {
+            Trigger = new Trigger(TimeSpan.FromMinutes(-(int)evt.NotificationTime))
+          });
+        }
+
+        return icsEvent;
+      }));
+
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = @event.Name
+      };
+    }
+
   }
 }

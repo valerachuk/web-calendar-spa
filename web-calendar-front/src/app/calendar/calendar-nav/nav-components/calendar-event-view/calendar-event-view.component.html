@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <h4 class="modal-title">Event info</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body ml-3" *ngIf="calendarEvent !== null">
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Name: </h6>
+    <span>{{calendarEvent.name === null ? 'No name' : calendarEvent.name}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Venue: </h6>
+    <span>{{calendarEvent.venue === null ? 'No venue' : calendarEvent.venue}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Start date: </h6>
+    <span>{{startDateTime === null ? 'No start date' : startDateTime}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">End date: </h6>
+    <span>{{endDateTime === null ? 'No end date' : endDateTime}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Calendar: </h6>
+    <span>{{calendar === null ? 'No calendar' : calendar}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Reiteration: </h6>
+    <span>{{calendarEvent.reiteration === null ? 'None' : 'Every ' + calendarEvent.reiteration + ' day(s)'}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Notification: </h6>
+    <span>{{calendarEvent.notificationTime === null ? 'None' : 'In ' + calendarEvent.notificationTime + ' minutes'}}</span>
+  </div>
+  <div class="form-row mb-3">
+    <h6 class="mr-2">Guests: </h6>
+    <ng-select [items]="users" bindLabel="email" placeholder="No users are invited"
+      class="w-100" [(ngModel)]="users" [multiple]="true"
+      [searchable]="false" [clearable]="false" [multiple]="true" disabled>
+    </ng-select>
+  </div>
+  <div class="form-row mb-3" *ngIf="calendarEvent.fileId">
+    <app-file-attach [event]="calendarEvent"></app-file-attach>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" *ngIf="calendarEvent?.reiteration !== null" (click)="exportSeries()">Export series</button>
+  <button type="button" class="btn btn-primary" (click)="export()">Export</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')"
+    ngbAutofocus>Close</button>
+</div>

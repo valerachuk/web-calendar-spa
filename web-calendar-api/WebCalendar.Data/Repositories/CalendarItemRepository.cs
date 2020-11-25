@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebCalendar.Data.Entities;
@@ -23,6 +24,24 @@ namespace WebCalendar.Data.Repositories
         .Contains(calendarEvent.CalendarId))
         .ToList();
       return eventsList;
+    }
+
+    public IEnumerable<Event> GetSharedCalendarEventsByTimeInterval(DateTime startDateTime, DateTime endDateTime, int[] calendarId, int userId)
+    {
+      var defaultCalendarId = _context.Calendars.Where(cal => cal.UserId == userId).Min(cal => cal.Id);
+      if (defaultCalendarId > 0 && calendarId.Contains(defaultCalendarId)) {
+        var sharedEventsList = _context.Events
+          .Include(ev => ev.Guests)
+          .ThenInclude(eventGuests => eventGuests.User)
+          .Where(calendarEvent =>
+            calendarEvent.EndDateTime >= startDateTime &&
+            calendarEvent.StartDateTime <= endDateTime &&
+            calendarEvent.Guests
+            .Any(x => x.UserId == userId && x.EventId == calendarEvent.Id))
+          .ToArray();
+        return sharedEventsList;
+      }
+      return new Event[] { };
     }
 
     public void UpdateCalendarsEventTime(DateTime startDateTime, DateTime endDateTime, int id)

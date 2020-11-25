@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using NLog;
 using WebCalendar.Business.Domains.Interfaces;
+using WebCalendar.Business.DTO;
 using WebCalendar.Business.Exceptions;
 using WebCalendar.Business.ViewModels;
 using WebCalendar.Data.Entities;
@@ -35,13 +40,13 @@ namespace WebCalendar.Business.Domains
     public IEnumerable<CalendarViewModel> GetUserCalendars(int id) =>
       _mapper.Map<IEnumerable<Calendar>, IEnumerable<CalendarViewModel>>(_caRepository.GetUserCalendars(id));
 
-    public Calendar GetCalendar(int id)
+    public CalendarViewModel GetCalendar(int id)
     {
       var calendar = _caRepository.GetCalendar(id);
       if (calendar == null)
         throw new NotFoundException("Calendar not found");
 
-      return calendar;
+      return _mapper.Map<Calendar, CalendarViewModel>(calendar);
     }
 
     public int AddCalendar(CalendarViewModel calendar, int userId)
@@ -57,6 +62,11 @@ namespace WebCalendar.Business.Domains
       if (GetCalendar(id).UserId != userId)
         throw new ForbiddenException("Not calendar owner");
 
+      if (id == _caRepository.GetDefaultCalendar(userId).Id)
+      {
+        throw new ForbiddenException("Forbidden to remove the 'Default' calendar");
+      }
+
       _notificationSender.CancelScheduledNotification(_eventRepository.GetCalendarEvents(id).ToArray());
 
       _logger.Info($"Delete calendar {id}");
@@ -69,6 +79,42 @@ namespace WebCalendar.Business.Domains
         throw new ForbiddenException("Not calendar owner");
 
       return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
+    }
+
+    public CalendarICSDTO CreateICS(int calendarId, int userId)
+    {
+      var calendar = _caRepository.GetCalendarWithEvents(calendarId);
+
+      if (calendar.UserId != userId)
+        throw new ForbiddenException("Not calendar owner");
+
+      var icsCalendar = new Ical.Net.Calendar();
+      icsCalendar.Events.AddRange(calendar.Events.Select(evt =>
+      {
+        var icsEvent = new CalendarEvent
+        {
+          Summary = evt.Name,
+          Location = evt.Venue,
+          Start = new CalDateTime(evt.StartDateTime),
+          End = new CalDateTime(evt.EndDateTime)
+        };
+
+        if (evt.NotificationTime != null)
+        {
+          icsEvent.Alarms.Add(new Alarm
+          {
+            Trigger = new Trigger(TimeSpan.FromMinutes(-(int)evt.NotificationTime))
+          });
+        }
+
+        return icsEvent;
+      }));
+
+      return new CalendarICSDTO
+      {
+        ICSContent = new CalendarSerializer(icsCalendar).SerializeToString(),
+        CalendarName = calendar.Name
+      };
     }
   }
 }

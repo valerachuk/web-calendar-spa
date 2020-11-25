@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -9,6 +10,9 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./sign-in-form.component.css']
 })
 export class SignInFormComponent {
+
+  faEnvelope = faEnvelope;
+  faLock = faLock;
 
   public form = new FormGroup({
     email: new FormControl(null, Validators.required),

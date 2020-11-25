@@ -14,6 +14,7 @@ import { DeleteItemModalComponent } from './calendar-nav/nav-components/delete-i
 import { ItemType } from '../enums/calendar-item-type.enum';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { EventFormComponent } from './calendar-nav/nav-components/event-form/event-form.component';
+import { CalendarEventViewComponent } from './calendar-nav/nav-components/calendar-event-view/calendar-event-view.component';
 
 
 @Component({
@@ -32,8 +33,10 @@ export class CalendarComponent implements OnInit {
   });
   view: CalendarView = CalendarView.Month;
   CalendarView = CalendarView;
-
+  sharedEvent = ItemType.SharedEvent;
+  sharedRepeatableEvent = ItemType.SharedRepeatableEvent;
   isActiveDayOpen = false;
+
   faTrash = faTrash;
   faEdit = faEdit;
 
@@ -124,7 +127,7 @@ export class CalendarComponent implements OnInit {
 
   openEventModal(event: CalendarEvent) {
     if (event.meta === ItemType.RepeatableEvent || event.meta as ItemType === ItemType.Event) {
-      let modalRef = this.modalService.open(EventFormComponent, { centered: true })
+      let modalRef = this.modalService.open(EventFormComponent, { centered: true, size: 'lg' })
       modalRef.componentInstance.getcalendarEvent(event.id);
       modalRef.result
         .then(_ => {
@@ -140,10 +143,7 @@ export class CalendarComponent implements OnInit {
     modalRef.result.then(() => {
       this.updateCalendarItems();
       this.closeOpenMonthViewDay();
-    })
-    .catch(() => {
-      // on modal close
-    });
+    }, () => { });
   }
 
   eventTimesChanged({
@@ -151,7 +151,7 @@ export class CalendarComponent implements OnInit {
     newStart,
     newEnd,
   }: CalendarEventTimesChangedEvent): void {
-    if(+event.start === +newStart && +event.end === +newEnd)
+    if (+event.start === +newStart && +event.end === +newEnd)
       return;
 
     event.start = newStart;
@@ -162,5 +162,10 @@ export class CalendarComponent implements OnInit {
       this.closeOpenMonthViewDay();
     }
     );
+  }
+
+  eventClicked(eventId) {
+    let modalRef = this.modalService.open(CalendarEventViewComponent, { centered: true });
+    modalRef.componentInstance.getCalendarEvent(eventId);
   }
 }
