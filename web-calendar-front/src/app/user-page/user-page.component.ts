@@ -6,6 +6,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserInfo } from '../interfaces/user-info.interface';
 import { saveAs } from 'file-saver';
 import { ToastGlobalService } from '../services/toast-global.service';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { CalendarExportRange } from '../interfaces/calendarExportRange.interface';
 
 @Component({
   selector: 'app-user-page',
@@ -23,6 +25,12 @@ export class UserPageComponent implements OnInit {
     lastName: new FormControl(null,  [Validators.required, this.noWhitespaceValidator]),
     notifications: new FormControl(null)
   });
+
+  public startDate: NgbDateStruct;
+  public endDate: NgbDateStruct;
+
+  public useStartDate = false;
+  public useEndDate = false;
   
   firstName = this.userForm.get('firstName');
   lastName = this.userForm.get('lastName');
@@ -39,6 +47,11 @@ export class UserPageComponent implements OnInit {
       this.calendars = data;
     });
     this.resetForm();
+
+    const date = new Date();
+    this.startDate = { day: date.getDate(), month: date.getMonth() + 1, year: date.getFullYear() };
+    this.endDate = { ...this.startDate };
+
   }
 
   public noWhitespaceValidator(control: FormControl) {
@@ -96,10 +109,26 @@ export class UserPageComponent implements OnInit {
     });
   }
 
+  private ngbDateToJsonDate(date: NgbDateStruct): string {
+    console.log(date);
+    return new Date(date.year, date.month - 1, date.day, 0, - (new Date()).getTimezoneOffset()).toJSON();
+  }
+
   exportCalendar(): void {
+    const calendarRange: CalendarExportRange = {};
+
+    if (this.useStartDate) {
+      calendarRange.from = this.ngbDateToJsonDate(this.startDate);
+    }
+
+    if (this.useEndDate) {
+      calendarRange.to = this.ngbDateToJsonDate(this.endDate);
+    }
+
     this.selectedCalendars
       .map(calendar => calendar.id)
-      .forEach(id => this.calendarService.downloadCalendarIcs(id).subscribe(response => {
+      .forEach(id => this.calendarService.downloadCalendarIcs(id, calendarRange)
+      .subscribe(response => {
         const uriEncodedFileName = response.headers.get('content-disposition').match(/filename\*=UTF-8''(.*?)$/)[1];
         const fileName = decodeURI(uriEncodedFileName);
         const file = new File([response.body], fileName, { type: response.body.type });

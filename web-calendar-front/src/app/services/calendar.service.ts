@@ -3,6 +3,7 @@ import { environment } from 'src/environments/environment';
 import { Calendar } from '../interfaces/calendar.interface';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CalendarExportRange } from '../interfaces/calendarExportRange.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -33,10 +34,13 @@ export class CalendarService {
     return this.httpClient.put<Calendar>(this.apiUrl, calendar);
   }
 
-  downloadCalendarIcs(calendarId: number): Observable<HttpResponse<Blob>> {
+  downloadCalendarIcs(calendarId: number, range: CalendarExportRange): Observable<HttpResponse<Blob>> {
     return this.httpClient.get(`${this.apiUrl}calendar-ics/${calendarId}`, {
       responseType: 'blob',
-      observe: 'response'
+      observe: 'response',
+      params: {
+        ...range,
+      }
     });
   }
 }

@@ -73,6 +73,43 @@
       <ng-container ngbNavItem>
         <a ngbNavLink>Calendar export</a>
         <ng-template ngbNavContent>
+
+          <div class="form-row">
+
+            <div class="form-group col">
+              <label for="calendarStartDate">From</label>
+              <div class="input-group">
+  
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" [(ngModel)]="useStartDate">
+                  </div>
+                </div>
+  
+                <input class="form-control cursor-pointer" name="calendarStartDate" readonly [disabled]="!useStartDate" [class.text-white]="!useStartDate"
+                  [(ngModel)]="startDate" ngbDatepicker #startdate="ngbDatepicker" (click)="startdate.toggle()" />
+
+              </div>
+            </div>
+
+            <div class="form-group col">
+              <label for="calendarEndDate">To</label>
+              <div class="input-group">
+  
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" [(ngModel)]="useEndDate">
+                  </div>
+                </div>
+  
+                <input class="form-control cursor-pointer" name="calendarEndDate" [disabled]="!useEndDate" [class.text-white]="!useEndDate"
+                  [(ngModel)]="endDate" ngbDatepicker #enddate="ngbDatepicker" readonly (click)="enddate.toggle()"/>
+
+              </div>
+            </div>
+
+          </div>
+
           <ng-select
             [items]="calendars"
             [multiple]="true"

@@ -61,9 +61,9 @@ namespace WebCalendar.Api.Controllers
     }
 
     [HttpGet("calendar-ics/{calendarId}")]
-    public IActionResult GetCalendarICS([FromRoute] int calendarId)
+    public IActionResult GetCalendarICS([FromRoute] int calendarId, [FromQuery] CalendarExportRangeViewModel range)
     {
-      var calendarIcs = _caDomain.CreateICS(calendarId, User.GetId());
+      var calendarIcs = _caDomain.CreateICS(calendarId, User.GetId(), range);
       return File(Encoding.UTF8.GetBytes(calendarIcs.ICSContent), "text/calendar", $"{calendarIcs.CalendarName}.ics");
     }
   }

@@ -11,6 +11,6 @@ namespace WebCalendar.Business.Domains.Interfaces
     int AddCalendar(CalendarViewModel calendar, int userId);
     bool DeleteCalendar(int id, int userId);
     bool EditCalendar(CalendarViewModel calendarView, int userId);
-    CalendarICSDTO CreateICS(int calendarId, int userId);
+    CalendarICSDTO CreateICS(int calendarId, int userId, CalendarExportRangeViewModel range);
   }
 }

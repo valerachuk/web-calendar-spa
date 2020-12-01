@@ -81,7 +81,7 @@ namespace WebCalendar.Business.Domains
       return _caRepository.EditCalendar(_mapper.Map<CalendarViewModel, Calendar>(calendarView));
     }
 
-    public CalendarICSDTO CreateICS(int calendarId, int userId)
+    public CalendarICSDTO CreateICS(int calendarId, int userId, CalendarExportRangeViewModel range)
     {
       var calendar = _caRepository.GetCalendarWithEvents(calendarId);
 
@@ -89,7 +89,27 @@ namespace WebCalendar.Business.Domains
         throw new ForbiddenException("Not calendar owner");
 
       var icsCalendar = new Ical.Net.Calendar();
-      icsCalendar.Events.AddRange(calendar.Events.Select(evt =>
+      icsCalendar.Events.AddRange(calendar
+        .Events
+        .Where(evt =>
+        {
+          if (range.From != null)
+          {
+            return evt.EndDateTime.Date >= range.From.Value.Date;
+          }
+
+          return true;
+        })
+        .Where(evt =>
+        {
+          if (range.To != null)
+          {
+            return evt.StartDateTime.Date <= range.To.Value.Date;
+          }
+
+          return true;
+        })
+        .Select(evt =>
       {
         var icsEvent = new CalendarEvent
         {
