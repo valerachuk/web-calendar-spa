@@ -2,7 +2,7 @@
 
 App for scheduling appointments, events and to do with the ability to create recurring events, set reminders and tasks, and invite others participants with email notification.
 
-Check it now on webcalendar.tk
+Check it now on [webcalendar.tk](webcalendar.tk)
 
 This project was created by
 [andrewpetrenko1](https://github.com/andrewpetrenko1), [RyzhkovaAnastasia](https://github.com/RyzhkovaAnastasia) and [valerachuk](https://github.com/valerachuk) under the guidance of [ilyaskav](https://github.com/ilyaskav) on [Apriorit](https://www.apriorit.com/)'s «Advanced .NET Web Development» course.
